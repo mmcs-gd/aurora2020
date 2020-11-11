@@ -80,7 +80,7 @@ let StartingScene = new Phaser.Class({
 
         this.slimes =  this.physics.add.group();
         let params = {};
-        for(let i = 0; i < 100; i++) {
+        for(let i = 0; i < 30; i++) {
             const x = Phaser.Math.RND.between(50, this.physics.world.bounds.width - 50 );
             const y = Phaser.Math.RND.between(50, this.physics.world.bounds.height -50 );
             params.slimeType = Phaser.Math.RND.between(0, 4);
