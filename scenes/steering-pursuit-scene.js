@@ -11,9 +11,9 @@ import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 
-import Evade from "../src/ai/steerings/evade"
+import Pursuit from "../src/ai/steerings/pursuit"
 
-let SteeringEvadeScene = new Phaser.Class({
+let SteeringPursuitScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
@@ -82,7 +82,7 @@ let SteeringEvadeScene = new Phaser.Class({
         this.gameObjects.push(this.player);
         this.physics.add.collider(this.player, worldLayer);
 
-        this.evader = this.characterFactory.buildCharacter('green', 300, 150, {Steering: new Evade(this, this.player)});
+        this.evader = this.characterFactory.buildCharacter('green', 300, 150, {Steering: new Pursuit(this, this.player)});
         this.gameObjects.push(this.evader);
         this.physics.add.collider(this.evader, worldLayer);
         this.physics.add.collider(this.evader, this.player);
@@ -113,4 +113,4 @@ let SteeringEvadeScene = new Phaser.Class({
     }
 });
 
-export default SteeringEvadeScene
+export default SteeringPursuitScene
