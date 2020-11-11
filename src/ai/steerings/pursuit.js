@@ -25,7 +25,7 @@ export default class Pursuit extends Steering {
         const targetDirection = target.body.velocity;
         const toTarget = new Vector2(this.owner.evader.x - target.x, this.owner.evader.y - target.y);
         const relativeHeading = searcherDirection.dot(targetDirection);
-        console.log(target.x, this.owner.evader.x,target.y, this.owner.evader.y)
+        //console.log(target.x, this.owner.evader.x,target.y, this.owner.evader.y)
         
         if (Math.abs(target.x - this.owner.evader.x) < 40 && Math.abs(target.y - this.owner.evader.y) < 40)
             return  new Vector2(0, 0);
