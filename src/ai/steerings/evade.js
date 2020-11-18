@@ -10,12 +10,12 @@ export default class Evade extends Steering {
     }
 
     static calculateFlee (owner, target, maxSpeed, panicDistSq) {
-        //console.log(owner.x,target.x, owner.y,target.y)
-        //console.log(new Vector2(owner.x-target.x, owner.y-target.y).lengthSq())
         if(new Vector2(owner.x-target.x, owner.y-target.y).lengthSq() > panicDistSq)
             return new Vector2(0, 0);
         const desiredVelocity = new Vector2(owner.x - target.x, owner.y-target.y).normalize().scale(maxSpeed);
         const prevVelocity = new Vector2(owner.body.x-owner.body.prev.x, owner.body.y-owner.body.prev.y);
+        //console.log(prevVelocity, desiredVelocity, target)
+        //console.log(desiredVelocity.subtract(prevVelocity))
         return desiredVelocity.subtract(prevVelocity);
     }
 
@@ -23,14 +23,20 @@ export default class Evade extends Steering {
 
         const pursuer = this.objects[0];
         const owner = this.owner.evader;
+        // console.log("owner")
+        // console.log(owner.x, owner.y)
+        // console.log("pursuer")
+        // console.log(pursuer.x, pursuer.y)
 
         const toPursuer = new Vector2(pursuer.x - owner.x, pursuer.y-owner.y);
+        //console.log(toPursuer)
         const prevPursuerVelocity = new Vector2(pursuer.body.x-pursuer.body.prev.x, 
             pursuer.body.y-pursuer.body.prev.y); 
         const lookAheadTime = toPursuer.length() / 
                         (this.ownerMaxSpeed + prevPursuerVelocity.length());                                    
         const targetPos = new Vector2(pursuer.x, pursuer.y).add((pursuer.body.velocity.clone()).scale(lookAheadTime));
-
+        
+        
         return Evade.calculateFlee(owner, targetPos, this.ownerMaxSpeed, this.panicDistSq);
     }
 }

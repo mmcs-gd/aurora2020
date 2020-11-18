@@ -48,6 +48,7 @@ let SteeringEvadeAndPursuitScene = new Phaser.Class({
         // Phaser's cache (i.e. the name you used in preload)
         const tileset = map.addTilesetImage("Dungeon_Tileset", "tiles");
 
+
         // Parameters: layer name (or index) from Tiled, tileset, x, y
         const belowLayer = map.createStaticLayer("Floor", tileset, 0, 0);
         const worldLayer = map.createStaticLayer("Walls", tileset, 0, 0);
@@ -76,19 +77,28 @@ let SteeringEvadeAndPursuitScene = new Phaser.Class({
         this.characterFactory = new CharacterFactory(this);
 
         
-        //Creating characters
-        // this.player = this.characterFactory.buildCharacter('aurora', 100, 120, {player: true});
-        // this.player.setVelocityX(50);
-        // this.gameObjects.push(this.player);
-        // this.physics.add.collider(this.player, worldLayer);
+        // Creating characters
+
+        this.evader = this.characterFactory.buildCharacter('green', 300, 150, {Steering: 1});
+        this.player = this.characterFactory.buildCharacter('aurora', 100, 120, {Steering: 1});
+        
+        
+        this.evader.Steering = new Evade(this, this.player);
+        this.player.Steering = new Pursuit(this, this.evader);
 
         
-        // this.evader = this.characterFactory.buildCharacter('green', 300, 150, {Steering: new Pursuit(this, this.player)});
-        // this.gameObjects.push(this.evader);
-        // this.physics.add.collider(this.evader, worldLayer);
-        // this.physics.add.collider(this.evader, this.player);
+        
 
+        this.gameObjects.push(this.evader);
+        this.gameObjects.push(this.player);
+        
 
+        this.physics.add.collider(this.player, worldLayer);
+        this.physics.add.collider(this.evader, worldLayer);
+        this.physics.add.collider(this.evader, this.player);
+
+        
+        
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
             this.physics.world.createDebugGraphic();

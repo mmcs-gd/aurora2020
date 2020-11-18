@@ -45,10 +45,12 @@ export default class CharacterFactory {
                 if (params.player)
                     return this.buildPlayerCharacter(spriteSheetName, x, y);
                 else
-                    if (params.Steering)
+                {
+                   if (params.Steering)
                         return this.buildNPCCharacter(spriteSheetName, x, y, params);
                     else
                         return this.buildCyberpunkCharacter(spriteSheetName, x, y, params);
+                }
             case "slime":
                 return this.buildSlime(x, y, params);
         }

@@ -18,7 +18,9 @@ export default class Pursuit extends Steering {
     }
 
     calculateImpulse () {
-        //console.log(this)
+        
+        console.log(this)
+        ev = 5;
         const searcherDirection = this.owner.evader.body.velocity;
         const target = this.objects[0];
         const targetPos = new Vector2(target.x, target.y);

@@ -19,7 +19,7 @@ const config = {
   //scene: StartingScene,
   //scene: SteeringEvadeScene,
   //scene: SteeringPursuitScene,
-  SteeringEvadeAndPursuitScene,
+  scene: SteeringEvadeAndPursuitScene,
   physics: {
     default: "arcade",
     arcade: {
