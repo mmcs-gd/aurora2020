@@ -38,7 +38,6 @@ export default class CharacterFactory {
     buildCharacter(spriteSheetName, x, y, params = {}) {
         switch (spriteSheetName) {
             case 'green':
-                return this.buildNPCCharacter(spriteSheetName, x, y, params);
             case 'punk':
             case 'aurora':
             case 'blue':
@@ -46,7 +45,10 @@ export default class CharacterFactory {
                 if (params.player)
                     return this.buildPlayerCharacter(spriteSheetName, x, y);
                 else
-                    return this.buildCyberpunkCharacter(spriteSheetName, x, y, params);
+                    if (params.Steering)
+                        return this.buildNPCCharacter(spriteSheetName, x, y, params);
+                    else
+                        return this.buildCyberpunkCharacter(spriteSheetName, x, y, params);
             case "slime":
                 return this.buildSlime(x, y, params);
         }
@@ -57,7 +59,7 @@ export default class CharacterFactory {
         // character.maxSpeed = 100;
         // character.setCollideWorldBounds(true);
         // character.cursors = this.scene.input.keyboard.createCursorKeys();
-        character.animationSets = this.animationLibrary.get('green');
+        character.animationSets = this.animationLibrary.get(spriteSheetName);
         return character;
 
     }

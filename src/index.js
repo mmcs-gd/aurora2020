@@ -3,8 +3,10 @@ import Phaser from 'phaser'
 import StartingScene from '../scenes/starting-scene';
 import SteeringEvadeScene from '../scenes/steering-evade-scene';
 import SteeringPursuitScene from '../scenes/steering-pursuit-scene';
-import CharacterMixin from '../src/characters/character.js';
+import SteeringEvadeAndPursuitScene from '../scenes/steering-evade-and-pursuit-scene';
 
+
+import CharacterMixin from '../src/characters/character.js';
 //https://github.com/mikewesthad/phaser-3-tilemap-blog-posts/blob/master/examples/post-1/05-physics/index.js
 Object.assign(Phaser.Physics.Arcade.Sprite.prototype, CharacterMixin);
 
@@ -16,7 +18,8 @@ const config = {
   zoom: 1.2,
   //scene: StartingScene,
   //scene: SteeringEvadeScene,
-  scene: SteeringPursuitScene,
+  //scene: SteeringPursuitScene,
+  SteeringEvadeAndPursuitScene,
   physics: {
     default: "arcade",
     arcade: {
