@@ -22,7 +22,7 @@ export default class Evade extends Steering {
     calculateImpulse () {
 
         const pursuer = this.objects[0];
-        const owner = this.owner.evader;
+        const owner = this.objects[0].Steering.objects[0];
         // console.log("owner")
         // console.log(owner.x, owner.y)
         // console.log("pursuer")

@@ -19,21 +19,23 @@ export default class Pursuit extends Steering {
 
     calculateImpulse () {
         
-        console.log(this)
-        ev = 5;
-        const searcherDirection = this.owner.evader.body.velocity;
+        // console.log(this.objects[0])
+        // console.log(this.objects[0].Steering.objects[0])
+        // ev = 5;
+        const pursuitMen = this.objects[0].Steering.objects[0];
+        const searcherDirection = pursuitMen.body.velocity;
         const target = this.objects[0];
         const targetPos = new Vector2(target.x, target.y);
         const targetDirection = target.body.velocity;
-        const toTarget = new Vector2(this.owner.evader.x - target.x, this.owner.evader.y - target.y);
+        const toTarget = new Vector2(pursuitMen.x - target.x, pursuitMen.y - target.y);
         const relativeHeading = searcherDirection.dot(targetDirection);
-        //console.log(target.x, this.owner.evader.x,target.y, this.owner.evader.y)
+        //console.log(target.x, pursuitMen.x,target.y, pursuitMen.y)
         
-        if (Math.abs(target.x - this.owner.evader.x) < 40 && Math.abs(target.y - this.owner.evader.y) < 40)
+        if (Math.abs(target.x - pursuitMen.x) < 40 && Math.abs(target.y - pursuitMen.y) < 40)
             return  new Vector2(0, 0);
 
         if (toTarget.dot(targetDirection) < 0 || relativeHeading > -0.95)
-            return Pursuit.seek(this.owner.evader, targetPos, this.ownerSpeed);
+            return Pursuit.seek(pursuitMen, targetPos, this.ownerSpeed);
 
         
             
@@ -41,7 +43,7 @@ export default class Pursuit extends Steering {
         
         const lookAheadTime = toTarget.length / (this.ownerSpeed + this.targetSpeed)
         
-        return Pursuit.seek(this.owner.evader, 
+        return Pursuit.seek(pursuitMen, 
             targetPos.add(target.body.velocity.clone().scale(lookAheadTime)), 
             this.ownerSpeed);
     }
