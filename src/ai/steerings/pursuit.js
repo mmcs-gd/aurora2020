@@ -1,5 +1,6 @@
 import Steering from "./steering.js";
 import Vector2 from 'phaser/src/math/Vector2'
+import Npc from "../../characters/npc.js";
 
 export default class Pursuit extends Steering {
 
@@ -22,9 +23,14 @@ export default class Pursuit extends Steering {
         // console.log(this.objects[0])
         // console.log(this.objects[0].Steering.objects[0])
         // ev = 5;
-        const pursuitMen = this.objects[0].Steering.objects[0];
-        const searcherDirection = pursuitMen.body.velocity;
         const target = this.objects[0];
+        let pursuitMen;
+        if (target instanceof Npc)
+            pursuitMen = this.objects[0].Steering.objects[0];
+        else    
+            pursuitMen = this.owner.evader;
+
+        const searcherDirection = pursuitMen.body.velocity;        
         const targetPos = new Vector2(target.x, target.y);
         const targetDirection = target.body.velocity;
         const toTarget = new Vector2(pursuitMen.x - target.x, pursuitMen.y - target.y);

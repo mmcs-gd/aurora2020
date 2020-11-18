@@ -20,7 +20,7 @@ let SteeringPursuitScene = new Phaser.Class({
     initialize:
 
         function StartingScene() {
-            Phaser.Scene.call(this, {key: 'SteeringEvadeScene'});
+            Phaser.Scene.call(this, {key: 'SteeringPursuitScene'});
         },
         characterFrameConfig: {frameWidth: 31, frameHeight: 31},
         slimeFrameConfig: {frameWidth: 32, frameHeight: 32},

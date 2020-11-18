@@ -1,5 +1,6 @@
 import Steering from "./steering.js";
 import Vector2 from 'phaser/src/math/Vector2'
+import Npc from "../../characters/npc.js";
 
 export default class Evade extends Steering {
 
@@ -20,9 +21,13 @@ export default class Evade extends Steering {
     }
 
     calculateImpulse () {
-
+        //console.log(this)
         const pursuer = this.objects[0];
-        const owner = this.objects[0].Steering.objects[0];
+        let owner;
+        if (pursuer instanceof Npc)
+            owner = this.objects[0].Steering.objects[0];
+        else    
+            owner = this.owner.evader;
         // console.log("owner")
         // console.log(owner.x, owner.y)
         // console.log("pursuer")

@@ -75,6 +75,7 @@ let SteeringEvadeScene = new Phaser.Class({
         this.physics.world.bounds.height = map.heightInPixels;
         this.characterFactory = new CharacterFactory(this);
 
+        
 
         // Creating characters
         this.player = this.characterFactory.buildCharacter('aurora', 100, 120, {player: true});
@@ -86,8 +87,6 @@ let SteeringEvadeScene = new Phaser.Class({
         this.gameObjects.push(this.evader);
         this.physics.add.collider(this.evader, worldLayer);
         this.physics.add.collider(this.evader, this.player);
-
-
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
             this.physics.world.createDebugGraphic();
