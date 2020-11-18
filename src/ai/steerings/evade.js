@@ -3,7 +3,7 @@ import Vector2 from 'phaser/src/math/Vector2'
 
 export default class Evade extends Steering {
 
-    constructor(owner, pursuer, force = 1, ownerMaxSpeed=100, panicDistSquare = 10e4) {
+    constructor(owner, pursuer, force = 1, ownerMaxSpeed=100, panicDistSquare = 10e3) {
         super(owner, [pursuer], force);
         this.panicDistSq = panicDistSquare;
         this.ownerMaxSpeed = ownerMaxSpeed;
