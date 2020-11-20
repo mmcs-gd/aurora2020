@@ -78,28 +78,11 @@ let SteeringSeekScene = new Phaser.Class({
         this.player = this.characterFactory.buildCharacter('aurora', 100, 100, {player: true});
         this.gameObjects.push(this.player);
         this.physics.add.collider(this.player, worldLayer);
-
-        const x = Phaser.Math.RND.between(50, this.physics.world.bounds.width - 50 );
-        const y = Phaser.Math.RND.between(50, this.physics.world.bounds.height -50 );
-        let params = {};
-        params.slimeType = Phaser.Math.RND.between(0, 4);
-        params.Steering = new Seek(this, this.player);
-        const slime = this.characterFactory.buildSlime(x, y, params);
-        this.physics.add.collider(slime, worldLayer);
-        this.gameObjects.push(slime);
-
-        //this.slimes =  this.physics.add.group();
-        //let params = {};
-        //for(let i = 0; i < 100; i++) {
-        //    const x = Phaser.Math.RND.between(50, this.physics.world.bounds.width - 50 );
-        //    const y = Phaser.Math.RND.between(50, this.physics.world.bounds.height -50 );
-        //    params.slimeType = Phaser.Math.RND.between(0, 4);
-        //    const slime = this.characterFactory.buildSlime(x, y, params);
-        //    this.slimes.add(slime);
-        //    this.physics.add.collider(slime, worldLayer);
-        //    this.gameObjects.push(slime);
-        //}
-        //this.physics.add.collider(this.player, this.slimes);
+        
+        this.seeker = this.characterFactory.buildCharacter('yellow',400,200,{steering : new Seek(this,[this.player])});
+        this.gameObjects.push(this.seeker);
+        this.physics.add.collider(this.seeker, worldLayer);
+        this.physics.add.collider(this.seeker, this.player);
 
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox

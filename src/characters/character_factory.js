@@ -1,10 +1,10 @@
 import {StateTableRow, StateTable} from '../ai/behaviour/state';
 import Slime from "./slime";
 import Player from "./player";
+import NPC from "./npc";
 import cyberpunkConfigJson from "../../assets/animations/cyberpunk.json";
 import slimeConfigJson from "../../assets/animations/slime.json";
 import AnimationLoader from "../utils/animation-loader";
-
 
 export default class CharacterFactory {
 
@@ -36,18 +36,33 @@ export default class CharacterFactory {
 
     buildCharacter(spriteSheetName, x, y, params = {}) {
         switch (spriteSheetName) {
+            case 'green':
+            case 'punk':
             case 'aurora':
             case 'blue':
-            case 'punk':
             case 'yellow':
-            case 'green':
                 if (params.player)
                     return this.buildPlayerCharacter(spriteSheetName, x, y);
                 else
-                    return this.buildCyberpunkCharacter(spriteSheetName, x, y, params);
+                {
+                   if (params.steering)
+                        return this.buildNPCCharacter(spriteSheetName, x, y, params);
+                    else
+                        return this.buildCyberpunkCharacter(spriteSheetName, x, y, params);
+                }
             case "slime":
                 return this.buildSlime(x, y, params);
         }
+    }
+
+    buildNPCCharacter(spriteSheetName, x, y, params) {
+        let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.steering);
+        // character.maxSpeed = 100;
+        // character.setCollideWorldBounds(true);
+        // character.cursors = this.scene.input.keyboard.createCursorKeys();
+        character.animationSets = this.animationLibrary.get(spriteSheetName);
+        return character;
+
     }
 
     buildPlayerCharacter(spriteSheetName, x, y) {
