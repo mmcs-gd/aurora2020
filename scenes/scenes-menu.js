@@ -2,9 +2,11 @@ import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 import menuBackgroundJson from '../assets/menu_background.json'
 
 import StartingScene from "./starting-scene";
+import explorationAndShadowingScene from "./explorationAndShadowing-scene";
 
 const scenes = [
-    ['StartingScene', StartingScene]
+    ['StartingScene', StartingScene],
+    ['explorationAndShadowingScene', explorationAndShadowingScene]
 ];
 
 let MenuScene = new Phaser.Class({
