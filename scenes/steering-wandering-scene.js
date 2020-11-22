@@ -10,15 +10,16 @@ import greenSpriteSheet from '../assets/sprites/characters/green.png'
 import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
+import Wandering from "../src/ai/steerings/wandering";
 
-let StartingScene = new Phaser.Class({
+let SteeringWanderingScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
     initialize:
 
         function StartingScene() {
-            Phaser.Scene.call(this, {key: 'StartingScene'});
+            Phaser.Scene.call(this, {key: 'SteeringWanderingScene'});
         },
     characterFrameConfig: {frameWidth: 31, frameHeight: 31},
     slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
@@ -78,19 +79,19 @@ let StartingScene = new Phaser.Class({
         this.gameObjects.push(this.player);
         this.physics.add.collider(this.player, worldLayer);
 
-        this.slimes =  this.physics.add.group();
         let params = {};
-        for(let i = 0; i < 10; i++) {
+        params.steering = true;
+				
+				for(let i = 0; i < 10; i++) {
             const x = Phaser.Math.RND.between(50, this.physics.world.bounds.width - 50 );
             const y = Phaser.Math.RND.between(50, this.physics.world.bounds.height -50 );
             params.slimeType = Phaser.Math.RND.between(0, 4);
-            const slime = this.characterFactory.buildSlime(x, y, params);
-            this.slimes.add(slime);
-            this.physics.add.collider(slime, worldLayer);
-            this.gameObjects.push(slime);
+            const wanderer = this.characterFactory.buildSlime(x, y, params);
+						console.log(wanderer);
+						this.gameObjects.push(wanderer);
+            this.physics.add.collider(wanderer, worldLayer);
         }
-        this.physics.add.collider(this.player, this.slimes);
-
+				
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
             this.physics.world.createDebugGraphic();
@@ -113,7 +114,7 @@ let StartingScene = new Phaser.Class({
     tilesToPixels(tileX, tileY)
     {
         return [tileX*this.tileSize, tileY*this.tileSize];
-    }
+    },
 });
 
-export default StartingScene
+export default SteeringWanderingScene

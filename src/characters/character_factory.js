@@ -4,12 +4,9 @@ import Player from "./player";
 import cyberpunkConfigJson from "../../assets/animations/cyberpunk.json";
 import slimeConfigJson from "../../assets/animations/slime.json";
 import AnimationLoader from "../utils/animation-loader";
-
+import WandererSlime from "./wanderer_slime";
 
 export default class CharacterFactory {
-
-
-
     constructor(scene) {
         this.scene = scene;
 
@@ -41,15 +38,22 @@ export default class CharacterFactory {
             case 'punk':
             case 'yellow':
             case 'green':
-                if (params.player)
-                    return this.buildPlayerCharacter(spriteSheetName, x, y);
-                else
-                    return this.buildCyberpunkCharacter(spriteSheetName, x, y, params);
+              if (params.player)
+                return this.buildPlayerCharacter(spriteSheetName, x, y);
+              else{
+                return this.buildCyberpunkCharacter(spriteSheetName, x, y, params);
+              }
             case "slime":
-                return this.buildSlime(x, y, params);
+              return this.buildSlime(x, y, params);
         }
     }
-
+		
+		buildNPCCharacter(spriteSheetName, x, y, params) {
+        let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.steering);
+        character.animationSets = this.animationLibrary.get(spriteSheetName);
+        return character;
+    }
+		
     buildPlayerCharacter(spriteSheetName, x, y) {
         let character = new Player(this.scene, x, y, spriteSheetName, 2);
         character.maxSpeed = 100;
@@ -80,7 +84,13 @@ export default class CharacterFactory {
 
     buildSlime(x, y, params) {
         const slimeType = params.slimeType || 1;
-        let slime = new Slime(this.scene, x, y, this.slimeSpriteSheet, 9 * slimeType);
+				let slime; 
+				if(params.steering){
+					slime = new WandererSlime(this.scene, x, y, this.slimeSpriteSheet, 9 * slimeType);
+				}
+				else{
+					slime = new Slime(this.scene, x, y, this.slimeSpriteSheet, 9 * slimeType);
+				}
         slime.animations = this.animationLibrary.get(this.slimeSpriteSheet).get(this.slimeNumberToName(slimeType));
         slime.setCollideWorldBounds(true);
         slime.speed = 40;
