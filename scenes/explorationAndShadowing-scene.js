@@ -72,7 +72,7 @@ let explorationAndShadowingScene = new Phaser.Class({
         );
 
         const shadowing = this.characterFactory.buildNpcCharacter(
-            "punk","punk",500,100,{Steering: new Shadowing(this,shadowing)}
+            "punk","punk",500,100,{Steering: new Shadowing(this,walker)}
         );
         this.gameObject.push(walker);
         this.gameObject.push(shadowing);
