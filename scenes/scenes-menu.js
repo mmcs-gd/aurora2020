@@ -1,10 +1,10 @@
 import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 import menuBackgroundJson from '../assets/menu_background.json'
 
-import StartingScene from "./starting-scene";
+import MinerScene from "./miner-scene";
 
 const scenes = [
-    ['StartingScene', StartingScene]
+    ['MinerScene', MinerScene]
 ];
 
 let MenuScene = new Phaser.Class({

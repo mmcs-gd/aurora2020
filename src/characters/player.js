@@ -1,15 +1,38 @@
+import Mine from "./mine";
+
 export default class Player extends Phaser.Physics.Arcade.Sprite{
     constructor(scene, x, y, name, frame) {
         super(scene, x, y, name, frame);
         scene.physics.world.enable(this);
         scene.add.existing(this);
+        this.lastMineTime = 0;
     }
+
+    hitMine(player, bomb) {
+        console.log("BOOM", player, bomb)
+    }
+
+    // createMine() {
+    //     const mine = new Mine(this.scene, this.body.x, this.body.y, "mine", 0);
+    //     mine.animations = this.animationLibrary.get("mine");
+    //     console.log("anim",mine.animations);
+    //     debugger;
+    // }
 
     update() {
         const body = this.body;
         this.body.setVelocity(0);
         const speed = this.maxSpeed;
         const cursors = this.cursors;
+        // console.log(cursors)
+        if (cursors.space.isDown && this.scene.time.now - this.lastMineTime > 1000) {
+            console.log("Mine thrown", this.scene)
+            this.lastMineTime = this.scene.time.now;
+            this.scene.characterFactory.buildMine(this.body.x, this.body.y);
+            // this.scene.physics.add.destroy();
+            // this.scene.physics.add.collider(mine, this, this.hitMine, null, this)
+            // this.scene.add.existing(mine);
+        }
 
         if (cursors.left.isDown) {
             body.velocity.x -= speed;

@@ -1,32 +1,58 @@
 import Vector2 from 'phaser/src/math/Vector2'
 const eps = 20;
-export default class Slime extends Phaser.Physics.Arcade.Sprite{
+export default class Slime extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, name, frame) {
         super(scene, x, y, name, frame);
         scene.physics.world.enable(this);
         scene.add.existing(this);
     }
+
+    findPointAway(mineX, mineY) {
+        let vx = 50;
+        let vy = 50;
+        if (mineX > this.body.x) {
+            vx *= -1;
+        }
+        if (mineY > this.body.y) {
+            vy *= -1;
+        }
+        let x = this.body.x + vx;
+        let y = this.body.y + vy;
+        x = x < 0 
+            ? 0 
+            : x > this.scene.physics.world.bounds.width - 1
+                ? this.scene.physics.world.bounds.width - 1 
+                : x;
+
+        y = y < 0 
+        ? 0 
+        : y > this.scene.physics.world.bounds.height - 1
+            ? this.scene.physics.world.bounds.height - 1 
+            : y;
+    
+        return { x, y };
+    }
+
     update() {
-        if (this.hasArrived())
-        {
-            console.log("Slime thinks: 'Where should I go?...'");
-            this.pointOfInterest = new Vector2( Phaser.Math.RND.between(0, this.scene.physics.world.bounds.width - 1),
+        if (this.hasArrived()) {
+            // console.log("scene",this.scene)
+            // console.log("Slime thinks: 'Where should I go?...'");
+            this.pointOfInterest = new Vector2(Phaser.Math.RND.between(0, this.scene.physics.world.bounds.width - 1),
                 Phaser.Math.RND.between(50, this.scene.physics.world.bounds.height - 50));
-            const neededTileX = Math.floor(this.pointOfInterest.x / 32) ;
-            const neededTileY = Math.floor(this.pointOfInterest.y / 32) ;
-            const currentPositionX =  Math.floor(this.body.x / 32);
-            const currentPositionY =  Math.floor(this.body.y / 32);
+            const neededTileX = Math.floor(this.pointOfInterest.x / 32);
+            const neededTileY = Math.floor(this.pointOfInterest.y / 32);
+            const currentPositionX = Math.floor(this.body.x / 32);
+            const currentPositionY = Math.floor(this.body.y / 32);
             const me = this;
-            if (!this.wantToJump)
-            {
-                this.scene.finder.findPath(currentPositionX, currentPositionY, neededTileX, neededTileY, function( path ) {
+            if (!this.wantToJump) {
+                this.scene.finder.findPath(currentPositionX, currentPositionY, neededTileX, neededTileY, function (path) {
                     if (path === null) {
-                        console.warn("Slime says: Path was not found, gonna jump!");
+                        // console.warn("Slime says: Path was not found, gonna jump!");
                         me.path = [];
                         me.wantToJump = true;
                     } else {
                         me.path = path;
-                        console.log("Slime says: Path was found, need to go...");
+                        // console.log("Slime says: Path was found, need to go...");
                         me.selectNextLocation();
                     }
                 });
@@ -34,8 +60,7 @@ export default class Slime extends Phaser.Physics.Arcade.Sprite{
             }
 
         }
-        if (this.nextLocation)
-        {
+        if (this.nextLocation) {
             const body = this.body;
             const position = body.position;
 
@@ -58,28 +83,25 @@ export default class Slime extends Phaser.Physics.Arcade.Sprite{
 
         this.updateAnimation();
     }
+
     updateAnimation() {
         const animsController = this.anims;
-        if (this.wantToJump)
-        {
+        // console.log(this.animations)
+        if (this.wantToJump) {
             animsController.play(this.animations[1], true);
-        } else
-        {
+        } else {
             animsController.play(this.animations[0], true);
         }
 
     }
-    hasArrived()
-    {
+    hasArrived() {
         return this.pointOfInterest === undefined || this.pointOfInterest.distance(this.body.position) < eps;
     }
     selectNextLocation() {
         const nextTile = this.path.shift();
-        if (nextTile)
-        {
+        if (nextTile) {
             this.nextLocation = new Vector2(nextTile.x * 32, nextTile.y * 32);
-        } else
-        {
+        } else {
             this.nextLocation = this.body.position;
         }
     }

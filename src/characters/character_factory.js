@@ -3,8 +3,10 @@ import Slime from "./slime";
 import Player from "./player";
 import cyberpunkConfigJson from "../../assets/animations/cyberpunk.json";
 import slimeConfigJson from "../../assets/animations/slime.json";
+import mineConfigJson from '../../assets/animations/mine.json';
 import AnimationLoader from "../utils/animation-loader";
-
+import Mine from "./mine";
+import SmartSlime from './minerScene/smartSlime';
 
 export default class CharacterFactory {
 
@@ -15,6 +17,7 @@ export default class CharacterFactory {
 
         this.cyberSpritesheets =  ['aurora', 'blue', 'yellow', 'green', 'punk'];
         this.slimeSpriteSheet = 'slime';
+        this.mineSpriteSheet = 'mine';
 
         const slimeStateTable = new StateTable(this);
         slimeStateTable.addState(new StateTableRow('searching', this.foundTarget, 'jumping'));
@@ -29,6 +32,7 @@ export default class CharacterFactory {
                     element).createAnimations());
             }
         );
+        animationLibrary.set(this.mineSpriteSheet, new AnimationLoader(scene, this.mineSpriteSheet, mineConfigJson, this.mineSpriteSheet).createAnimations());
         animationLibrary.set(this.slimeSpriteSheet,
                 new AnimationLoader(scene, this.slimeSpriteSheet, slimeConfigJson, this.slimeSpriteSheet).createAnimations());
         this.animationLibrary = animationLibrary;
@@ -47,6 +51,8 @@ export default class CharacterFactory {
                     return this.buildCyberpunkCharacter(spriteSheetName, x, y, params);
             case "slime":
                 return this.buildSlime(x, y, params);
+            case "mine":
+                return this.buildMine(x, y, params);
         }
     }
 
@@ -55,7 +61,7 @@ export default class CharacterFactory {
         character.maxSpeed = 100;
         character.setCollideWorldBounds(true);
         character.cursors = this.scene.input.keyboard.createCursorKeys();
-        character.animationSets = this.animationLibrary.get('aurora');
+        character.animationSets = this.animationLibrary.get('punk');
         //todo: not here
       character.footstepsMusic = this.scene.sound.add('footsteps', {
           mute: false,
@@ -80,12 +86,18 @@ export default class CharacterFactory {
 
     buildSlime(x, y, params) {
         const slimeType = params.slimeType || 1;
-        let slime = new Slime(this.scene, x, y, this.slimeSpriteSheet, 9 * slimeType);
+        let slime;
+        if (params.useSteering) {
+            slime = new SmartSlime(this.scene, x, y, this.slimeSpriteSheet, 9*slimeType);
+        } else {
+            slime = new Slime(this.scene, x, y, this.slimeSpriteSheet, 9 * slimeType);
+        }
         slime.animations = this.animationLibrary.get(this.slimeSpriteSheet).get(this.slimeNumberToName(slimeType));
         slime.setCollideWorldBounds(true);
         slime.speed = 40;
         return slime;
     }
+
     slimeNumberToName(n)
     {
         switch (n) {
@@ -95,5 +107,11 @@ export default class CharacterFactory {
             case 3: return 'Pink';
             case 4: return 'Violet';
         }
+    }
+    
+    buildMine(x, y, params) {
+        let mine = new Mine(this.scene, x, y, this.mineSpriteSheet, 0);
+        mine.animations = this.animationLibrary.get(this.mineSpriteSheet).get("Mine");
+        console.log("anim",mine);
     }
 }
