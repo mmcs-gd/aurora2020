@@ -3,8 +3,13 @@ import menuBackgroundJson from '../assets/menu_background.json'
 
 import StartingScene from "./starting-scene";
 
+import SteeringFleeScene from './steering-flee-scene';
+import SteeringExploringScene from './steering-exploring-scene';
+
 const scenes = [
-    ['StartingScene', StartingScene]
+    ['StartingScene', StartingScene],
+    ['SteeringFleeScene', SteeringFleeScene],
+    ['SteeringExploringScene', SteeringExploringScene]
 ];
 
 let MenuScene = new Phaser.Class({
@@ -158,4 +163,5 @@ class Hint extends Phaser.Scene {
     }
 }
 
-export default MenuScene
+export default MenuScene 
+
