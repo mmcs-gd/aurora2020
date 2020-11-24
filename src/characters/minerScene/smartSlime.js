@@ -9,55 +9,45 @@ export default class SmartSlime extends Slime {
         scene.add.existing(this);
         const mines = this.scene.mines.children.entries;
         this.dies = false;
+        this.dead = false;
         this.steeringRanaway = new Ranaway(this, mines);
 
     }
 
-
-
-    nearestMine() {
-        const mines = this.scene.mines.children.entries;
-        if (mines.length === 0) {
-            return null;
-        }
-        const nearest = Ranaway.findNearestMine(this.body, mines);
-        if (!Ranaway.isNear(this.body, nearest)) {
-            return null;
-        }
-        return nearest;
-    }
-
     update() {
-        let velocity = new Vector2(0, 0);
-        const mine = this.nearestMine();
-        if (mine) {
-            if (mine.beeps) {
-                velocity = this.steeringRanaway.calculateImpulse();
-                if (velocity.x !== 0 || velocity.y !== 0) {
-                    this.body.setVelocityX(velocity.x);
-                    this.body.setVelocityY(velocity.y);
-                }
-            } else if (mine.explodes) {
-                console.warn("There's a MINE!!!")
-                this.dies = true;
-            }
-        }
-        if (!this.dies && (!mine || (velocity.x === 0 && velocity.y === 0))) {
-
-            super.update();
-        }
-        this.updateAnimation();
-    }
-
-    updateAnimation() {
-        const animsController = this.anims;
         if (this.dies) {
-            animsController.play(this.animations[2], true);
-            // this.destroy();
-        } else if (this.wantToJump) {
-            animsController.play(this.animations[1], true);
+            console.log("die")
+            this.destroy();
         } else {
-            animsController.play(this.animations[0], true);
+            const { mines, velocity } = this.steeringRanaway.calculateImpulse();
+            
+            if (mines) {
+                if (mines.some(m => m.explodes && Ranaway.isNear(this, m))) {
+                    // console.log("boom")
+                    this.dies = true;
+                }
+                else {
+                    if (velocity) {
+                        // console.log("run from mine, vel: ", velocity)
+                        this.body.setVelocityX(velocity.x);
+                        this.body.setVelocityY(velocity.y);
+                    }
+                }
+            }
+            if (!this.dies && !mines) {
+                // console.log("just go somewhere")
+                super.update();
+            }
+            this.updateAnimation();
         }
     }
+
+    // updateAnimation() {
+    //     const animsController = this.anims;
+    //     if (this.wantToJump) {
+    //         animsController.play(this.animations[1], true);
+    //     } else {
+    //         animsController.play(this.animations[0], true);
+    //     }
+    // }
 }

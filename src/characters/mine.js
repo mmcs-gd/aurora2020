@@ -5,7 +5,7 @@ export default class Mine extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         scene.mines.add(this);
         this.lifeTime = 5000;
-        this.dangerZone = 100;
+        this.dangerZone = 60;
         this.createdAt = scene.time.now;
         // this.beep = false; 
         // console.log("mine", this)
@@ -19,7 +19,8 @@ export default class Mine extends Phaser.Physics.Arcade.Sprite {
     }
 
     get explodes() {
-        return this.scene.time.now - this.createdAt < this.lifeTime + 2500;
+        let time = this.scene.time.now - this.createdAt;
+        return time > this.lifeTime && time < this.lifeTime + 2500;
     }
 
     update() {     
@@ -35,12 +36,12 @@ export default class Mine extends Phaser.Physics.Arcade.Sprite {
 
     updateAnimation() {
         const animsController = this.anims;
-        console.log("mine", this.animations)
+        // console.log("mine", this.animations)
         if (this.beeps) {
-            console.log("beeps")
+            // console.log("beeps")
             animsController.play(this.animations[0], true);
         } else if (this.explodes) {
-            console.log("explodes")
+            // console.log("explodes")
             animsController.play(this.animations[1], true);
         }
         // console.log(this.animations)
