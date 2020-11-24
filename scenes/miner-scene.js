@@ -89,7 +89,7 @@ let MinerScene = new Phaser.Class({
         let params = {};
         params.useSteering = true;
         // slimes amount !
-        for(let i = 0; i < 1; i++) {
+        for(let i = 0; i < 15; i++) {
             const x = Phaser.Math.RND.between(50, this.physics.world.bounds.width - 50 );
             const y = Phaser.Math.RND.between(50, this.physics.world.bounds.height -50 );
             params.slimeType = Phaser.Math.RND.between(0, 4);
@@ -99,9 +99,6 @@ let MinerScene = new Phaser.Class({
             this.gameObjects.push(slime);
         }
         this.physics.add.collider(this.player, this.slimes);
-
-        
-        // this.physics.add.collider(this.mines, this.slimes);
 
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
