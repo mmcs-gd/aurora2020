@@ -35,7 +35,6 @@ export default class Slime extends Phaser.Physics.Arcade.Sprite {
 
     update() {
         if (this.hasArrived()) {
-            // console.log("scene",this.scene)
             // console.log("Slime thinks: 'Where should I go?...'");
             this.pointOfInterest = new Vector2(Phaser.Math.RND.between(0, this.scene.physics.world.bounds.width - 1),
                 Phaser.Math.RND.between(50, this.scene.physics.world.bounds.height - 50));

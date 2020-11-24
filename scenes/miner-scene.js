@@ -11,8 +11,6 @@ import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import mineSpriteSheet from '../assets/sprites/characters/bomb.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
-import boomSpriteSheet from '../assets/sprites/characters/explosion.png'
-import Ranaway from "../src/ai/steerings/ranaway";
 
 let MinerScene = new Phaser.Class({
 
@@ -114,22 +112,16 @@ let MinerScene = new Phaser.Class({
                 .setAlpha(0.75)
                 .setDepth(20);
         });
-
-
-        // console.log("this", this)
     },
     update: function () {
-        // console.log("update", this.mines)
         if (this.gameObjects)
         {
-            // console.log(this.gameObjects)
             this.gameObjects.forEach( function(element) {
                 element.update();
             });
         }
         const mineEntries = this.mines.children.entries;
         if (mineEntries.length > 0) {
-            // console.log(this.mines);
             mineEntries.forEach(element => element.update());
         }
 

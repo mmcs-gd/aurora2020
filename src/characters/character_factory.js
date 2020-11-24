@@ -73,7 +73,7 @@ export default class CharacterFactory {
           delay: 0
       });
       //todo uncomment at your won risk - these footsteps will get you insane
-     // character.footstepsMusic.play();
+    //  character.footstepsMusic.play();
         return character;
 
     }
@@ -112,6 +112,5 @@ export default class CharacterFactory {
     buildMine(x, y, params) {
         let mine = new Mine(this.scene, x, y, this.mineSpriteSheet, 0);
         mine.animations = this.animationLibrary.get(this.mineSpriteSheet).get("Mine");
-        console.log("anim",mine);
     }
 }

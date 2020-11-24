@@ -2,25 +2,24 @@ import Vector2 from "phaser/src/math/Vector2";
 import Steering from "./steering";
 
 export default class Ranaway extends Steering {
-    constructor(owner, mines, force = 1, maxSpeed = 30) {
-        super(owner, mines, force);
-        this.maxSpeed = maxSpeed;
+    constructor(owner, objects, force = 1) {
+        super(owner, objects, force);
     }
 
-    static calculateDistance(object, mine) {
-        return Math.sqrt((object.x - mine.x)*(object.x - mine.x) + (object.y - mine.y)*(object.y - mine.y));
+    static calculateDistance(owner, object) {
+        return Math.sqrt((owner.x - object.x)*(owner.x - object.x) + (owner.y - object.y)*(owner.y - object.y));
     }
 
-    static isNear(object, mine, margin = 0) {
-        const d = Ranaway.calculateDistance(object, mine);
-        return d < mine.dangerZone + margin;
+    static isNear(owner, object, margin = 0) {
+        const d = Ranaway.calculateDistance(owner, object);
+        return d < object.dangerZone + margin;
     }
 
-    static findNearMines(object, mines) {
+    static findNearObjects(owner, object) {
         let nearest = [];
         
-        for (const m of mines) {
-            if (Ranaway.isNear(object, m, 50)) {
+        for (const m of object) {
+            if (Ranaway.isNear(owner, m, 50)) {
                 nearest.push(m);
             }
         }
@@ -29,19 +28,22 @@ export default class Ranaway extends Steering {
 
     calculateImpulse() {
         if (this.objects.length === 0) {
-            return {mines: null, velocity: null};
+            return {objects: null, velocity: null};
         }
-        const mines = Ranaway.findNearMines(this.owner, this.objects);
-        if (mines.length === 0) {
-            return {mines: null, velocity: null};
+        const nearestObjects = Ranaway.findNearObjects(this.owner.body, this.objects);
+        if (nearestObjects.length === 0) {
+            return {objects: null, velocity: null};
         }
-        let vel = new Vector2(0,0);
-        for (const m of mines) {
-            vel.add(new Vector2(this.owner.x - m.x, this.owner.y - m.y));
+        let desiredVelocity = new Vector2(0,0);
+        for (const m of nearestObjects) {
+            desiredVelocity.add(new Vector2(this.owner.body.x - m.x, this.owner.body.y - m.y));
         }
-        vel.normalize().scale(this.maxSpeed);
-        // const toMine = new Vector2(mine.x - this.owner.x, mine.y - this.owner.y);
-        // const vel = new Vector2(this.owner.x - mine.x, this.owner.y - mine.y).normalize().scale(this.maxSpeed);
-        return { mines, velocity: vel };
+        desiredVelocity.normalize().scale(this.owner.maxSpeed);
+
+        const curVelocity = new Vector2(
+            this.owner.body.x - this.owner.body.prev.x, 
+            this.owner.body.y - this.owner.body.prev.y);
+
+        return { objects: nearestObjects, velocity: desiredVelocity.subtract(curVelocity) };
     }
 }
