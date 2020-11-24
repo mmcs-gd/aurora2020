@@ -10,11 +10,11 @@ import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 
-let SteeringWanderingScene = new Phaser.Class({
+let SteeringArrivalScene = new Phaser.Class({
   Extends: Phaser.Scene,
   initialize:
     function StartingScene() {
-      Phaser.Scene.call(this, {key: 'SteeringWanderingScene'});
+      Phaser.Scene.call(this, {key: 'SteeringArrivalScene'});
     },
   characterFrameConfig: {frameWidth: 31, frameHeight: 31},
   slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
@@ -74,9 +74,10 @@ let SteeringWanderingScene = new Phaser.Class({
 		this.slimes =  this.physics.add.group();
 				
     let params = {};
-    params.steering = "wandering";
+    params.steering = "arrival";
+		params.target = this.player;
 				
-		for(let i = 0; i < 20; i++) {
+		for(let i = 0; i < 5; i++) {
       const x = Phaser.Math.RND.between(50, this.physics.world.bounds.width - 50 );
       const y = Phaser.Math.RND.between(50, this.physics.world.bounds.height - 50 );
       params.slimeType = Phaser.Math.RND.between(0, 4);
@@ -86,7 +87,7 @@ let SteeringWanderingScene = new Phaser.Class({
       this.physics.add.collider(slime, worldLayer);
     }
 		
-		const npc = this.characterFactory.buildNPCCharacter('blue', 200, 200, {steering: "wandering"});
+		const npc = this.characterFactory.buildNPCCharacter('blue', 200, 200, {steering: "arrival", target: this.player});
     this.gameObjects.push(npc);
     this.physics.add.collider(npc, worldLayer);
     this.physics.add.collider(npc, this.player);
@@ -114,4 +115,4 @@ let SteeringWanderingScene = new Phaser.Class({
   },
 });
 
-export default SteeringWanderingScene
+export default SteeringArrivalScene

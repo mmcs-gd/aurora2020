@@ -3,10 +3,12 @@ import menuBackgroundJson from '../assets/menu_background.json'
 
 import StartingScene from "./starting-scene";
 import SteeringWanderingScene from "./steering-wandering-scene";
+import SteeringArrivalScene from "./steering-arrival-scene";
 
 const scenes = [
     ['StartingScene', StartingScene],
-		['SteeringWanderingScene', SteeringWanderingScene]
+		['SteeringWanderingScene', SteeringWanderingScene],
+		['SteeringArrivalScene', SteeringArrivalScene]
 ];
 
 let MenuScene = new Phaser.Class({

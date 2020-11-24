@@ -1,5 +1,7 @@
 import Vector2 from 'phaser/src/math/Vector2'
 const eps = 20;
+const delay = 500;
+
 export default class Slime extends Phaser.Physics.Arcade.Sprite{
   constructor(scene, x, y, name, frame) {
     super(scene, x, y, name, frame);
@@ -10,19 +12,14 @@ export default class Slime extends Phaser.Physics.Arcade.Sprite{
   }
 	
   update() {
-		//kostyl :)
-    if (this.hasArrived() || !this.cntLess(500)){
-		//if (this.hasArrived()){
-			if(this.steering){
-				const dist = this.steering.calculateImpulse(); //calculate all steerings?
-				this.body.setVelocityX(dist.velocity.x)
-				this.body.setVelocityY(dist.velocity.y)
-				this.pointOfInterest = dist.target;
-			} else {
-				this.wantToJump = true;
-			}
-			this.cnt = 0;
-    }
+		if(this.steering){
+			const dir = this.steering.calculateImpulse(!this.cntLess(delay)); //calculate all steerings?
+			this.body.setVelocityX(dir.x)
+			this.body.setVelocityY(dir.y)
+			this.cnt = this.cntLess(delay) ? this.cnt + 1 : 0;
+		} else {
+			this.wantToJump = true;
+		}
 		this.updateAnimation();
 	}
     
@@ -33,7 +30,6 @@ export default class Slime extends Phaser.Physics.Arcade.Sprite{
     } else {
 			animsController.play(this.animations[0], true);
     }
-		++this.cnt;
   }
     
 	hasArrived(){

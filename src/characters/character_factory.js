@@ -6,6 +6,7 @@ import cyberpunkConfigJson from "../../assets/animations/cyberpunk.json";
 import slimeConfigJson from "../../assets/animations/slime.json";
 import AnimationLoader from "../utils/animation-loader";
 import Wandering from "../ai/steerings/wandering";
+import Arrival from "../ai/steerings/arrival";
 
 export default class CharacterFactory {
     constructor(scene) {
@@ -90,18 +91,19 @@ export default class CharacterFactory {
         const slimeType = params.slimeType || 1;
 				let slime = new Slime(this.scene, x, y, this.slimeSpriteSheet, 9 * slimeType);
 				if(params.steering)
-					slime.steering = this.getSteerings(params, slime, []);
-				
+					slime.steering = this.getSteerings(params, slime);
         slime.animations = this.animationLibrary.get(this.slimeSpriteSheet).get(this.slimeNumberToName(slimeType));
         slime.setCollideWorldBounds(true);
         slime.speed = 40;
         return slime;
     }
 		
-		getSteerings(params, owner, target){
+		getSteerings(params, owner){
 			switch(params.steering){
 				case "wandering": 
-					return new Wandering(owner, target);
+					return new Wandering(owner, params.target);
+				case "arrival":
+					return new Arrival(owner, params.target);
 				default:
 					return null;
 			}
