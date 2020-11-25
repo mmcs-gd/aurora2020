@@ -1,11 +1,11 @@
 import {StateTableRow, StateTable} from '../ai/behaviour/state';
 import Slime from "./slime";
 import Player from "./player";
+import NPC from "./npc";
 import cyberpunkConfigJson from "../../assets/animations/cyberpunk.json";
 import slimeConfigJson from "../../assets/animations/slime.json";
 import AnimationLoader from "../utils/animation-loader";
 import NPC from "../characters/npc";
-
 
 export default class CharacterFactory {
 
@@ -46,7 +46,8 @@ export default class CharacterFactory {
                     return this.buildPlayerCharacter(spriteSheetName, x, y);
                 else
                 {
-                   if (params.Steering)
+
+                   if (params.steering)
                         return this.buildNPCCharacter(spriteSheetName, x, y, params);
                     else
                         return this.buildCyberpunkCharacter(spriteSheetName, x, y, params);
@@ -57,7 +58,9 @@ export default class CharacterFactory {
     }
 
     buildNPCCharacter(spriteSheetName, x, y, params) {
-        let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.Steering);
+
+        let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.steering);
+
         // character.maxSpeed = 100;
         // character.setCollideWorldBounds(true);
         // character.cursors = this.scene.input.keyboard.createCursorKeys();

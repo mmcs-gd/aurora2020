@@ -2,6 +2,7 @@ import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 import menuBackgroundJson from '../assets/menu_background.json'
 
 import StartingScene from "./starting-scene";
+import SteeringSeekScene from "./steering-seek-scene"
 
 import SteeringEvadeScene from './steering-evade-scene';
 import SteeringPursuitScene from './steering-pursuit-scene';
@@ -11,7 +12,9 @@ const scenes = [
     ['StartingScene', StartingScene],
     ['SteeringEvadeScene', SteeringEvadeScene],
     ['SteeringPursuitScene', SteeringPursuitScene],
-    ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene]
+    ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
+    ['SteeringSeekScene', SteeringSeekScene]
+
 
 ];
 
