@@ -6,21 +6,20 @@ import NPC from "../characters/npc";
 import cyberpunkConfigJson from "../../assets/animations/cyberpunk.json";
 import slimeConfigJson from "../../assets/animations/slime.json";
 import AnimationLoader from "../utils/animation-loader";
+import npc from "./npc";
 import Wandering from "../ai/steerings/wandering";
 import Arrival from "../ai/steerings/arrival";
+
 
 
 export default class CharacterFactory {
     constructor(scene) {
         this.scene = scene;
-
         this.cyberSpritesheets =  ['aurora', 'blue', 'yellow', 'green', 'punk'];
         this.slimeSpriteSheet = 'slime';
-
         const slimeStateTable = new StateTable(this);
         slimeStateTable.addState(new StateTableRow('searching', this.foundTarget, 'jumping'));
         slimeStateTable.addState(new StateTableRow('jumping', this.lostTarget, 'searching'));
-
         let animationLibrary =  new Map();
         this.cyberSpritesheets.forEach(
             function (element) {
@@ -41,8 +40,11 @@ export default class CharacterFactory {
             case 'punk':
             case 'aurora':
             case 'blue':
-            case 'yellow':
+            case 'punk':
+                if (params.player)
+                    return this.buildPlayerCharacter(spriteSheetName,x,y);
 
+            case 'yellow':
             case 'green':
               if (params.player)
                 return this.buildPlayerCharacter(spriteSheetName, x, y);
@@ -64,8 +66,13 @@ export default class CharacterFactory {
         return character;
     }
 
+    buildNpcCharacter(animation,spriteSheetName, x, y,params){
+        let character = new npc(this.scene,x,y,spriteSheetName,2,params.Steering)
+        character.animationSets = this.animationLibrary.get(animation);
+        return character;
+    }
     buildPlayerCharacter(spriteSheetName, x, y) {
-        let character = new Player(this.scene, x, y, spriteSheetName, 2);
+        let character = new Player(this.scene, x, y, spriteSheetName,2);
         character.maxSpeed = 100;
         character.setCollideWorldBounds(true);
         character.cursors = this.scene.input.keyboard.createCursorKeys();
@@ -81,7 +88,7 @@ export default class CharacterFactory {
           delay: 0
       });
       //todo uncomment at your won risk - these footsteps will get you insane
-     // character.footstepsMusic.play();
+      //character.footstepsMusic.play();
         return character;
 
     }
