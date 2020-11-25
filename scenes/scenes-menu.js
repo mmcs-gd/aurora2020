@@ -2,8 +2,10 @@ import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 import menuBackgroundJson from '../assets/menu_background.json'
 
 import MinerScene from "./miner-scene";
+import StartingScene from './starting-scene';
 
 const scenes = [
+    ['StartingScene', StartingScene],
     ['MinerScene', MinerScene]
 ];
 
