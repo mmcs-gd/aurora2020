@@ -1,10 +1,10 @@
 const delay = 1000;
 export default class Npc extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, name, frame) {
+    constructor(scene, x, y, name, frame, steering) {
         super(scene, x, y, name, frame);
         scene.physics.world.enable(this);
         scene.add.existing(this);
-        this.steering = undefined;
+        this.steering = steering;
         this.cnt = 0;
     }
 

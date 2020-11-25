@@ -1,17 +1,10 @@
 import {StateTableRow, StateTable} from '../ai/behaviour/state';
 import Slime from "./slime";
 import Player from "./player";
-
-import NPC from "../characters/npc";
 import cyberpunkConfigJson from "../../assets/animations/cyberpunk.json";
 import slimeConfigJson from "../../assets/animations/slime.json";
 import AnimationLoader from "../utils/animation-loader";
 import NPC from "../characters/npc";
-
-export default class CharacterFactory {
-
-
-
 
 export default class CharacterFactory {
     constructor(scene) {
