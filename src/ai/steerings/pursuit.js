@@ -1,36 +1,66 @@
 import Steering from "./steering.js";
 import Vector2 from 'phaser/src/math/Vector2'
+import Npc from "../../characters/npc.js";
 
-class Pursuit extends Steering {
+export default class Pursuit extends Steering {
 
-    constructor (owner, objects, force = 1, ownerSpeed, targetSpeed) {
-        super(owner, objects, force);
+    constructor (owner, target, force = 1, ownerSpeed= 80, targetSpeed = 100) {
+        super(owner, [target], force);
+
         this.ownerSpeed = ownerSpeed;
         this.targetSpeed = targetSpeed
     }
 
+    static seek(owner, target, maxSpeed) {
+        const desiredVelocity = new Vector2(target.x - owner.x, target.y-owner.y)
+        .normalize().scale(maxSpeed);
+        const prevVelocity = new Vector2(owner.body.x-owner.body.prev.x, owner.body.y-owner.body.prev.y);
+        //console.log(owner.evader.body.prev.x,desiredVelocity)
+        return desiredVelocity.subtract(prevVelocity);
+    }
+
     calculateImpulse () {
-        const searcherDirection = this.owner.body.velocity;
+        
+        // console.log(this.objects[0])
+        // console.log(this.objects[0].Steering.objects[0])
+        // ev = 5;
         const target = this.objects[0];
+
+        let pursuitMen;
+        if (target instanceof Npc)
+            pursuitMen = this.objects[0].Steering.objects[0];
+        else    
+            pursuitMen = this.owner.evader;
+
+        const searcherDirection = pursuitMen.body.velocity;        
+        const targetPos = new Vector2(target.x, target.y);
         const targetDirection = target.body.velocity;
-        const toTarget = new Vector2(this.owner.x - target.x, this.owner.y - target.y);
+        const toTarget = new Vector2(pursuitMen.x - target.x, pursuitMen.y - target.y);
+
         const relativeHeading = searcherDirection.dot(targetDirection);
+        //console.log(target.x, pursuitMen.x,target.y, pursuitMen.y)
+        
+        if (Math.abs(target.x - pursuitMen.x) < 40 && Math.abs(target.y - pursuitMen.y) < 40)
+            return  new Vector2(0, 0);
+
+
+        if (Math.abs(target.x - this.pursuitMen.x) < 40 && Math.abs(target.y - this.pursuitMen.y) < 40)
+            return  new Vector2(0, 0);
 
         if (toTarget.dot(targetDirection) < 0 || relativeHeading > -0.95)
-        {
-            const predictTime = toTarget.length() / (this.targetSpeed + this.ownerSpeed);
-            toTarget.x += predictTime*targetDirection.x;
-            toTarget.y += predictTime*targetDirection.y;
-        }
+            return Pursuit.seek(this.pursuitMen, targetPos, this.ownerSpeed);
 
-        if (isNaN(toTarget.x))
-            return [0, 0];
-        const x = (Math.abs(toTarget.x) < 1) ? 0 : -Math.sign(toTarget.x)*this.ownerSpeed;
-        const y = (Math.abs(toTarget.y) < 1) ? 0 : -Math.sign(toTarget.y)*this.ownerSpeed;
 
-        return new Vector2(x, y);
 
+        
+            
+              
+        
+        const lookAheadTime = toTarget.length / (this.ownerSpeed + this.targetSpeed)
+        
+        return Pursuit.seek(pursuitMen, 
+
+            targetPos.add(target.body.velocity.clone().scale(lookAheadTime)), 
+            this.ownerSpeed);
     }
 }
-
-export {Pursuit};
