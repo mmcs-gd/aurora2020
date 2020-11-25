@@ -1,12 +1,14 @@
 import {StateTableRow, StateTable} from '../ai/behaviour/state';
 import Slime from "./slime";
 import Player from "./player";
+
 import NPC from "../characters/npc";
 import cyberpunkConfigJson from "../../assets/animations/cyberpunk.json";
 import slimeConfigJson from "../../assets/animations/slime.json";
 import AnimationLoader from "../utils/animation-loader";
 import Wandering from "../ai/steerings/wandering";
 import Arrival from "../ai/steerings/arrival";
+
 
 export default class CharacterFactory {
     constructor(scene) {
@@ -35,21 +37,24 @@ export default class CharacterFactory {
 
     buildCharacter(spriteSheetName, x, y, params = {}) {
         switch (spriteSheetName) {
+            case 'green':
+            case 'punk':
             case 'aurora':
             case 'blue':
-            case 'punk':
             case 'yellow':
+
             case 'green':
               if (params.player)
                 return this.buildPlayerCharacter(spriteSheetName, x, y);
               else{
                 return this.buildNPCCharacter(spriteSheetName, x, y, params);
               }
+
             case "slime":
               return this.buildSlime(x, y, params);
         }
     }
-		
+	
 		buildNPCCharacter(spriteSheetName, x, y, params) {
         let character = new NPC(this.scene, x, y, spriteSheetName, 2);
 				if(params.steering){
@@ -58,7 +63,7 @@ export default class CharacterFactory {
         character.animationSets = this.animationLibrary.get(spriteSheetName);
         return character;
     }
-		
+
     buildPlayerCharacter(spriteSheetName, x, y) {
         let character = new Player(this.scene, x, y, spriteSheetName, 2);
         character.maxSpeed = 100;

@@ -42,4 +42,3 @@ export default class Npc extends Phaser.Physics.Arcade.Sprite{
 	cntLess(steps){
 		return this.cnt < steps;
 	}
-}
