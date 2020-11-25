@@ -4,9 +4,18 @@ import menuBackgroundJson from '../assets/menu_background.json'
 import StartingScene from "./starting-scene";
 import SteeringSeekScene from "./steering-seek-scene"
 
+import SteeringEvadeScene from './steering-evade-scene';
+import SteeringPursuitScene from './steering-pursuit-scene';
+import SteeringEvadeAndPursuitScene from './steering-evade-and-pursuit-scene';
+
 const scenes = [
     ['StartingScene', StartingScene],
+    ['SteeringEvadeScene', SteeringEvadeScene],
+    ['SteeringPursuitScene', SteeringPursuitScene],
+    ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
     ['SteeringSeekScene', SteeringSeekScene]
+
+
 ];
 
 let MenuScene = new Phaser.Class({
@@ -160,4 +169,5 @@ class Hint extends Phaser.Scene {
     }
 }
 
-export default MenuScene
+export default MenuScene 
+

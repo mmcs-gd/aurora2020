@@ -5,6 +5,7 @@ import NPC from "./npc";
 import cyberpunkConfigJson from "../../assets/animations/cyberpunk.json";
 import slimeConfigJson from "../../assets/animations/slime.json";
 import AnimationLoader from "../utils/animation-loader";
+import NPC from "../characters/npc";
 
 export default class CharacterFactory {
 
@@ -45,6 +46,7 @@ export default class CharacterFactory {
                     return this.buildPlayerCharacter(spriteSheetName, x, y);
                 else
                 {
+
                    if (params.steering)
                         return this.buildNPCCharacter(spriteSheetName, x, y, params);
                     else
@@ -56,7 +58,9 @@ export default class CharacterFactory {
     }
 
     buildNPCCharacter(spriteSheetName, x, y, params) {
+
         let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.steering);
+
         // character.maxSpeed = 100;
         // character.setCollideWorldBounds(true);
         // character.cursors = this.scene.input.keyboard.createCursorKeys();
