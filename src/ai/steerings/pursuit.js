@@ -6,6 +6,7 @@ export default class Pursuit extends Steering {
 
     constructor (owner, target, force = 1, ownerSpeed= 80, targetSpeed = 100) {
         super(owner, [target], force);
+
         this.ownerSpeed = ownerSpeed;
         this.targetSpeed = targetSpeed
     }
@@ -24,6 +25,7 @@ export default class Pursuit extends Steering {
         // console.log(this.objects[0].Steering.objects[0])
         // ev = 5;
         const target = this.objects[0];
+
         let pursuitMen;
         if (target instanceof Npc)
             pursuitMen = this.objects[0].Steering.objects[0];
@@ -34,14 +36,21 @@ export default class Pursuit extends Steering {
         const targetPos = new Vector2(target.x, target.y);
         const targetDirection = target.body.velocity;
         const toTarget = new Vector2(pursuitMen.x - target.x, pursuitMen.y - target.y);
+
         const relativeHeading = searcherDirection.dot(targetDirection);
         //console.log(target.x, pursuitMen.x,target.y, pursuitMen.y)
         
         if (Math.abs(target.x - pursuitMen.x) < 40 && Math.abs(target.y - pursuitMen.y) < 40)
             return  new Vector2(0, 0);
 
+
+        if (Math.abs(target.x - this.pursuitMen.x) < 40 && Math.abs(target.y - this.pursuitMen.y) < 40)
+            return  new Vector2(0, 0);
+
         if (toTarget.dot(targetDirection) < 0 || relativeHeading > -0.95)
-            return Pursuit.seek(pursuitMen, targetPos, this.ownerSpeed);
+            return Pursuit.seek(this.pursuitMen, targetPos, this.ownerSpeed);
+
+
 
         
             
@@ -50,6 +59,7 @@ export default class Pursuit extends Steering {
         const lookAheadTime = toTarget.length / (this.ownerSpeed + this.targetSpeed)
         
         return Pursuit.seek(pursuitMen, 
+
             targetPos.add(target.body.velocity.clone().scale(lookAheadTime)), 
             this.ownerSpeed);
     }

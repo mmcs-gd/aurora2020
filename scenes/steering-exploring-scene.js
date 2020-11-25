@@ -11,19 +11,22 @@ import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 
-let StartingScene = new Phaser.Class({
+
+import Exploring from "../src/ai/steerings/exploring"
+
+let SteeringExploringScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
     initialize:
 
         function StartingScene() {
-            Phaser.Scene.call(this, {key: 'StartingScene'});
+            Phaser.Scene.call(this, {key: 'SteeringExploringScene'});
         },
     characterFrameConfig: {frameWidth: 31, frameHeight: 31},
-    slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
-    preload: function () {
+        slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
 
+    preload: function () {
         //loading map tiles and json with positions
         this.load.image("tiles", tilemapPng);
         this.load.tilemapTiledJSON("map", dungeonRoomJson);
@@ -38,14 +41,12 @@ let StartingScene = new Phaser.Class({
         this.load.audio('footsteps', Footsteps);
     },
     create: function () {
-
         this.gameObjects = [];
         const map = this.make.tilemap({key: "map"});
 
         // Parameters are the name you gave the tileset in Tiled and then the key of the tileset image in
         // Phaser's cache (i.e. the name you used in preload)
         const tileset = map.addTilesetImage("Dungeon_Tileset", "tiles");
-
 
         // Parameters: layer name (or index) from Tiled, tileset, x, y
         const belowLayer = map.createStaticLayer("Floor", tileset, 0, 0);
@@ -68,28 +69,21 @@ let StartingScene = new Phaser.Class({
 
         worldLayer.setCollisionBetween(1, 500);
         aboveLayer.setDepth(10);
+
         this.physics.world.bounds.width = map.widthInPixels;
         this.physics.world.bounds.height = map.heightInPixels;
         this.characterFactory = new CharacterFactory(this);
 
         // Creating characters
-        this.player = this.characterFactory.buildCharacter('punk', 100, 100, {player: true});
-        this.gameObjects.push(this.player);
-        this.physics.add.collider(this.player, worldLayer);
-        this.slimes =  this.physics.add.group();
-        let params = {};
-
-        for(let i = 0; i < 50; i++) {
-
-            const x = Phaser.Math.RND.between(50, this.physics.world.bounds.width - 50 );
-            const y = Phaser.Math.RND.between(50, this.physics.world.bounds.height -50 );
-            params.slimeType = Phaser.Math.RND.between(0, 4);
-            const slime = this.characterFactory.buildSlime(x, y, params);
-            this.slimes.add(slime);
-            this.physics.add.collider(slime, worldLayer);
-            this.gameObjects.push(slime);
+        for(let i = 0; i < 10; i++)
+        {
+            this.explorer = this.characterFactory.buildCharacter('green', 200, 100, {Steering: new Exploring(this)});
+            this.gameObjects.push(this.explorer);
+            this.physics.add.collider(this.explorer, worldLayer);
         }
-        this.physics.add.collider(this.player, this.slimes);
+        this.explorer = this.characterFactory.buildCharacter('green', 200, 100, {Steering: new Exploring(this)});
+        this.gameObjects.push(this.explorer);
+        this.physics.add.collider(this.explorer, worldLayer);
 
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
@@ -116,4 +110,4 @@ let StartingScene = new Phaser.Class({
     }
 });
 
-export default StartingScene
+export default SteeringExploringScene
