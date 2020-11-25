@@ -1,6 +1,7 @@
 import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 import menuBackgroundJson from '../assets/menu_background.json'
 
+
 import StartingScene from "./starting-scene";
 import explorationAndShadowingScene from "./explorationAndShadowing-scene";
 
@@ -27,7 +28,9 @@ const scenes = [
     ['SteeringSeekScene', SteeringSeekScene],
     ['SteeringWanderingScene', SteeringWanderingScene],
 		['SteeringArrivalScene', SteeringArrivalScene],
-    ['explorationAndShadowingScene', explorationAndShadowingScene]
+    ['explorationAndShadowingScene', explorationAndShadowingScene],
+    ['MinerScene', MinerScene]
+
 ];
 
 let MenuScene = new Phaser.Class({
