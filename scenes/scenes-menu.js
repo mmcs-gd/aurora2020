@@ -11,8 +11,11 @@ import SteeringEvadeScene from './steering-evade-scene';
 import SteeringPursuitScene from './steering-pursuit-scene';
 import SteeringEvadeAndPursuitScene from './steering-evade-and-pursuit-scene';
 
+import SteeringRudnevScene from './scene-Rudnev';
+
 const scenes = [
     ['StartingScene', StartingScene],
+    ['SteeringRudnevScene', SteeringRudnevScene],
     ['SteeringEvadeScene', SteeringEvadeScene],
     ['SteeringPursuitScene', SteeringPursuitScene],
     ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
@@ -20,6 +23,7 @@ const scenes = [
     ['SteeringWanderingScene', SteeringWanderingScene],
 		['SteeringArrivalScene', SteeringArrivalScene],
     ['explorationAndShadowingScene', explorationAndShadowingScene]
+
 
 ];
 
