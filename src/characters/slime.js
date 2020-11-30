@@ -5,57 +5,21 @@ export default class Slime extends Phaser.Physics.Arcade.Sprite{
         super(scene, x, y, name, frame);
         scene.physics.world.enable(this);
         scene.add.existing(this);
+        this.steering = undefined;
+        this.wantToJump = true;
+    }
+    setSteering(steering) {
+        this.steering = steering;
     }
     update() {
-        if (this.hasArrived())
-        {
-            console.log("Slime thinks: 'Where should I go?...'");
-            this.pointOfInterest = new Vector2( Phaser.Math.RND.between(0, this.scene.physics.world.bounds.width - 1),
-                Phaser.Math.RND.between(50, this.scene.physics.world.bounds.height - 50));
-            const neededTileX = Math.floor(this.pointOfInterest.x / 32) ;
-            const neededTileY = Math.floor(this.pointOfInterest.y / 32) ;
-            const currentPositionX =  Math.floor(this.body.x / 32);
-            const currentPositionY =  Math.floor(this.body.y / 32);
-            const me = this;
-            if (!this.wantToJump)
-            {
-                this.scene.finder.findPath(currentPositionX, currentPositionY, neededTileX, neededTileY, function( path ) {
-                    if (path === null) {
-                        console.warn("Slime says: Path was not found, gonna jump!");
-                        me.path = [];
-                        me.wantToJump = true;
-                    } else {
-                        me.path = path;
-                        console.log("Slime says: Path was found, need to go...");
-                        me.selectNextLocation();
-                    }
-                });
-                this.scene.finder.calculate();
-            }
-
-        }
-        if (this.nextLocation)
-        {
-            const body = this.body;
-            const position = body.position;
-
-            if (position.distance(this.nextLocation) < eps) {
-                this.selectNextLocation();
-            }
-            else {
-
-                let delta = Math.round(this.nextLocation.x - position.x);
-                if (delta !== 0) {
-                    body.setVelocity(delta, 0);
-                } else {
-                    delta = Math.round(this.nextLocation.y - position.y);
-
-                    body.setVelocity(0, delta);
-                }
-                this.body.velocity.normalize().scale(Math.min(Math.abs(delta), this.speed));
+        if (this.steering) {
+            const vector = this.steering.calculateImpulse();
+            if (vector != undefined){
+                this.body.setVelocityX(vector.x);
+                this.body.setVelocityY(vector.y);
+                this.wantToJump = vector.x == 0 && vector.y == 0;
             }
         }
-
         this.updateAnimation();
     }
     updateAnimation() {
@@ -68,19 +32,5 @@ export default class Slime extends Phaser.Physics.Arcade.Sprite{
             animsController.play(this.animations[0], true);
         }
 
-    }
-    hasArrived()
-    {
-        return this.pointOfInterest === undefined || this.pointOfInterest.distance(this.body.position) < eps;
-    }
-    selectNextLocation() {
-        const nextTile = this.path.shift();
-        if (nextTile)
-        {
-            this.nextLocation = new Vector2(nextTile.x * 32, nextTile.y * 32);
-        } else
-        {
-            this.nextLocation = this.body.position;
-        }
     }
 }

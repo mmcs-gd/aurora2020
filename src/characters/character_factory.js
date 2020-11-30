@@ -5,11 +5,7 @@ import cyberpunkConfigJson from "../../assets/animations/cyberpunk.json";
 import slimeConfigJson from "../../assets/animations/slime.json";
 import AnimationLoader from "../utils/animation-loader";
 
-
 export default class CharacterFactory {
-
-
-
     constructor(scene) {
         this.scene = scene;
 
