@@ -13,7 +13,7 @@ import {Shadowing} from "../src/ai/steerings/shadowing";
 import {Exploration} from "../src/ai/steerings/exploration";
 
 
-let explorationAndShadowingScene = new Phaser.Class({
+let ExplorationAndShadowingScene = new Phaser.Class({
 
     Extends: Phaser.scene,
     initialize:
@@ -102,4 +102,4 @@ let explorationAndShadowingScene = new Phaser.Class({
     }
 })
 
-export default explorationAndShadowingScene
+export default ExplorationAndShadowingScene

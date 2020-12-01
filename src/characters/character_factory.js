@@ -118,7 +118,7 @@ export default class CharacterFactory {
     }
 
     buildSlime(x, y, params) {
-        const slimeType = params.slimeType || 1;
+        const slimeType = params.slimeType;
         let slime;
         if (params.useSteering) {
             slime = new SmartSlime(this.scene, x, y, this.slimeSpriteSheet, 9*slimeType);
