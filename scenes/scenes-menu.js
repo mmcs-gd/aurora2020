@@ -1,10 +1,36 @@
 import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 import menuBackgroundJson from '../assets/menu_background.json'
 
+
 import StartingScene from "./starting-scene";
+import explorationAndShadowingScene from "./explorationAndShadowing-scene";
+
+import SteeringWanderingScene from "./steering-wandering-scene";
+import SteeringArrivalScene from "./steering-arrival-scene";
+import SteeringSeekScene from "./steering-seek-scene"
+import SteeringEvadeScene from './steering-evade-scene';
+import SteeringPursuitScene from './steering-pursuit-scene';
+import SteeringEvadeAndPursuitScene from './steering-evade-and-pursuit-scene';
+
+import SteeringRudnevScene from './scene-Rudnev';
+
+import SteeringFleeScene from './steering-flee-scene';
+import SteeringExploringScene from './steering-exploring-scene';
 
 const scenes = [
-    ['StartingScene', StartingScene]
+    ['StartingScene', StartingScene],
+    ['SteeringFleeScene', SteeringFleeScene],
+    ['SteeringExploringScene', SteeringExploringScene],
+    ['SteeringRudnevScene', SteeringRudnevScene],
+    ['SteeringEvadeScene', SteeringEvadeScene],
+    ['SteeringPursuitScene', SteeringPursuitScene],
+    ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
+    ['SteeringSeekScene', SteeringSeekScene],
+    ['SteeringWanderingScene', SteeringWanderingScene],
+		['SteeringArrivalScene', SteeringArrivalScene],
+    ['explorationAndShadowingScene', explorationAndShadowingScene],
+    ['MinerScene', MinerScene]
+
 ];
 
 let MenuScene = new Phaser.Class({
@@ -158,4 +184,5 @@ class Hint extends Phaser.Scene {
     }
 }
 
-export default MenuScene
+export default MenuScene 
+
