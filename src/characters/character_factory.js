@@ -9,13 +9,6 @@ import mineConfigJson from '../../assets/animations/mine.json';
 import AnimationLoader from "../utils/animation-loader";
 import Mine from "./mine";
 import SmartSlime from './minerScene/smartSlime';
-import NPC from "../characters/npc";
-
-
-export default class CharacterFactory {
-
-
-
 
 export default class CharacterFactory {
     constructor(scene) {
