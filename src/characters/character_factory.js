@@ -55,38 +55,9 @@ export default class CharacterFactory {
         }
     }
 	
-		buildNPCCharacter(spriteSheetName, x, y, params) {
-        let character = new NPC(this.scene, x, y, spriteSheetName, 2);
-				if(params.steering){
-					character.steering = this.getSteerings(params, character, []);
-				}
-        character.animationSets = this.animationLibrary.get(spriteSheetName);
-        return character;
-    }
-
 
     buildNPCCharacter(spriteSheetName, x, y, params) {
         let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.Steering);
-        // character.maxSpeed = 100;
-        // character.setCollideWorldBounds(true);
-        // character.cursors = this.scene.input.keyboard.createCursorKeys();
-        character.animationSets = this.animationLibrary.get(spriteSheetName);
-        return character;
-
-    }
-
-
-    buildNpcCharacter(animation,spriteSheetName, x, y,params){
-        let character = new npc(this.scene,x,y,spriteSheetName,2,params.Steering)
-        character.animationSets = this.animationLibrary.get(animation);
-        return character;
-    }
-
-    buildNPCCharacter(spriteSheetName, x, y, params) {
-        let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.Steering);
-        // character.maxSpeed = 100;
-        // character.setCollideWorldBounds(true);
-        // character.cursors = this.scene.input.keyboard.createCursorKeys();
         character.animationSets = this.animationLibrary.get(spriteSheetName);
         return character;
 
@@ -132,17 +103,6 @@ export default class CharacterFactory {
         slime.speed = 40;
         return slime;
     }
-
-		getSteerings(params, owner){
-			switch(params.steering){
-				case "wandering": 
-					return new Wandering(owner, params.target);
-				case "arrival":
-					return new Arrival(owner, params.target);
-				default:
-					return null;
-			}
-		}
 		
     slimeNumberToName(n){
       switch (n) {

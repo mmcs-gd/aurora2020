@@ -9,6 +9,7 @@ import greenSpriteSheet from '../assets/sprites/characters/green.png'
 import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
+import Arrival from "../src/ai/steerings/arrival";
 
 let SteeringArrivalScene = new Phaser.Class({
   Extends: Phaser.Scene,
@@ -87,7 +88,9 @@ let SteeringArrivalScene = new Phaser.Class({
       this.physics.add.collider(slime, worldLayer);
     }
 		
-		const npc = this.characterFactory.buildNPCCharacter('blue', 200, 200, {steering: "arrival", target: this.player});
+		const npc = this.characterFactory
+            .buildNPCCharacter('blue', 200, 200,
+                {Steering: new Arrival(this, this.player)});
     this.gameObjects.push(npc);
     this.physics.add.collider(npc, worldLayer);
     this.physics.add.collider(npc, this.player);
