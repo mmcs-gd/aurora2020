@@ -26,7 +26,7 @@ let ExplorationAndShadowingScene = new Phaser.Class({
 
         //loading map tiles and json with positions
         this.load.image("tiles", tilemapPng);
-        this.load.tilemapTiledJSON("map", dungeonRoomJson
+        this.load.tilemapTiledJSON("map", dungeonRoomJson);
         //loading spitesheets
         this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
