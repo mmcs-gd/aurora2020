@@ -1,4 +1,5 @@
 import EasyStar from "easystarjs";
+
 import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 import dungeonRoomJson from '../assets/dungeon_room.json'
 import auroraSpriteSheet from '../assets/sprites/characters/aurora.png'
@@ -9,24 +10,26 @@ import greenSpriteSheet from '../assets/sprites/characters/green.png'
 import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
-import {Shadowing} from "../src/ai/steerings/shadowing";
-import {Exploring} from "../src/ai/steerings/exploring";
+import Union from "../src/ai/steerings/union"
+import Group from "../src/characters/group";
 
+let SteeringUnionGroupScene = new Phaser.Class({
 
-let ExplorationAndShadowingScene = new Phaser.Class({
+    Extends: Phaser.Scene,
 
-    Extends: Phaser.scene,
     initialize:
-        function explorationAndShadowingScene() {
-            Phaser.Scene.call(this, {key: 'explorationAndShadowingScene'});
+
+        function StartingScene() {
+            Phaser.Scene.call(this, {key: 'SteeringUnionGroupScene'});
         },
     characterFrameConfig: {frameWidth: 31, frameHeight: 31},
-    slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
-    preload: function () {
+        slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
 
+    preload: function () {
         //loading map tiles and json with positions
         this.load.image("tiles", tilemapPng);
         this.load.tilemapTiledJSON("map", dungeonRoomJson);
+
         //loading spitesheets
         this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
@@ -36,11 +39,15 @@ let ExplorationAndShadowingScene = new Phaser.Class({
         this.load.spritesheet('slime', slimeSpriteSheet, this.slimeFrameConfig);
         this.load.audio('footsteps', Footsteps);
     },
-    create:function (){
-        this.gameObject = [];
-        const  map = this.make.tilemap({key:"map"});
+    create: function () {
+        this.gameObjects = [];
+        const map = this.make.tilemap({key: "map"});
+
+        // Parameters are the name you gave the tileset in Tiled and then the key of the tileset image in
+        // Phaser's cache (i.e. the name you used in preload)
         const tileset = map.addTilesetImage("Dungeon_Tileset", "tiles");
 
+        // Parameters: layer name (or index) from Tiled, tileset, x, y
         const belowLayer = map.createStaticLayer("Floor", tileset, 0, 0);
         const worldLayer = map.createStaticLayer("Walls", tileset, 0, 0);
         const aboveLayer = map.createStaticLayer("Upper", tileset, 0, 0);
@@ -61,23 +68,28 @@ let ExplorationAndShadowingScene = new Phaser.Class({
 
         worldLayer.setCollisionBetween(1, 500);
         aboveLayer.setDepth(10);
+
         this.physics.world.bounds.width = map.widthInPixels;
         this.physics.world.bounds.height = map.heightInPixels;
         this.characterFactory = new CharacterFactory(this);
-        console.log(this.characterFactory)
 
-        const walker = this.characterFactory.buildNPCCharacter(
-           "green",200,300,{Steering: new Exploring(this)}
-        );
-
-        const shadowing = this.characterFactory.buildNPCCharacter(
-            "punk",500,100,{Steering: new Shadowing(this,walker)}
-        );
-        this.gameObject.push(walker);
-        this.gameObject.push(shadowing);
-        this.physics.add.collider(walker, worldLayer);
-        this.physics.add.collider(shadowing, worldLayer);
-        console.log(this.gameObject);
+        // Creating characters
+        const group = new Group([]);
+        for(let i = 0; i < 3; i++)
+        {
+            this.explorer = this.characterFactory.buildCharacter('green', 200 + i * 200, 100, {Steering: new Union(this, group, i)});
+            this.gameObjects.push(this.explorer);
+            group.join(this.explorer);
+            this.physics.add.collider(this.explorer, worldLayer);
+        }
+        for(let i = 0; i < 3; i++)
+        {
+            this.explorer = this.characterFactory.buildCharacter('green', 200 + i * 200, 400, {Steering: new Union(this, group, i + 3)});
+            this.gameObjects.push(this.explorer);
+            group.join(this.explorer);
+            this.physics.add.collider(this.explorer, worldLayer);
+        }
+        
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
             this.physics.world.createDebugGraphic();
@@ -88,17 +100,19 @@ let ExplorationAndShadowingScene = new Phaser.Class({
                 .setDepth(20);
         });
     },
-    update:function () {
-        if (this.gameObject) {
-            this.gameObject.forEach(function (element) {
+    update: function () {
+        if (this.gameObjects)
+        {
+            this.gameObjects.forEach( function(element) {
                 element.update();
             });
         }
+
     },
     tilesToPixels(tileX, tileY)
     {
         return [tileX*this.tileSize, tileY*this.tileSize];
     }
-})
+});
 
-export default ExplorationAndShadowingScene
+export default SteeringUnionGroupScene

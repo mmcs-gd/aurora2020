@@ -14,6 +14,7 @@ import SteeringRudnevScene from './scene-Rudnev';
 import SteeringPursuitWithDistanceScene from './steering-pursuit-with-distance'
 import SteeringFleeScene from './steering-flee-scene';
 import SteeringExploringScene from './steering-exploring-scene';
+import SteeringUnionGroupScene from './steering-union-group-scene';
 
 const scenes = [
     ['StartingScene', StartingScene],
@@ -26,7 +27,8 @@ const scenes = [
     ['SteeringWanderingScene', SteeringWanderingScene],
     ['SteeringArrivalScene', SteeringArrivalScene],
     ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
-    ['MinerScene', MinerScene]
+    ['MinerScene', MinerScene],
+    ['SteeringUnionGroupScene', SteeringUnionGroupScene],
 
 ];
 
