@@ -1,5 +1,6 @@
 import Scene from "./scenes-generator.js"
 
+import Evade from '../ai/steerings/evade'
 
 const TILE_MAPPING = {
     BLANK: 17,
@@ -83,6 +84,7 @@ const TILE_MAPPING = {
         groundLayer.putTileAt(TILE_MAPPING.WALL.BOTTOM_LEFT, left, down);
     });
 
+
         //console.log(rooms)
         let palyerSpawnX = 0;
         let palyerSpawnY = 0;
@@ -96,14 +98,32 @@ const TILE_MAPPING = {
         scene.physics.add.collider(scene.player, OtherSubjLayer);
 
 
+        //// add something
+        let randomRoom = rooms[Math.floor(Math.random() * rooms.length) + 1].startCenter
+
+        scene.evader = scene.characterFactory.buildCharacter('green', randomRoom.x * 24 + 50,  randomRoom.y * 24 + 50, 
+        {Steering: new Evade(scene, scene.player)});
+        scene.gameObjects.push(scene.evader);
+        scene.physics.add.collider(scene.evader, groundLayer);
+        scene.physics.add.collider(scene.evader, OtherSubjLayer);
+        scene.physics.add.collider(scene.evader, scene.player);
+        ////
+
         const camera = scene.cameras.main;
         camera.setZoom(1.0)
-        // camera.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels);
-        camera.setBounds(0, 0, 5000, 5000);
+        scene.physics.world.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels, true, true, true, true);
+        camera.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels);
         camera.startFollow(scene.player);
 
+        
         groundLayer.setCollisionBetween(1, 500);
         OtherSubjLayer.setDepth(10);
+  
 
-        return {"Ground" : groundLayer, "OtherSubj" : OtherSubjLayer}
+
+
+
+      
+
+      return {"Ground" : groundLayer, "OtherSubj" : OtherSubjLayer}
 };

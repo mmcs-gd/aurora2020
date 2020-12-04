@@ -11,6 +11,7 @@ import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 
 
+
 let ProcScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
@@ -55,7 +56,6 @@ let ProcScene = new Phaser.Class({
         this.OtherSubjLayer = layers["OtherSubj"];
         //this.OtherSubjLayer.setCollisionBetween(1, 500)
         
-
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
             this.physics.world.createDebugGraphic();
