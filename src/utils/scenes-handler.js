@@ -90,7 +90,7 @@ const TILE_MAPPING = {
         let palyerSpawnY = 0;
         if (rooms.length != 0)
         {
-            palyerSpawnX = rooms[0].startCenter.x * 24 + 50;
+            palyerSpawnX = rooms[0].startCenter.x * 24 + 100;
             palyerSpawnY = rooms[0].startCenter.y * 24 + 50;
         }
         scene.player = scene.characterFactory.buildCharacter("aurora", palyerSpawnX, palyerSpawnY, {player: true});
@@ -98,15 +98,25 @@ const TILE_MAPPING = {
         scene.physics.add.collider(scene.player, OtherSubjLayer);
 
 
-        //// add something
-        let randomRoom = rooms[Math.floor(Math.random() * rooms.length) + 1].startCenter
+        //// Добавим что-нибудь
+        let randdd = Math.floor(Math.random() * rooms.length) + 1
+        //console.log(rooms.length, randdd)
+        let randomRoom = rooms[randdd == rooms.length? randdd - 1 : randdd]
 
-        scene.evader = scene.characterFactory.buildCharacter('green', randomRoom.x * 24 + 50,  randomRoom.y * 24 + 50, 
+        let npcX
+        let npcY
+        npcX = randomRoom.startCenter.x * 24 + 50;
+        npcY = randomRoom.startCenter.y * 24 + 100;
+
+
+        scene.evader = scene.characterFactory.buildCharacter('green', npcX, npcY, 
         {Steering: new Evade(scene, scene.player)});
         scene.gameObjects.push(scene.evader);
         scene.physics.add.collider(scene.evader, groundLayer);
         scene.physics.add.collider(scene.evader, OtherSubjLayer);
         scene.physics.add.collider(scene.evader, scene.player);
+
+        //Можно накидать всё что в голову придёт, но в tileset мало интересного
         ////
 
         const camera = scene.cameras.main;
@@ -118,12 +128,6 @@ const TILE_MAPPING = {
         
         groundLayer.setCollisionBetween(1, 500);
         OtherSubjLayer.setDepth(10);
-  
-
-
-
-
-      
 
       return {"Ground" : groundLayer, "OtherSubj" : OtherSubjLayer}
 };

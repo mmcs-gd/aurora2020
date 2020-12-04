@@ -24,9 +24,6 @@ let ProcScene = new Phaser.Class({
     slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
     preload: function () {
         this.load.image("Dungeon_Tileset", tilemapPng);
-        //this.load.tilemapTiledJSON("map", dungeonRoomJson);
-
-        //loading spitesheets
         this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('green', greenSpriteSheet, this.characterFrameConfig);
@@ -34,27 +31,20 @@ let ProcScene = new Phaser.Class({
         this.load.spritesheet('punk', punkSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('slime', slimeSpriteSheet, this.slimeFrameConfig);
         this.load.audio('footsteps', Footsteps);
-
-        //this.characterFactory = new CharacterFactory(this);
     },
     
     create: function () {
-        //this.characterFactory.loadAnimations();
         this.characterFactory = new CharacterFactory(this);
-        //this.scene++;
-        this.hasPlayerReachedStairs = false;
-        
         this.gameObjects = [];
 
-        let width = 40; 
-        let height = 40; 
+        let width = 100; 
+        let height = 100; 
         let maxRooms = 100;
 
         const layers = buildLevel(width, height, maxRooms, this);
         this.gameObjects.push(this.player);
         this.groundLayer = layers["Ground"];
         this.OtherSubjLayer = layers["OtherSubj"];
-        //this.OtherSubjLayer.setCollisionBetween(1, 500)
         
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
