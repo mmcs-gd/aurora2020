@@ -1,17 +1,15 @@
 import Vector2 from 'phaser/src/math/Vector2'
 
 export default class Scene{
-    constructor(width, height, roomsCount, minRoomWidth = 5, maxRoomWidth = 9, 
-        minRoomHeight = 5, maxRoomHeight = 9, maxFilling = 0.7){
+    constructor(width, height, roomsCount, minRoomWidth = 5, maxRoomWidth = 10, 
+        minRoomHeight = 5, maxRoomHeight = 10){
         this.width = width,
         this.height = height,
         this.roomsCount = roomsCount,
-        this.maxFilling = maxFilling,
         this.minRoomWidth = minRoomWidth,
         this.maxRoomWidth = maxRoomWidth,
         this.minRoomHeight = minRoomHeight,
-        this.maxRoomHeight = maxRoomHeight,
-        this.maxPaths = 2;
+        this.maxRoomHeight = maxRoomHeight
     }
 
     ////
@@ -114,7 +112,7 @@ export default class Scene{
                     });
 
             for(let n = 0; 
-                n < Phaser.Math.RND.integerInRange(1, Math.min(rooms[i].neighs.length, this.maxPaths)); n++){
+                n < Phaser.Math.RND.integerInRange(1, Math.min(rooms[i].neighs.length, 2)); n++){
                 this.paveWay(rooms[i].startCenter, rooms[rooms[i].neighs[n].idx].startCenter)
             }
         }
@@ -161,7 +159,7 @@ export default class Scene{
 
     dilateGenerator(rooms){
         let filling = rooms.length;
-        while(filling / (this.width* this.height) < this.maxFilling){
+        while(filling / (this.width* this.height) < 0.7){
             for(let i = 0; i < rooms.length; i++) {
                 filling += this.expanding(rooms[i], Math.random() < 0.5);
             }
