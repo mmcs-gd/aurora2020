@@ -36,15 +36,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
     };
 
     updateAnimation() {
-        //console.log(this)
+        
         const animations = this.animationSets.get('Walk');
         const animsController = this.anims;
         const x = this.body.velocity.x;
         const y = this.body.velocity.y;
-        if (x!==0 || y !== 0 && this.footstepsMusic.isPaused)
-        {
-            this.footstepsMusic.resume();
-        }
+        // console.log(this.anims)
+
+        // if (x!==0 || y !== 0 && this.footstepsMusic.isPaused)
+        // {
+        //     this.footstepsMusic.resume();
+        // }
         if (x < 0) {
             animsController.play(animations[0], true);
         } else if (x > 0) {
@@ -53,13 +55,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
             animsController.play(animations[2], true);
         } else if (y > 0) {
             animsController.play(animations[3], true);
-        } else {
-            this.footstepsMusic.pause();
-            const currentAnimation = animsController.currentAnim;
-            if (currentAnimation) {
-                const frame = currentAnimation.getLastFrame();
-                this.setTexture(frame.textureKey, frame.textureFrame);
-            }
         }
+        // } else {
+        //     this.footstepsMusic.pause();
+        //     const currentAnimation = animsController.currentAnim;
+        //     if (currentAnimation) {
+        //         const frame = currentAnimation.getLastFrame();
+        //         this.setTexture(frame.textureKey, frame.textureFrame);
+        //     }
+        // }
     }
 }

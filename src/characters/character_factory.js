@@ -7,6 +7,7 @@ import mineConfigJson from '../../assets/animations/mine.json';
 import AnimationLoader from "../utils/animation-loader";
 import Mine from "./mine";
 import SmartSlime from './minerScene/smartSlime';
+import Footsteps from "../../assets/audio/footstep_ice_crunchy_run_01.wav";
 
 import NPC from "../characters/npc";
 
@@ -68,17 +69,17 @@ export default class CharacterFactory {
         character.maxSpeed = 100;
         character.setCollideWorldBounds(true);
         character.cursors = this.scene.input.keyboard.createCursorKeys();
-        character.animationSets = this.animationLibrary.get('punk');
+        character.animationSets = this.animationLibrary.get(spriteSheetName);
         //todo: not here
-      character.footstepsMusic = this.scene.sound.add('footsteps', {
-          mute: false,
-          volume: 1,
-          rate: 1,
-          detune: 0,
-          seek: 0,
-          loop: true,
-          delay: 0
-      });
+    //   character.footstepsMusic = this.scene.sound.add('footsteps', {
+    //       mute: false,
+    //       volume: 1,
+    //       rate: 1,
+    //       detune: 0,
+    //       seek: 0,
+    //       loop: true,
+    //       delay: 0
+    //   });
       //todo uncomment at your won risk - these footsteps will get you insane
 
         return character;
