@@ -21,7 +21,7 @@ export default class Scene{
     ////
     
     generateScene(){
-
+        //console.log(this)
         //// создать пустую сцену
         this.SceneMatrix = [];
         const empty = [];
@@ -33,12 +33,12 @@ export default class Scene{
         }
         this.SceneMatrix = empty;
         ////
-
+        //console.log(this)
 
         const startCenters = []; 
         //с помощью квадродерева накидать заданное число точек - центров комнат - на плоскость
         this.scatterPointsQT(startCenters, this.roomsCount, 0, this.width-1, 0, this.height-1);
-
+        //console.log(this)
         // создать дескрипторы для каждой из комнат
         let rooms = [];
         startCenters.forEach(c => {
@@ -60,12 +60,14 @@ export default class Scene{
             })
             this.SceneMatrix[c.y][c.x] = 0;
         })
-
+        //console.log(this)
         // проверить минимальные расстояния и размеры комнат
         this.AddRooms(rooms);
         rooms = rooms.filter(r => r.square > 1);
+        //console.log(this)
         // расширять территории, пока не заполнится % от всей площади
         this.Transition(rooms);
+        //console.log(this)
         return rooms;
     }
 
