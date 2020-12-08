@@ -50,7 +50,7 @@ export default class Scene{
                 down: c.y,
                 id: this.SceneMatrix[c.y][c.x],
                 square: 1,
-                neighs: [],
+                tonel: [],
                 width : function() {
                     return this.right - this.left + 1
                 },
@@ -67,7 +67,7 @@ export default class Scene{
         //console.log(this)
         // расширять территории, пока не заполнится % от всей площади
         this.Transition(rooms);
-        //console.log(this)
+        //console.log(rooms)
         return rooms;
     }
 
@@ -162,7 +162,7 @@ export default class Scene{
         {
             for(let j = i+1; j < rooms.length; j++)
             {
-                rooms[i].neighs.push({
+                rooms[i].tonel.push({
                     idx: j,
                     id:rooms[j].id, 
                     dist : rooms[i].startCenter.distance(rooms[j].startCenter)})
@@ -170,7 +170,7 @@ export default class Scene{
 
             // переходы между комнатами - минимальное остовное дерево
             // ширина перехода - 2 тайла
-            rooms[i].neighs = rooms[i].neighs.sort(
+            rooms[i].tonel = rooms[i].tonel.sort(
                 (neigh1, neigh2) => 
                     {
                         const d1 = neigh1.dist;
@@ -180,10 +180,10 @@ export default class Scene{
                         return 0
                     });
 
-            for(let n = 0; n < Phaser.Math.RND.integerInRange(1, Math.min(rooms[i].neighs.length, 2)); n++)
+            for(let n = 0; n < Phaser.Math.RND.integerInRange(1, Math.min(rooms[i].tonel.length, 2)); n++)
             {
                 let center1 = rooms[i].startCenter;
-                let center2 = rooms[rooms[i].neighs[n].idx].startCenter;
+                let center2 = rooms[rooms[i].tonel[n].idx].startCenter;
                 let y, y1, x, x1, 
                 dx = center1.x >= center2.x? 1 : -1, 
                 dy = center1.y >= center2.y? 1 : -1;
