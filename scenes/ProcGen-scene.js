@@ -35,7 +35,8 @@ let ProcScene = new Phaser.Class({
     
     create: function () {
         this.characterFactory = new CharacterFactory(this);
-        this.gameObjects = [];
+        this.gameObjects = []; // Впринципе можн было это не делать, 
+                                // но для того, что бы можно было кидать объекты, не только в handler
 
         let width = 100; 
         let height = 100; 
@@ -45,6 +46,8 @@ let ProcScene = new Phaser.Class({
         this.gameObjects.push(this.player);
         this.groundLayer = layers["Ground"];
         this.OtherSubjLayer = layers["OtherSubj"];
+        // Аналогично предыдущему, можно убрать, 
+        // ничего не измениться, но если мы хотим кидать npc или плюшки, пигодиться
         
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
@@ -68,7 +71,9 @@ let ProcScene = new Phaser.Class({
         if (this.hasPlayerReachedStairs) return;
 
         //console.log(this.player)
-        this.player.update();
+        //this.player.update(); // так как кинул player в объекты,
+                                 //  нет смыла его двадый за frame обновлять
+                                 // оствил на случай разделение логики объектов
     },
     tilesToPixels(tileX, tileY) {
         return [tileX*this.tileSize, tileY*this.tileSize];

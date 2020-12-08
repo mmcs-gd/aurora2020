@@ -52,6 +52,7 @@ const TILE_MAPPING = {
 
         const w = right - left + 1
         const h = down - top + 1
+        // отрисовываем стены вернхие и нижние
         for (let i = 0; i < w; i++)
         {
             if(levelMatrix[top - 1][i + left] == 0)
@@ -64,6 +65,7 @@ const TILE_MAPPING = {
             }
         }
 
+        // отрисовываем стены боковые
         for (let i = 0; i < h; i++)
         {
             if(levelMatrix[i + top][left - 1] == 0)
@@ -77,7 +79,7 @@ const TILE_MAPPING = {
             }
         }
 
-        
+        // добавляем углы комнаты
         groundLayer.putTileAt(TILE_MAPPING.WALL.TOP_LEFT, left, top);
         groundLayer.putTileAt(TILE_MAPPING.WALL.TOP_RIGHT, right, top);
         groundLayer.putTileAt(TILE_MAPPING.WALL.BOTTOM_RIGHT, right, down);
@@ -86,6 +88,8 @@ const TILE_MAPPING = {
 
 
         //console.log(rooms)
+
+        // считаем положение где заспавниться игрок
         let palyerSpawnX = 0;
         let palyerSpawnY = 0;
         if (rooms.length != 0)
@@ -99,6 +103,8 @@ const TILE_MAPPING = {
 
 
         //// Добавим что-нибудь
+
+        // Берем рандомную комнату для добавления персонажа, его ещё найти надо будет
         let randdd = Math.floor(Math.random() * rooms.length) + 1
         //console.log(rooms.length, randdd)
         let randomRoom = rooms[randdd == rooms.length? randdd - 1 : randdd]
@@ -119,12 +125,14 @@ const TILE_MAPPING = {
         //Можно накидать всё что в голову придёт, но в tileset мало интересного
         ////
 
+
+        // Меняем настройки камеры, а так же размер карты
         const camera = scene.cameras.main;
         camera.setZoom(1.0)
         scene.physics.world.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels, true, true, true, true);
         camera.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels);
         camera.startFollow(scene.player);
-
+        // 
         
         groundLayer.setCollisionBetween(1, 500);
         OtherSubjLayer.setDepth(10);
