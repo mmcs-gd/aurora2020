@@ -68,7 +68,6 @@ let ProcScene = new Phaser.Class({
                 element.update();
             });
         }
-        if (this.hasPlayerReachedStairs) return;
 
         //console.log(this.player)
         //this.player.update(); // так как кинул player в объекты,

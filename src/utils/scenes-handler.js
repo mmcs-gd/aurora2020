@@ -94,8 +94,8 @@ const TILE_MAPPING = {
         let palyerSpawnY = 0;
         if (rooms.length != 0)
         {
-            palyerSpawnX = rooms[0].startCenter.x * 24 + 100;
-            palyerSpawnY = rooms[0].startCenter.y * 24 + 50;
+            palyerSpawnX = rooms[0].startCenter.x * 32 + 10;
+            palyerSpawnY = rooms[0].startCenter.y * 32 + 10;
         }
         scene.player = scene.characterFactory.buildCharacter("aurora", palyerSpawnX, palyerSpawnY, {player: true});
         scene.physics.add.collider(scene.player, groundLayer);
@@ -111,8 +111,8 @@ const TILE_MAPPING = {
 
         let npcX
         let npcY
-        npcX = randomRoom.startCenter.x * 24 + 50;
-        npcY = randomRoom.startCenter.y * 24 + 100;
+        npcX = randomRoom.startCenter.x * 32 + 10;
+        npcY = randomRoom.startCenter.y * 32 + 10;
 
 
         scene.evader = scene.characterFactory.buildCharacter('green', npcX, npcY, 
