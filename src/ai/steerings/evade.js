@@ -28,7 +28,7 @@ export default class Evade extends Steering {
         const pursuer = this.objects[0];
         let owner;
         if (pursuer instanceof Npc)
-            owner = this.objects[0].Steering.objects[0];
+            owner = this.objects[0].steering.objects[0];
         else    
             owner = this.owner.evader;
 

@@ -1,20 +1,14 @@
 import {StateTableRow, StateTable} from '../ai/behaviour/state';
 import Slime from "./slime";
 import Player from "./player";
-
-import NPC from "../characters/npc";
 import cyberpunkConfigJson from "../../assets/animations/cyberpunk.json";
 import slimeConfigJson from "../../assets/animations/slime.json";
 import mineConfigJson from '../../assets/animations/mine.json';
 import AnimationLoader from "../utils/animation-loader";
 import Mine from "./mine";
 import SmartSlime from './minerScene/smartSlime';
+
 import NPC from "../characters/npc";
-
-
-export default class CharacterFactory {
-
-
 
 
 export default class CharacterFactory {
@@ -61,38 +55,9 @@ export default class CharacterFactory {
         }
     }
 	
-		buildNPCCharacter(spriteSheetName, x, y, params) {
-        let character = new NPC(this.scene, x, y, spriteSheetName, 2);
-				if(params.steering){
-					character.steering = this.getSteerings(params, character, []);
-				}
-        character.animationSets = this.animationLibrary.get(spriteSheetName);
-        return character;
-    }
-
 
     buildNPCCharacter(spriteSheetName, x, y, params) {
         let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.Steering);
-        // character.maxSpeed = 100;
-        // character.setCollideWorldBounds(true);
-        // character.cursors = this.scene.input.keyboard.createCursorKeys();
-        character.animationSets = this.animationLibrary.get(spriteSheetName);
-        return character;
-
-    }
-
-
-    buildNpcCharacter(animation,spriteSheetName, x, y,params){
-        let character = new npc(this.scene,x,y,spriteSheetName,2,params.Steering)
-        character.animationSets = this.animationLibrary.get(animation);
-        return character;
-    }
-
-    buildNPCCharacter(spriteSheetName, x, y, params) {
-        let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.Steering);
-        // character.maxSpeed = 100;
-        // character.setCollideWorldBounds(true);
-        // character.cursors = this.scene.input.keyboard.createCursorKeys();
         character.animationSets = this.animationLibrary.get(spriteSheetName);
         return character;
 
@@ -125,7 +90,7 @@ export default class CharacterFactory {
     }
 
     buildSlime(x, y, params) {
-        const slimeType = params.slimeType || 1;
+        const slimeType = params.slimeType;
         let slime;
         if (params.useSteering) {
             slime = new SmartSlime(this.scene, x, y, this.slimeSpriteSheet, 9*slimeType);
@@ -138,17 +103,6 @@ export default class CharacterFactory {
         slime.speed = 40;
         return slime;
     }
-
-		getSteerings(params, owner){
-			switch(params.steering){
-				case "wandering": 
-					return new Wandering(owner, params.target);
-				case "arrival":
-					return new Arrival(owner, params.target);
-				default:
-					return null;
-			}
-		}
 		
     slimeNumberToName(n){
       switch (n) {
