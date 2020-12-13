@@ -2,16 +2,15 @@ import Vector2 from 'phaser/src/math/Vector2'
 
 export default class Level{
     constructor(width, height, roomsCount, minRoomWidth = 5, maxRoomWidth = 9, 
-        minRoomHeight = 5, maxRoomHeight = 9, pathWidth = 3, maxFilling = 0.7){
+        minRoomHeight = 5, maxRoomHeight = 9, pathWidth = 3, maxPaths = 2){
         this.width = width,
         this.height = height,
         this.roomsCount = roomsCount,
-        this.maxFilling = maxFilling,
         this.minRoomWidth = minRoomWidth,
         this.maxRoomWidth = maxRoomWidth,
         this.minRoomHeight = minRoomHeight,
         this.maxRoomHeight = maxRoomHeight,
-        this.maxPaths = 2;
+        this.maxPaths = maxPaths;
     }
 
     generateLevel(){
@@ -64,7 +63,7 @@ export default class Level{
             if(sum === width * height){
                 for(let y = room.top; y <= room.down; y++)
                     for(let x = room.left; x <= room.right; x++)
-                        this.levelMatrix[y][x] = room.id;
+                        this.levelMatrix[y][x] = 1;
                 room.square = sum;
             }
         }
@@ -73,22 +72,22 @@ export default class Level{
     paveTheWays(rooms){
         for(let i = 0; i < rooms.length - 1; i++){
             for(let j = i+1; j < rooms.length; j++){
-                rooms[i].neighs.push({
+                rooms[i].neighbours.push({
                     idx: j,
                     id:rooms[j].id, 
                     dist : rooms[i].startCenter.distance(rooms[j].startCenter)})
             }
-            rooms[i].neighs = rooms[i].neighs.sort(this.distComparer);
-            for(let n = 0; n < Phaser.Math.RND.integerInRange(1, Math.min(rooms[i].neighs.length, this.maxPaths)); n++)
+            rooms[i].neighbours = rooms[i].neighbours.sort(this.distComparer);
+            for(let n = 0; n < Phaser.Math.RND.integerInRange(1, Math.min(rooms[i].neighbours.length, this.maxPaths)); n++)
             {
-                this.paveWay(rooms[i].startCenter, rooms[rooms[i].neighs[n].idx].startCenter)
+                this.paveWay(rooms[i].startCenter, rooms[rooms[i].neighbours[n].idx].startCenter)
             }
         }
     }
 
-    distComparer(neigh1, neigh2){
-        const d1 = neigh1.dist;
-        const d2 = neigh2.dist;
+    distComparer(neighbour1, neighbour2){
+        const d1 = neighbour1.dist;
+        const d2 = neighbour2.dist;
         if(d1 > d2) return 1
         if(d2 > d1) return -1
         return 0
@@ -105,20 +104,20 @@ export default class Level{
         while (x != x1){
             if(this.levelMatrix[y][x] === 0){
                 if(y-1 >= 0)
-                    this.levelMatrix[y-1][x] = -1;
-                this.levelMatrix[y][x] = -1;
+                    this.levelMatrix[y-1][x] = 1;
+                this.levelMatrix[y][x] = 1;
                 if(y+1 < this.height)
-                    this.levelMatrix[y+1][x] = -1;
+                    this.levelMatrix[y+1][x] = 1;
             }
             x+= dx;
         }
         while(y != y1){
             if(this.levelMatrix[y][x1] === 0){
                 if(x1-1 >= 0)
-                    this.levelMatrix[y][x1-1] = -1;
-                this.levelMatrix[y][x1] = -1;
+                    this.levelMatrix[y][x1-1] = 1;
+                this.levelMatrix[y][x1] = 1;
                 if(x1+1 < this.width)
-                    this.levelMatrix[y][x1+1] = -1;
+                    this.levelMatrix[y][x1+1] = 1;
             }
             y += dy;
         }
@@ -135,7 +134,7 @@ export default class Level{
                 down: c.y,
                 id: this.levelMatrix[c.y][c.x],
                 square: 1,
-                neighs: [], // stores id's of neighbours and distances between centers of them
+                neighbours: [], // stores id's of neighbours and distances between centers to them
                 width : function() {
                     return this.right - this.left + 1
                 },
