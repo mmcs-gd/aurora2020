@@ -56,7 +56,10 @@ export default class GeneratorLevel {
 
         //5. Снова соединяем и смотрим на дичь
         temp = this.OR(map, temp);
-
+				
+				//6. Сглаживаем
+				this.smooth(temp);
+				
         return temp;
     }
 
@@ -75,11 +78,34 @@ export default class GeneratorLevel {
         let map = [];
         for (let x = 0; x < arr1.length; ++x) {
             map[x] = [];
-            for (let y = 0; y < arr1[0].length; ++y)
-                map[x][y] = arr1[x][y] || arr2[x][y] ? 1 : 0
+            for (let y = 0; y < arr1[0].length; ++y){
+              map[x][y] = arr1[x][y] || arr2[x][y] || map[x][y] ? 1 : 0
+							this.connect8neighbor(map, x, y);
+						}
         }
         return map;
     }
+		
+		connect8neighbor(map, i, j){
+			if(i && j && map[i][j]){
+				//northwest
+				if(map[i-1][j-1]){
+					map[i-1][j] = 1;
+					map[i][j-1] = 1;
+				}
+				//northeast
+				if(map[i+1] && map[i+1][j-1]){
+					map[i][j-1] = 1;
+				}
+			} 
+		} 
+		
+		smooth(map){
+			for (let i = 1; i < map.length-1; ++i) 
+        for (let j = 1; j < map[0].length-1; ++j)
+					if(map[i][j])
+						map[i][j] = map[i-1][j] + map[i+1][j] + map[i][j-1] + map[i][j+1] < 2 ? 0 : 1;
+		}
 
     generateLevel() {
         const map = this.createMap();
