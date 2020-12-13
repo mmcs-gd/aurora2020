@@ -41,8 +41,10 @@ export default class GeneratorLevel {
         //5. Снова соединяем и смотрим на дичь
         temp = this.OR(map, temp);
 
-        //6. Наращиваем карту на 1
+        //6. Наращиваем карту на 1 (на 2)
         temp = this.enlarge(temp);
+        temp = this.enlarge(temp);
+        
 
         //7. Сглаживаем
         temp = this.smooth(temp);
@@ -183,11 +185,17 @@ export default class GeneratorLevel {
     enlarge(map) {
         for (let x = 0; x < this.width; ++x) {
             for (let y = 0; y < this.height; ++y) {
-                if (map[x][y] === 0) {
-                    map[x][y] = 0;
-                } else if (map[x][y] === 1) {
+                if (map[x][y] === 1) {
                     map[x][y] = 2;
                     map = this.setNeighbors(map, x, y);
+                }
+            }
+        }
+
+        for (let x = 0; x < this.width; ++x) {
+            for (let y = 0; y < this.height; ++y) {
+                if (map[x][y] > 1) {
+                    map[x][y] = 1;
                 }
             }
         }
