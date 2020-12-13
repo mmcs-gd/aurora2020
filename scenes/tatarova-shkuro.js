@@ -1,4 +1,6 @@
+// import tilemapPng from '../assets/tileset/Dungeon.png'
 import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
+
 import dungeonRoomJson from '../assets/dungeon_room.json'
 import auroraSpriteSheet from '../assets/sprites/characters/aurora.png'
 import punkSpriteSheet from '../assets/sprites/characters/punk.png'
@@ -10,6 +12,7 @@ import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 
 import GeneratorLevel from '../src/utils/generators/level-generator';
+import LevelMapper from '../src/utils/generators/level-mapper'
 
 const config = {
 	cellularAutomata: {
@@ -18,10 +21,10 @@ const config = {
 		chanceToStartAlive: 0.45
 	},
 	randomWalk: {
-		maxTunnels: 50, 
-		maxLength: 50,
-		minWidth: 2,
-		maxWidth: 3
+		maxTunnels: 5, 
+		maxLength: 10,
+		minWidth: 3,
+		maxWidth: 5
 	}
 };
 
@@ -54,11 +57,14 @@ let TatarovaShkuro = new Phaser.Class({
     create: function () {
         this.characterFactory = new CharacterFactory(this);
         this.gameObjects = [];
+        this.tileSize = 32;
 
         const width = 100;
         const height = 100;
 
-        const layers = (new GeneratorLevel(width, height, config, this)).generateLevel();
+        const map = (new GeneratorLevel(width, height, config)).debugMap();
+
+        const layers = (new LevelMapper(map, this, width, height, this.tileSize)).generateLevel();
         this.gameObjects.push(this.player);
         this.groundLayer = layers.Ground;
         this.otherLayer = layers.Other;

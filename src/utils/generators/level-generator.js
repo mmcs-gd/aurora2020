@@ -1,28 +1,12 @@
 import CellularAutomata from './cellular-automata'
 import RandomWalk from './random-walk'
 
-const TILE_MAPPING = {
-    BLANK: 17,
-    WALL: {
-        TOP_LEFT: 3,
-        TOP_RIGHT: 5,
-        BOTTOM_RIGHT: 53,
-        BOTTOM_LEFT: 51,
-        TOP: 14,
-        LEFT: 18,
-        RIGHT: 16,
-        BOTTOM: 52
-    },
-    FLOOR: 95,
-};
-
 export default class GeneratorLevel {
-    constructor(width, height, config, scene) {
+    constructor(width, height, config) {
         this.width = width;
         this.height = height;
         this.autoC = config.cellularAutomata;
         this.walkC = config.randomWalk;
-        this.scene = scene;
     }
 
     /***
@@ -81,52 +65,66 @@ export default class GeneratorLevel {
         return map;
     }
 
-    generateLevel() {
-        const map = this.createMap();
-        const tilesize = 32;
-        this.scene.map = this.scene.make.tilemap({
-            tileWidth: tilesize,
-            tileHeight: tilesize,
-            width: this.width,
-            height: this.height
-        });
-
-        const tileset = this.scene.map.addTilesetImage("tiles", null, tilesize, tilesize);
-        const floorLayer = this.scene.map.createBlankDynamicLayer("Floor", tileset);
-        const groundLayer = this.scene.map.createBlankDynamicLayer("Ground", tileset);
-        const otherLayer = this.scene.map.createBlankDynamicLayer("Other", tileset);
-
-        for (let y = 0; y < this.height; y++) {
-            for (let x = 0; x < this.width; x++) {
-                if (map[y][x] === 0)
-                    groundLayer.putTileAt(TILE_MAPPING.BLANK, x, y); // BLANK
-                else
-                    floorLayer.putTileAt(TILE_MAPPING.FLOOR, x, y); // floor
+    debugMap() {
+        let map = [];
+        for (let i = 0; i < this.width; ++i) {
+            map.push([]);
+            for (let j = 0; j < this.height; ++j) {
+                map[i].push(0);
             }
         }
 
-        // randomize player position
-        let playerX = 10, playerY = 10;
+        let cw = this.width / 2;
+        let ch = this.height / 2;
 
-        while (map[playerY][playerX] === 0) {
-            playerX = Math.floor(Math.random() * map.length);
-            playerY = Math.floor(Math.random() * map[0].length);            
-        }
-        
-        this.scene.player = this.scene.characterFactory.buildCharacter('punk', playerX*tilesize, playerY*tilesize, { player: true });
-        this.scene.physics.add.collider(this.scene.player, groundLayer);
-        this.scene.physics.add.collider(this.scene.player, otherLayer);
+        // center line
+        map[cw - 3][ch] = 1;
+        map[cw - 2][ch] = 1;
+        map[cw - 1][ch] = 1;
+        map[cw][ch] = 1;
+        map[cw + 1][ch] = 1;
+        map[cw + 2][ch] = 1;
+        map[cw + 3][ch] = 1;
+        map[cw + 4][ch] = 1;
 
-        const camera = this.scene.cameras.main;
-        camera.setZoom(1.0);
-        this.scene.physics.world.setBounds(0, 0, this.scene.map.widthInPixels, this.scene.map.heightInPixels, true);
-        camera.setBounds(0, 0, this.scene.map.widthInPixels, this.scene.map.heightInPixels);
-        camera.startFollow(this.scene.player);
+        // upper line
+        map[cw - 3][ch - 1] = 1;
+        map[cw - 2][ch - 1] = 1;
+        map[cw - 1][ch - 1] = 1;
+        map[cw][ch - 1] = 1;
+        map[cw + 1][ch - 1] = 1;
+        map[cw + 2][ch - 1] = 1;
+        map[cw + 3][ch - 1] = 1;
+        map[cw + 4][ch - 1] = 1;
 
-        groundLayer.setCollisionBetween(1, 500);
-        otherLayer.setDepth(10);
+        // upper x 2 line
+        map[cw - 1][ch - 2] = 1;
+        map[cw][ch - 2] = 1;
+        map[cw + 1][ch - 2] = 1;
 
-        return { Ground: groundLayer, Other: otherLayer };
+        // lower line
+        map[cw - 3][ch + 1] = 1;
+        map[cw - 2][ch + 1] = 1;
+        map[cw - 1][ch + 1] = 1;
+        map[cw][ch + 1] = 1;
+        map[cw + 1][ch + 1] = 1;
+        map[cw + 2][ch + 1] = 1;
+        map[cw + 3][ch + 1] = 1;
+        map[cw + 4][ch + 1] = 1;
+
+        // lower x 2 line
+        map[cw - 1][ch + 2] = 1;
+        map[cw][ch + 2] = 1;
+        map[cw + 1][ch + 2] = 1;
+        map[cw + 2][ch + 2] = 1;
+
+        // lower x 3 line
+        map[cw - 1][ch + 3] = 1;
+        map[cw][ch + 3] = 1;
+        map[cw + 1][ch + 3] = 1;
+        map[cw + 2][ch + 3] = 1;
+
+        return map;
+
     }
-
 }
