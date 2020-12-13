@@ -11,7 +11,7 @@ const LEVEL_TO_TILE = {
 }
 
 export default function buildLevel(width, height, maxRooms, scene){
-    let level = new Level(width, height, maxRooms); // level is a dictionary with names as keys and dynamic levels as values
+    let level = new Level(width, height, maxRooms); 
     const rooms = level.generateLevel();
     const levelMatrix = level.levelMatrix;
     serialize(level);
