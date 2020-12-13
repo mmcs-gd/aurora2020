@@ -10,7 +10,7 @@ export default class CellularAutomata {
 			for(let x = 0; x < this.width; ++x){
 				this.cellmap[x] = [];
 				for(let y = 0; y < this.height; ++y)
-					this.cellmap[x][y] = Math.random() <= chanceToStartAlive;   //здесь воспользоваться рандомом фазера
+					this.cellmap[x][y] = Phaser.Math.RND.frac() <= chanceToStartAlive;
 			}
 		}
 	}
