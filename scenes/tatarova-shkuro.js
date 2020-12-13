@@ -65,7 +65,7 @@ let TatarovaShkuro = new Phaser.Class({
         const width = 100;
         const height = 100;
 
-        const map = (new GeneratorLevel(width, height, config)).debugMap();
+        const map = (new GeneratorLevel(width, height, config)).createMap();
         const markedMap = (new MapLayout(map, width, height)).getMapLayout();
 
         const layers = (new TileMapper(markedMap, this, width, height, this.tileSize)).generateLevel();

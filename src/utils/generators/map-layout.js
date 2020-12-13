@@ -68,7 +68,7 @@ export default class MapLayout {
         //#endregion
 
         //#region INNER CORNERS
-       /* if (this.cellIsInnerTopLeft(neighbors)) {
+        if (this.cellIsInnerTopLeft(neighbors)) {
             return config.WALL.INNER_TOP_LEFT;
         }
 
@@ -82,7 +82,7 @@ export default class MapLayout {
 
         if (this.cellIsInnerBottomRight(neighbors)) {
             return config.WALL.INNER_BOTTOM_RIGHT;
-        }*/
+        }
         //#endregion
 
         //#region PLAIN SIDES

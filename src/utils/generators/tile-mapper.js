@@ -43,10 +43,10 @@ const TILE_MAPPING = {
         RIGHT: 12,
         BOTTOM: 1,
 
-        INNER_TOP_LEFT: 232,
-        INNER_TOP_RIGHT: 231,
-        INNER_BOTTOM_LEFT: 244,
-        INNER_BOTTOM_RIGHT: 243,
+        INNER_TOP_LEFT: 0,
+        INNER_TOP_RIGHT: 2,
+        INNER_BOTTOM_LEFT: 24,
+        INNER_BOTTOM_RIGHT: 26,
     },
     FLOOR: 16
 };
