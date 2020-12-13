@@ -41,8 +41,11 @@ export default class GeneratorLevel {
         //5. Снова соединяем и смотрим на дичь
         temp = this.OR(map, temp);
 
-        //6. Сглаживаем
-        this.smooth(temp);
+        //6. Наращиваем карту на 1
+        temp = this.enlarge(temp);
+
+        //7. Сглаживаем
+        temp = this.smooth(temp);
 
         return temp;
     }
@@ -89,6 +92,7 @@ export default class GeneratorLevel {
             for (let j = 1; j < map[0].length - 1; ++j)
                 if (map[i][j])
                     map[i][j] = map[i - 1][j] + map[i + 1][j] + map[i][j - 1] + map[i][j + 1] < 2 ? 0 : 1;
+        return map;
     }
 
     debugMap() {
@@ -150,7 +154,43 @@ export default class GeneratorLevel {
         map[cw + 1][ch + 3] = 1;
         map[cw + 2][ch + 3] = 1;
 
-        return map;
+        return this.enlarge(map);
 
+    }
+
+    setNeighbors(map, x, y) {
+        const dirs = [
+            { x: -1, y: -1},
+            { x: 0, y: -1},
+            { x: 1, y: -1},
+            { x: 1, y: 0},
+            { x: 1, y: 1},
+            { x: 0, y: 1},
+            { x: -1, y: 1},
+            { x: -1, y: 0}            
+        ];
+        for (const d of dirs) {
+            const x2 = x + d.x;
+            const y2 = y + d.y;
+            if (x2 < 0 || x2 >= this.width || y2 < 0 || y2 >= this.height) {
+                continue;
+            }
+            map[x2][y2] = 2;
+        }
+        return map;
+    }
+
+    enlarge(map) {
+        for (let x = 0; x < this.width; ++x) {
+            for (let y = 0; y < this.height; ++y) {
+                if (map[x][y] === 0) {
+                    map[x][y] = 0;
+                } else if (map[x][y] === 1) {
+                    map[x][y] = 2;
+                    map = this.setNeighbors(map, x, y);
+                }
+            }
+        }
+        return map;
     }
 }

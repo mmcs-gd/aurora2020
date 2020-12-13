@@ -110,36 +110,36 @@ export default class MapLayout {
     cellIsTop(cells) {
         // * * *
         // - - -
-        return this.isBlank(cells.top) &&
-            (this.isBlank(cells.topLeft) ||
-                this.isBlank(cells.topRight));
+        return this.isBlank(cells.top) //&&
+            // (this.isBlank(cells.topLeft) ||
+            //     this.isBlank(cells.topRight));
     }
 
     cellIsLeft(cells) {
         // * -
         // * -
         // * -
-        return this.isBlank(cells.left) &&
-            (this.isBlank(cells.topLeft) ||
-                this.isBlank(cells.bottomLeft));
+        return this.isBlank(cells.left) //&&
+            // (this.isBlank(cells.topLeft) ||
+            //     this.isBlank(cells.bottomLeft));
     }
 
     cellIsRight(cells) {
         // - * 
         // - *
         // - * 
-        return this.isBlank(cells.right) &&
-            (this.isBlank(cells.topRight) ||
-                this.isBlank(cells.bottomRight));
+        return this.isBlank(cells.right) //&&
+            // (this.isBlank(cells.topRight) ||
+            //     this.isBlank(cells.bottomRight));
     }
 
     cellIsBottom(cells) {
         // - * 
         // - *
         // - * 
-        return this.isBlank(cells.bottom) &&
-            (this.isBlank(cells.bottomLeft) ||
-                this.isBlank(cells.bottomRight));
+        return this.isBlank(cells.bottom) //&&
+            // (this.isBlank(cells.bottomLeft) ||
+            //     this.isBlank(cells.bottomRight));
     }
     //#endregion
 
@@ -149,7 +149,7 @@ export default class MapLayout {
         // * - -
         // * - -
         return this.isBlank(cells.top) &&
-            this.isBlank(cells.topLeft) &&
+            // this.isBlank(cells.topLeft) &&
             this.isBlank(cells.left);
     }
 
@@ -158,7 +158,7 @@ export default class MapLayout {
         // - - *
         // - - *
         return this.isBlank(cells.top) &&
-            this.isBlank(cells.topRight) &&
+            // this.isBlank(cells.topRight) &&
             this.isBlank(cells.right);
     }
 
@@ -168,7 +168,7 @@ export default class MapLayout {
         // * * *
         // return false;
         return this.isBlank(cells.bottom) &&
-            this.isBlank(cells.bottomLeft) &&
+            // this.isBlank(cells.bottomLeft) &&
             this.isBlank(cells.left);
     }
 
@@ -178,7 +178,7 @@ export default class MapLayout {
         // * * *
         // return false;
         return this.isBlank(cells.bottom) &&
-            this.isBlank(cells.bottomRight) &&
+            // this.isBlank(cells.bottomRight) &&
             this.isBlank(cells.right);
     }
     //#endregion
