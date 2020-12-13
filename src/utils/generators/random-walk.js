@@ -79,7 +79,7 @@ export default class RandomWalk {
             shouldBreak = true;
         }
         if (pos.y >= this.height) {
-            pos.y = h - 1;
+            pos.y = this.height - 1;
             shouldBreak = true;
         }
         if (pos.y < 0) {
