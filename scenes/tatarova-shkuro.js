@@ -1,7 +1,7 @@
 // import tilemapPng from '../assets/tileset/Dungeon.png'
 import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
-
-import dungeonRoomJson from '../assets/dungeon_room.json'
+import crystalTilemapPng from '../assets/tileset/Crystal_tileset.png'
+// import dungeonRoomJson from '../assets/dungeon_room.json'
 import auroraSpriteSheet from '../assets/sprites/characters/aurora.png'
 import punkSpriteSheet from '../assets/sprites/characters/punk.png'
 import blueSpriteSheet from '../assets/sprites/characters/blue.png'
@@ -44,7 +44,9 @@ let TatarovaShkuro = new Phaser.Class({
 
         //loading map tiles and json with positions
         this.load.image("tiles", tilemapPng);
-        this.load.tilemapTiledJSON("map", dungeonRoomJson);
+        this.load.image("crystals", crystalTilemapPng);
+
+        // this.load.tilemapTiledJSON("map", dungeonRoomJson);
 
         //loading spitesheets
         this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);

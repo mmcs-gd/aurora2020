@@ -1,23 +1,54 @@
 import { config, digitToType } from './map-config';
 
-const TILE_MAPPING = {
-    BLANK: 17,
-    WALL: {
-        TOP_LEFT: 3,
-        TOP_RIGHT: 5,
-        BOTTOM_RIGHT: 53,
-        BOTTOM_LEFT: 51,
+// Dangeon
+// const TILE_MAPPING = {
+//     BLANK: 17,
+//     WALL: {
+//         TOP_LEFT: 3,
+//         TOP_RIGHT: 5,
+//         BOTTOM_RIGHT: 53,
+//         BOTTOM_LEFT: 51,
         
-        TOP: 4,
-        LEFT: 18, //35, //18,
-        RIGHT: 16, // 37, //16,
-        BOTTOM: 52, // 1, //52,
-        INNER_TOP_LEFT: 0,
-        INNER_TOP_RIGHT: 2,
-        INNER_BOTTOM_LEFT: 32,
-        INNER_BOTTOM_RIGHT: 34,
+//         TOP: 4,
+//         LEFT: 18, //35, //18,
+//         RIGHT: 16, // 37, //16,
+//         BOTTOM: 52, // 1, //52,
+//         INNER_TOP_LEFT: 0,
+//         INNER_TOP_RIGHT: 2,
+//         INNER_BOTTOM_LEFT: 32,
+//         INNER_BOTTOM_RIGHT: 34,
+//     },
+//     FLOOR: 95
+// };
+
+// Crystal
+const TILE_MAPPING = {
+    BLANK: 13,
+    WALL: {
+        // TOP_LEFT: 3,
+        // TOP_RIGHT: 5,
+        // BOTTOM_RIGHT: 29,
+        // BOTTOM_LEFT: 27,
+        TOP_LEFT: 180,
+        TOP_RIGHT: 181,
+        BOTTOM_RIGHT: 193,
+        BOTTOM_LEFT: 192,
+        
+        // TOP: 4,
+        // LEFT: 15,
+        // RIGHT: 17,
+        // BOTTOM: 28,
+        TOP: 25,
+        LEFT: 14,
+        RIGHT: 12,
+        BOTTOM: 1,
+
+        INNER_TOP_LEFT: 232,
+        INNER_TOP_RIGHT: 231,
+        INNER_BOTTOM_LEFT: 244,
+        INNER_BOTTOM_RIGHT: 243,
     },
-    FLOOR: 95
+    FLOOR: 16
 };
 
 export default class TileMapper {
@@ -37,7 +68,7 @@ export default class TileMapper {
             height: this.height
         });
 
-        const tileset = this.scene.map.addTilesetImage("tiles", null, this.tilesize, this.tilesize);
+        const tileset = this.scene.map.addTilesetImage("crystals", null, this.tilesize, this.tilesize);
         const floorLayer = this.scene.map.createBlankDynamicLayer("Floor", tileset);
         const groundLayer = this.scene.map.createBlankDynamicLayer("Ground", tileset);
         const otherLayer = this.scene.map.createBlankDynamicLayer("Other", tileset);
