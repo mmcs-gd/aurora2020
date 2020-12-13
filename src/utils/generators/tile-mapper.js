@@ -20,7 +20,7 @@ const TILE_MAPPING = {
     FLOOR: 95
 };
 
-export default class LevelCreator {
+export default class TileMapper {
     constructor(map, scene, width, height, tilesize) {
         this.width = width;
         this.height = height;

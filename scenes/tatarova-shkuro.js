@@ -13,7 +13,7 @@ import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 
 import GeneratorLevel from '../src/utils/generators/level-generator';
 import MapLayout from '../src/utils/generators/map-layout';
-import LevelCreator from '../src/utils/generators/level-creator';
+import TileMapper from '../src/utils/generators/tile-mapper';
 
 const config = {
 	cellularAutomata: {
@@ -66,7 +66,7 @@ let TatarovaShkuro = new Phaser.Class({
         const map = (new GeneratorLevel(width, height, config)).debugMap();
         const markedMap = (new MapLayout(map, width, height)).getMapLayout();
 
-        const layers = (new LevelCreator(markedMap, this, width, height, this.tileSize)).generateLevel();
+        const layers = (new TileMapper(markedMap, this, width, height, this.tileSize)).generateLevel();
         this.gameObjects.push(this.player);
         this.groundLayer = layers.Ground;
         this.otherLayer = layers.Other;
