@@ -15,6 +15,7 @@ import SteeringPursuitWithDistanceScene from './steering-pursuit-with-distance'
 import SteeringFleeScene from './steering-flee-scene';
 import SteeringExploringScene from './steering-exploring-scene';
 import SteeringUnionGroupScene from './steering-union-group-scene';
+import TatarovaShkuro from './tatarova-shkuro';
 
 const scenes = [
     ['StartingScene', StartingScene],
@@ -29,6 +30,7 @@ const scenes = [
     ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
     ['MinerScene', MinerScene],
     ['SteeringUnionGroupScene', SteeringUnionGroupScene],
+    ['Tatarova-Shkuro', TatarovaShkuro]
 
 ];
 

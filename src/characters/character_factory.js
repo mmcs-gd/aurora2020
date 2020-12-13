@@ -65,7 +65,9 @@ export default class CharacterFactory {
 
     buildPlayerCharacter(spriteSheetName, x, y) {
         let character = new Player(this.scene, x, y, spriteSheetName,2);
-        character.maxSpeed = 100;
+        // character.maxSpeed = 100;
+        character.maxSpeed = 1000;
+        
         character.setCollideWorldBounds(true);
         character.cursors = this.scene.input.keyboard.createCursorKeys();
         character.animationSets = this.animationLibrary.get('punk');
