@@ -4,7 +4,11 @@ import Exploring from "../ai/steerings/exploring";
 const TILE_MAPPING = {
     BLANK: 17,
     FLOOR: 95,
-  };
+};
+const LEVEL_TO_TILE = {
+    0: TILE_MAPPING.BLANK,
+    1: TILE_MAPPING.FLOOR
+}
 
 export default function buildLevel(width, height, maxRooms, scene){
     let level = new Level(width, height, maxRooms); // level is a dictionary with names as keys and dynamic levels as values
@@ -30,9 +34,13 @@ export default function buildLevel(width, height, maxRooms, scene){
     // ground tiles mapping
     for(let y = 0; y < height; y++)
         for(let x = 0; x < width; x++)
-            if(levelMatrix[y][x] === 0)
-                outsideLayer.putTileAt(TILE_MAPPING.BLANK, x, y);
-            else groundLayer.putTileAt(TILE_MAPPING.FLOOR, x, y);
+        {
+            let index = levelMatrix[y][x];
+            if(index === 0)
+                outsideLayer.putTileAt(LEVEL_TO_TILE[index], x, y);
+            else 
+                groundLayer.putTileAt(LEVEL_TO_TILE[index], x, y);
+        }
 
     if (rooms.length != 0)
     {
