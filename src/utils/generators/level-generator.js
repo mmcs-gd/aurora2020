@@ -44,10 +44,12 @@ export default class GeneratorLevel {
         //6. Наращиваем карту на 1 (на 2)
         temp = this.enlarge(temp);
         temp = this.enlarge(temp);
+        // temp = this.enlarge(temp);
+        
         
 
         //7. Сглаживаем
-        temp = this.smooth(temp);
+        // temp = this.smooth(temp);
 
         return temp;
     }
@@ -177,7 +179,9 @@ export default class GeneratorLevel {
             if (x2 < 0 || x2 >= this.width || y2 < 0 || y2 >= this.height) {
                 continue;
             }
-            map[x2][y2] = 2;
+            if (map[x2][y2] === 0) {
+                map[x2][y2] = 2;
+            }
         }
         return map;
     }
