@@ -180,12 +180,12 @@ export default class Level{
         if(number === 0) return;
         if (number === 1){
             let x = 0, y = 0;
-            let notAdded = true;
-            while(notAdded) {
+            let alreadyAdded = true;
+            while(alreadyAdded) {
                 x = Phaser.Math.RND.integerInRange(left, right);
                 y = Phaser.Math.RND.integerInRange(top, down);
                 if(this.levelMatrix[y][x] < 1)
-                    notAdded = false;
+                    alreadyAdded = false;
             }
             points.push(new Vector2(x, y));
             this.levelMatrix[y][x] = points.length;
