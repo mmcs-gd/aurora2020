@@ -8,39 +8,42 @@ import blueSpriteSheet from '../assets/sprites/characters/blue.png'
 import yellowSpriteSheet from '../assets/sprites/characters/yellow.png'
 import greenSpriteSheet from '../assets/sprites/characters/green.png'
 import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
+import mineSpriteSheet from '../assets/sprites/characters/bomb.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 
-import Pursuit from "../src/ai/steerings/pursuit"
-import Evade from "../src/ai/steerings/evade"
-
-let SteeringEvadeAndPursuitScene = new Phaser.Class({
+let MinerScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
     initialize:
 
         function StartingScene() {
-            Phaser.Scene.call(this, {key: 'SteeringEvadeAndPursuitScene'});
+            Phaser.Scene.call(this, {key: 'MinerScene'});
         },
-        characterFrameConfig: {frameWidth: 31, frameHeight: 31},
-        slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
-        preload: function () {
-    
-            //loading map tiles and json with positions
-            this.load.image("tiles", tilemapPng);
-            this.load.tilemapTiledJSON("map", dungeonRoomJson);
-    
-            //loading spitesheets
-            this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
-            this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
-            this.load.spritesheet('green', greenSpriteSheet, this.characterFrameConfig);
-            this.load.spritesheet('yellow', yellowSpriteSheet, this.characterFrameConfig);
-            this.load.spritesheet('punk', punkSpriteSheet, this.characterFrameConfig);
-            this.load.spritesheet('slime', slimeSpriteSheet, this.slimeFrameConfig);
-            this.load.audio('footsteps', Footsteps);
-        },
+    characterFrameConfig: {frameWidth: 31, frameHeight: 31},
+    slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
+    mineFrameConfig: { frameWidth: 130, frameHeight: 130 },
+    // boomFrameConfig: { frameWidth: 112, frameHeight: 112 },
+    preload: function () {
+
+        //loading map tiles and json with positions
+        this.load.image("tiles", tilemapPng);
+        this.load.tilemapTiledJSON("map", dungeonRoomJson);
+
+        //loading spitesheets
+        this.load.spritesheet('slime', slimeSpriteSheet, this.slimeFrameConfig);
+        this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
+        this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
+        this.load.spritesheet('green', greenSpriteSheet, this.characterFrameConfig);
+        this.load.spritesheet('yellow', yellowSpriteSheet, this.characterFrameConfig);
+        this.load.spritesheet('punk', punkSpriteSheet, this.characterFrameConfig);
+        this.load.spritesheet('mine', mineSpriteSheet, this.mineFrameConfig);
+        // this.load.spritesheet('boom', boomSpriteSheet, this.boomFrameConfig);
+        this.load.audio('footsteps', Footsteps);
+    },
     create: function () {
+
         this.gameObjects = [];
         const map = this.make.tilemap({key: "map"});
 
@@ -56,7 +59,6 @@ let SteeringEvadeAndPursuitScene = new Phaser.Class({
         this.tileSize = 32;
         this.finder = new EasyStar.js();
         let grid = [];
-
         for(let y = 0; y < worldLayer.tilemap.height; y++){
             let col = [];
             for(let x = 0; x < worldLayer.tilemap.width; x++) {
@@ -76,31 +78,28 @@ let SteeringEvadeAndPursuitScene = new Phaser.Class({
         this.physics.world.bounds.height = map.heightInPixels;
         this.characterFactory = new CharacterFactory(this);
 
-        
         // Creating characters
-
-        this.evader = this.characterFactory.buildCharacter('green',
-            300, 150, {Steering: 1});
-        this.player = this.characterFactory.buildCharacter('aurora',
-            100, 120, {Steering: 1});
-        
-        
-        this.evader.steering = new Evade(this, this.player);
-        this.player.steering = new Pursuit(this, this.evader);
-
-        
-        
-
-        this.gameObjects.push(this.evader);
+        this.player = this.characterFactory.buildCharacter('punk', 100, 100, {player: true});
         this.gameObjects.push(this.player);
-        
-
         this.physics.add.collider(this.player, worldLayer);
-        this.physics.add.collider(this.evader, worldLayer);
-        this.physics.add.collider(this.evader, this.player);
 
-        
-        
+        this.mines = this.physics.add.group();
+
+        this.slimes =  this.physics.add.group();
+        let params = {};
+        params.useSteering = true;
+        // slimes amount !
+        for(let i = 0; i < 15; i++) {
+            const x = Phaser.Math.RND.between(50, this.physics.world.bounds.width - 50 );
+            const y = Phaser.Math.RND.between(50, this.physics.world.bounds.height -50 );
+            params.slimeType = Phaser.Math.RND.between(0, 4);
+            const slime = this.characterFactory.buildSlime(x, y, params);
+            this.slimes.add(slime);
+            this.physics.add.collider(slime, worldLayer);
+            this.gameObjects.push(slime);
+        }
+        this.physics.add.collider(this.player, this.slimes);
+
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
             this.physics.world.createDebugGraphic();
@@ -118,6 +117,10 @@ let SteeringEvadeAndPursuitScene = new Phaser.Class({
                 element.update();
             });
         }
+        const mineEntries = this.mines.children.entries;
+        if (mineEntries.length > 0) {
+            mineEntries.forEach(element => element.update());
+        }
 
     },
     tilesToPixels(tileX, tileY)
@@ -126,4 +129,4 @@ let SteeringEvadeAndPursuitScene = new Phaser.Class({
     }
 });
 
-export default SteeringEvadeAndPursuitScene
+export default MinerScene

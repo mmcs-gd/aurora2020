@@ -1,9 +1,9 @@
 import Vector2 from 'phaser/src/math/Vector2'
 
 export default class Steering {
-    constructor (owner, target, force = 1) {
+    constructor (owner, objects, force = 1) {
         this.owner = owner;
-        this.target = target;
+        this.objects = objects;
         this.force = force;
     }
 

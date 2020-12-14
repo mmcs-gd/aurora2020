@@ -10,21 +10,23 @@ import greenSpriteSheet from '../assets/sprites/characters/green.png'
 import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
-import {Seek} from "../src/ai/steerings/seek";
 
-let SteeringSeekScene = new Phaser.Class({
+
+import Exploring from "../src/ai/steerings/exploring"
+
+let SteeringExploringScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
     initialize:
 
         function StartingScene() {
-            Phaser.Scene.call(this, {key: 'SteeringSeekScene'});
+            Phaser.Scene.call(this, {key: 'SteeringExploringScene'});
         },
     characterFrameConfig: {frameWidth: 31, frameHeight: 31},
-    slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
-    preload: function () {
+        slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
 
+    preload: function () {
         //loading map tiles and json with positions
         this.load.image("tiles", tilemapPng);
         this.load.tilemapTiledJSON("map", dungeonRoomJson);
@@ -39,14 +41,12 @@ let SteeringSeekScene = new Phaser.Class({
         this.load.audio('footsteps', Footsteps);
     },
     create: function () {
-
         this.gameObjects = [];
         const map = this.make.tilemap({key: "map"});
 
         // Parameters are the name you gave the tileset in Tiled and then the key of the tileset image in
         // Phaser's cache (i.e. the name you used in preload)
         const tileset = map.addTilesetImage("Dungeon_Tileset", "tiles");
-
 
         // Parameters: layer name (or index) from Tiled, tileset, x, y
         const belowLayer = map.createStaticLayer("Floor", tileset, 0, 0);
@@ -75,14 +75,15 @@ let SteeringSeekScene = new Phaser.Class({
         this.characterFactory = new CharacterFactory(this);
 
         // Creating characters
-        this.player = this.characterFactory.buildCharacter('aurora', 100, 100, {player: true});
-        this.gameObjects.push(this.player);
-        this.physics.add.collider(this.player, worldLayer);
-        
-        this.seeker = this.characterFactory.buildCharacter('yellow',400,200,{steering : new Seek(this,[this.player])});
-        this.gameObjects.push(this.seeker);
-        this.physics.add.collider(this.seeker, worldLayer);
-        this.physics.add.collider(this.seeker, this.player);
+        for(let i = 0; i < 10; i++)
+        {
+            this.explorer = this.characterFactory.buildCharacter('green', 200, 100, {Steering: new Exploring(this)});
+            this.gameObjects.push(this.explorer);
+            this.physics.add.collider(this.explorer, worldLayer);
+        }
+        this.explorer = this.characterFactory.buildCharacter('green', 200, 100, {Steering: new Exploring(this)});
+        this.gameObjects.push(this.explorer);
+        this.physics.add.collider(this.explorer, worldLayer);
 
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
@@ -106,7 +107,7 @@ let SteeringSeekScene = new Phaser.Class({
     tilesToPixels(tileX, tileY)
     {
         return [tileX*this.tileSize, tileY*this.tileSize];
-    },
+    }
 });
 
-export default SteeringSeekScene
+export default SteeringExploringScene

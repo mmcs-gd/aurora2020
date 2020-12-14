@@ -83,7 +83,8 @@ let SteeringEvadeScene = new Phaser.Class({
         this.gameObjects.push(this.player);
         this.physics.add.collider(this.player, worldLayer);
 
-        this.evader = this.characterFactory.buildCharacter('green', 300, 150, {Steering: new Evade(this, this.player)});
+        this.evader = this.characterFactory.buildCharacter('green', 300, 150,
+            {Steering: new Evade(this, this.player)});
         this.gameObjects.push(this.evader);
         this.physics.add.collider(this.evader, worldLayer);
         this.physics.add.collider(this.evader, this.player);
