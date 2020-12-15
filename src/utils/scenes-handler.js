@@ -146,21 +146,30 @@ import TILE_MAPPING from './Tile.js'
 
 
         // добавим цель
-        let endRoom = rooms[rooms.length - 1];
-
-        let win = {x: -1, y:-1};
-        if (Math.random() > 0.93)
+        let win = {x: -1, y: -1};
+        if (Math.random() > 0.84)
         {
-          groundLayer.putTileAt(TILE_MAPPING.CHEST, 
-            rooms[rooms.length - 2].startCenter.x, 
-            rooms[rooms.length - 2].startCenter.y);
-            win = {x: rooms[rooms.length - 2].startCenter.x * 32 + 10,
-                   y: rooms[rooms.length - 2].startCenter.y * 32 + 10};
+            let winRoom = rooms[rooms.length - 2];
+
+            groundLayer.putTileAt(TILE_MAPPING.CHEST, winRoom.startCenter.x, winRoom.startCenter.y);
+
+
+            floorLayer.putTileAt(TILE_MAPPING.FLOOR.BLACK, winRoom.startCenter.x, winRoom.startCenter.y)
+
+            floorLayer.putTileAt(TILE_MAPPING.FLOOR.BLACK, winRoom.startCenter.x, winRoom.startCenter.y + 1)
+            floorLayer.putTileAt(TILE_MAPPING.FLOOR.BLACK, winRoom.startCenter.x, winRoom.startCenter.y - 1)
+
+            floorLayer.putTileAt(TILE_MAPPING.FLOOR.BLACK, winRoom.startCenter.x + 1, winRoom.startCenter.y)
+            floorLayer.putTileAt(TILE_MAPPING.FLOOR.BLACK, winRoom.startCenter.x - 1, winRoom.startCenter.y)
+
+
+            win = {x: winRoom.startCenter.x * 32 + 10,
+                   y: winRoom.startCenter.y * 32 + 10};
          }
         
-
+        let endRoom = rooms[rooms.length - 1];
         groundLayer.putTileAt(TILE_MAPPING.STAIRS, endRoom.startCenter.x, endRoom.startCenter.y);
-        floorLayer.putTileAt(TILE_MAPPING.BLANK, endRoom.startCenter.x, endRoom.startCenter.y);
+        //floorLayer.putTileAt(TILE_MAPPING.BLANK, endRoom.startCenter.x, endRoom.startCenter.y);
         let goal = {x: endRoom.startCenter.x  * 32 + 10, y: endRoom.startCenter.y * 32 + 10 }
         //
 
@@ -175,5 +184,5 @@ import TILE_MAPPING from './Tile.js'
         groundLayer.setCollisionBetween(1, 500);
         OtherSubjLayer.setDepth(10);
 
-      return {"Ground" : groundLayer, "OtherSubj" : OtherSubjLayer, "Floor" : floorLayer, "Goal": goal, "Win":win}
+      return {"Ground" : groundLayer, "OtherSubj" : OtherSubjLayer, "Floor" : floorLayer, "Goal": goal, "Win": win}
 };

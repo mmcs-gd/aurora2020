@@ -14,6 +14,7 @@ const TILE_MAPPING = {
     FLOOR:{
        USUALY: 95,
        BROKEN: 248,
+       BLACK: 151,
     },
     TOWER: {
       HEAD: 208,
@@ -21,7 +22,7 @@ const TILE_MAPPING = {
     },
     TRASH: 86,
     CHEST: 260,
-    STAIRS: 212,
+    STAIRS: 211,
   };
   
   export default TILE_MAPPING;
