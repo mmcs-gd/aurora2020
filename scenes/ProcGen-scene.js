@@ -38,14 +38,17 @@ let ProcScene = new Phaser.Class({
         this.gameObjects = []; // Впринципе можн было это не делать, 
                                 // но для того, что бы можно было кидать объекты, не только в handler
 
-        let width = 100; 
-        let height = 100; 
-        let maxRooms = 100;
+        let width = 25; 
+        let height = 25; 
+        let maxRooms = 25;
 
         const layers = buildLevel(width, height, maxRooms, this);
         this.gameObjects.push(this.player);
         this.groundLayer = layers["Ground"];
         this.OtherSubjLayer = layers["OtherSubj"];
+        this.floorjLayer = layers["Floor"];
+
+        this.goal = layers["Goal"];
         // Аналогично предыдущему, можно убрать, 
         // ничего не измениться, но если мы хотим кидать npc или плюшки, пигодиться
         
@@ -58,7 +61,7 @@ let ProcScene = new Phaser.Class({
                 .setAlpha(0.75)
                 .setDepth(20);
         });
-        //console.log(this)
+        console.log(this)
 
     },
 
@@ -80,3 +83,8 @@ let ProcScene = new Phaser.Class({
 });
 
 export default ProcScene
+
+function isAttained()
+{
+    
+}

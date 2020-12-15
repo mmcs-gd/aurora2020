@@ -14,7 +14,16 @@ const TILE_MAPPING = {
       RIGHT: 16,
       BOTTOM: 52
     },
-    FLOOR: 95,
+    FLOOR:{
+       USUALY: 95,
+       BROKEN: 248,
+    },
+    TOWER: {
+      HEAD: 208,
+      TILE: 224,
+    },
+    TRASH: 86,
+    CHEST: 260,
   };
 
   export default function buildLevel(width, height, maxRooms, scene){
@@ -41,11 +50,17 @@ const TILE_MAPPING = {
             if(levelMatrix[y][x] === 0)
                 groundLayer.putTileAt(TILE_MAPPING.BLANK, x, y); // BLANK
             else 
-                floorLayer.putTileAt(TILE_MAPPING.FLOOR, x, y); // floor
+            {
+              if (Math.random() > 0.98)
+                floorLayer.putTileAt(TILE_MAPPING.FLOOR.BROKEN, x, y); // floor
+              else
+                floorLayer.putTileAt(TILE_MAPPING.FLOOR.USUALY, x, y); // floor
+            }
 
     
     let flag = true;
 
+    //console.log(level)
     rooms.forEach(room => {
         const {x, y} = room.startCenter;
         const {width, height, left, right, top, down } = room;
@@ -84,6 +99,29 @@ const TILE_MAPPING = {
         groundLayer.putTileAt(TILE_MAPPING.WALL.TOP_RIGHT, right, top);
         groundLayer.putTileAt(TILE_MAPPING.WALL.BOTTOM_RIGHT, right, down);
         groundLayer.putTileAt(TILE_MAPPING.WALL.BOTTOM_LEFT, left, down);
+
+        //добавим рандомные объекты
+        if (Math.random() >= 0.7)
+        {
+          groundLayer.putTileAt(TILE_MAPPING.TOWER.TILE,
+            (x + 4 > w ? x + 1: x + 4 ),
+            (y + 4 > h ? y + 1: y + 4));
+
+            groundLayer.putTileAt(TILE_MAPPING.TOWER.HEAD,
+              (x + 4 > w ? x + 1: x + 4 ),
+              (y + 3 > h ? y: y + 3));
+        }
+
+        if (Math.random() >= 0.5)
+        {
+
+          let rand_X = x + Math.floor(Math.random() * 3) + 1;
+          let rand_Y = y + Math.floor(Math.random() * 3) + 1;
+
+          groundLayer.putTileAt(TILE_MAPPING.TRASH,
+            (rand_X < w ? rand_X: rand_X - 1),
+            (rand_Y < h ? rand_Y: rand_Y - 1));
+        }
     });
 
 
@@ -126,6 +164,12 @@ const TILE_MAPPING = {
         ////
 
 
+        // добавим цель
+        let endRoom = rooms[rooms.length - 1];
+        groundLayer.putTileAt(TILE_MAPPING.CHEST, endRoom.startCenter.x, endRoom.startCenter.y);
+        let goal = {x: endRoom.startCenter.x, y: endRoom.startCenter.y }
+        //
+
         // Меняем настройки камеры, а так же размер карты
         const camera = scene.cameras.main;
         camera.setZoom(1.0)
@@ -137,5 +181,5 @@ const TILE_MAPPING = {
         groundLayer.setCollisionBetween(1, 500);
         OtherSubjLayer.setDepth(10);
 
-      return {"Ground" : groundLayer, "OtherSubj" : OtherSubjLayer}
+      return {"Ground" : groundLayer, "OtherSubj" : OtherSubjLayer, "Floor" : floorLayer, "Goal": goal}
 };
