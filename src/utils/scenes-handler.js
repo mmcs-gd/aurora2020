@@ -160,6 +160,7 @@ import TILE_MAPPING from './Tile.js'
         
 
         groundLayer.putTileAt(TILE_MAPPING.STAIRS, endRoom.startCenter.x, endRoom.startCenter.y);
+        floorLayer.putTileAt(TILE_MAPPING.BLANK, endRoom.startCenter.x, endRoom.startCenter.y);
         let goal = {x: endRoom.startCenter.x  * 32 + 10, y: endRoom.startCenter.y * 32 + 10 }
         //
 
