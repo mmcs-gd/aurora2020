@@ -84,10 +84,16 @@ let ProcScene = new Phaser.Class({
         {
             if (disance(this.player, this.win) < 32)
             {
-                
+                // мы победили, но не приддумал пока ничего улчше этого
+                if (this._runningScene !== null) {
+                    this.scene.pause(this._runningScene);
+                    this.scene.stop(this._runningScene);
+                    this._runningScene = null;
+                }
             }
         }
 
+        //console.log(this.win)
         //console.log(disance(this.player, this.goal), this.player.x, this.player.y, this.goal.x, this.goal.y)
         if (disance(this.player, this.goal) < 32)
         {
