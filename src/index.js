@@ -11,7 +11,7 @@ const config = {
   width: 800,
   height: 600,
   pixelArt: true,
-  zoom: 1.2,
+  zoom: 1.1,
   scene: MenuScene,
   physics: {
     default: "arcade",

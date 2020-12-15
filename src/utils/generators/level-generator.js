@@ -39,12 +39,13 @@ export default class GeneratorLevel {
         temp = automataWild.createMap(3, 4, 5)
 
         //5. Снова соединяем и смотрим на дичь
-        temp = this.OR(map, temp);
+        //temp = this.OR(map, temp);
+				temp = map; //не генерируем дичь
 
         //6. Наращиваем карту на 1 (на 2)
         temp = this.enlarge(temp);
-        temp = this.enlarge(temp);
-        // temp = this.enlarge(temp);
+        //temp = this.enlarge(temp);
+				//temp = this.enlarge(temp);
         
         
 

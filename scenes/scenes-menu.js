@@ -18,18 +18,18 @@ import SteeringUnionGroupScene from './steering-union-group-scene';
 import TatarovaShkuro from './tatarova-shkuro';
 
 const scenes = [
-    ['StartingScene', StartingScene],
-    ['SteeringFleeScene', SteeringFleeScene],
-    ['SteeringExploringScene', SteeringExploringScene],
-    ['SteeringRudnevScene', SteeringRudnevScene],
-    ['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
-    ['SteeringPursuitScene', SteeringPursuitScene],
-    ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
-    ['SteeringWanderingScene', SteeringWanderingScene],
-    ['SteeringArrivalScene', SteeringArrivalScene],
-    ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
-    ['MinerScene', MinerScene],
-    ['SteeringUnionGroupScene', SteeringUnionGroupScene],
+    //['StartingScene', StartingScene],
+    //['SteeringFleeScene', SteeringFleeScene],
+    //['SteeringExploringScene', SteeringExploringScene],
+    //['SteeringRudnevScene', SteeringRudnevScene],
+    //['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
+    //['SteeringPursuitScene', SteeringPursuitScene],
+    //['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
+    //['SteeringWanderingScene', SteeringWanderingScene],
+    //['SteeringArrivalScene', SteeringArrivalScene],
+    //['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
+   // ['MinerScene', MinerScene],
+    //['SteeringUnionGroupScene', SteeringUnionGroupScene],
     ['Tatarova-Shkuro', TatarovaShkuro]
 
 ];

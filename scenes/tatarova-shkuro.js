@@ -15,17 +15,19 @@ import GeneratorLevel from '../src/utils/generators/level-generator';
 import MapLayout from '../src/utils/generators/map-layout';
 import TileMapper from '../src/utils/generators/tile-mapper';
 
+import { fillability } from '../src/utils/generators/metrics';
+
 const config = {
 	cellularAutomata: {
 		deathLimit: 3,
-		birthLimit: 4, 
+		birthLimit: 3, 
 		chanceToStartAlive: 0.45
 	},
 	randomWalk: {
-		maxTunnels: 5, 
-		maxLength: 10,
-		minWidth: 5,
-		maxWidth: 8
+		maxTunnels: 20, 
+		maxLength: 30,
+		minWidth: 2,
+		maxWidth: 4
 	}
 };
 
@@ -64,10 +66,15 @@ let TatarovaShkuro = new Phaser.Class({
 
         const width = 100;
         const height = 100;
-
-        const map = (new GeneratorLevel(width, height, config)).createMap();
-        const markedMap = (new MapLayout(map, width, height)).getMapLayout();
-
+				
+				let map = [];
+				let markedMap = [];
+				do {
+					map = (new GeneratorLevel(width, height, config)).createMap();
+					markedMap = (new MapLayout(map, width, height)).getMapLayout();
+				} while (fillability(markedMap) < 0.13);
+			
+				
         const layers = (new TileMapper(markedMap, this, width, height, this.tileSize)).generateLevel();
         this.gameObjects.push(this.player);
         this.groundLayer = layers.Ground;
