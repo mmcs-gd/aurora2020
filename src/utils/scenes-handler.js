@@ -1,30 +1,7 @@
 import Scene from "./scenes-generator.js"
 
 import Evade from '../ai/steerings/evade'
-
-const TILE_MAPPING = {
-    BLANK: 17,
-    WALL: {
-      TOP_LEFT: 3,
-      TOP_RIGHT: 5,
-      BOTTOM_RIGHT: 53,
-      BOTTOM_LEFT: 51,
-      TOP: 14,
-      LEFT: 18,
-      RIGHT: 16,
-      BOTTOM: 52
-    },
-    FLOOR:{
-       USUALY: 95,
-       BROKEN: 248,
-    },
-    TOWER: {
-      HEAD: 208,
-      TILE: 224,
-    },
-    TRASH: 86,
-    CHEST: 260,
-  };
+import TILE_MAPPING from './Tile.js'
 
   export default function buildLevel(width, height, maxRooms, scene){
     let level = new Scene(width, height, maxRooms);
@@ -103,13 +80,17 @@ const TILE_MAPPING = {
         //добавим рандомные объекты
         if (Math.random() >= 0.7)
         {
-          groundLayer.putTileAt(TILE_MAPPING.TOWER.TILE,
-            (x + 4 > w ? x + 1: x + 4 ),
-            (y + 4 > h ? y + 1: y + 4));
+          let rand_X = x + Math.floor(Math.random() * 3) + 1;
+          let rand_Y = y + Math.floor(Math.random() * 3) + 1;
+          
+          groundLayer.putTileAt(TILE_MAPPING.TOWER.TAIL,
+            (rand_X < w ? rand_X: rand_X - 1),
+            (rand_Y < h ? rand_Y: rand_Y - 1));
 
             groundLayer.putTileAt(TILE_MAPPING.TOWER.HEAD,
-              (x + 4 > w ? x + 1: x + 4 ),
-              (y + 3 > h ? y: y + 3));
+              (rand_X < w ? rand_X: rand_X - 1),
+              (rand_Y -1  < h ? rand_Y -1: rand_Y -1 - 1));
+
         }
 
         if (Math.random() >= 0.5)
@@ -166,8 +147,20 @@ const TILE_MAPPING = {
 
         // добавим цель
         let endRoom = rooms[rooms.length - 1];
-        groundLayer.putTileAt(TILE_MAPPING.CHEST, endRoom.startCenter.x, endRoom.startCenter.y);
-        let goal = {x: endRoom.startCenter.x, y: endRoom.startCenter.y }
+
+        let win = {x: -1, y:-1};
+        if (Math.random() > 0.93)
+        {
+          groundLayer.putTileAt(TILE_MAPPING.CHEST, 
+            rooms[rooms.length - 2].startCenter.x, 
+            rooms[rooms.length - 2].startCenter.y);
+            win = {x: rooms[rooms.length - 2].startCenter.x * 32 + 10,
+                   y: rooms[rooms.length - 2].startCenter.y * 32 + 10};
+         }
+        
+
+        groundLayer.putTileAt(TILE_MAPPING.STAIRS, endRoom.startCenter.x, endRoom.startCenter.y);
+        let goal = {x: endRoom.startCenter.x  * 32 + 10, y: endRoom.startCenter.y * 32 + 10 }
         //
 
         // Меняем настройки камеры, а так же размер карты
@@ -181,5 +174,5 @@ const TILE_MAPPING = {
         groundLayer.setCollisionBetween(1, 500);
         OtherSubjLayer.setDepth(10);
 
-      return {"Ground" : groundLayer, "OtherSubj" : OtherSubjLayer, "Floor" : floorLayer, "Goal": goal}
+      return {"Ground" : groundLayer, "OtherSubj" : OtherSubjLayer, "Floor" : floorLayer, "Goal": goal, "Win":win}
 };

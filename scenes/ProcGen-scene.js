@@ -11,6 +11,12 @@ import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 
 
+import TILE_MAPPING from '../src/utils/Tile.js'
+
+
+let GLOB_WIDTH = 25;
+let GLOB_HEIGHT = 25;
+let GLOB_MAXROOM = 25;
 
 let ProcScene = new Phaser.Class({
 
@@ -38,18 +44,19 @@ let ProcScene = new Phaser.Class({
         this.gameObjects = []; // Впринципе можн было это не делать, 
                                 // но для того, что бы можно было кидать объекты, не только в handler
 
-        let width = 25; 
-        let height = 25; 
-        let maxRooms = 25;
+        let width = GLOB_WIDTH; 
+        let height = GLOB_HEIGHT; 
+        let maxRooms = GLOB_MAXROOM;
 
         const layers = buildLevel(width, height, maxRooms, this);
         this.gameObjects.push(this.player);
         this.groundLayer = layers["Ground"];
         this.OtherSubjLayer = layers["OtherSubj"];
-        this.floorjLayer = layers["Floor"];
-
+        this.floorLayer = layers["Floor"];
         this.goal = layers["Goal"];
-        // Аналогично предыдущему, можно убрать, 
+        this.win = layers["Win"];
+
+         // Аналогично предыдущему, можно убрать, 
         // ничего не измениться, но если мы хотим кидать npc или плюшки, пигодиться
         
         this.input.keyboard.once("keydown_D", event => {
@@ -61,7 +68,7 @@ let ProcScene = new Phaser.Class({
                 .setAlpha(0.75)
                 .setDepth(20);
         });
-        console.log(this)
+        //console.log(this)
 
     },
 
@@ -72,7 +79,29 @@ let ProcScene = new Phaser.Class({
             });
         }
 
-        //console.log(this.player)
+
+        if (this.win.x != -1 && this.win.y != -1)
+        {
+            if (disance(this.player, this.win) < 32)
+            {
+                
+            }
+        }
+
+        //console.log(disance(this.player, this.goal), this.player.x, this.player.y, this.goal.x, this.goal.y)
+        if (disance(this.player, this.goal) < 32)
+        {
+            let width = GLOB_WIDTH; 
+            let height = GLOB_HEIGHT; 
+            let maxRooms = GLOB_MAXROOM;
+            const layers = buildLevel(width, height, maxRooms, this);
+            this.gameObjects.push(this.player);
+            this.groundLayer = layers["Ground"];
+            this.OtherSubjLayer = layers["OtherSubj"];
+            this.floorLayer = layers["Floor"];
+            this.goal = layers["Goal"];
+            this.win = layers["Win"];
+        }
         //this.player.update(); // так как кинул player в объекты,
                                  //  нет смыла его двадый за frame обновлять
                                  // оствил на случай разделение логики объектов
@@ -84,7 +113,6 @@ let ProcScene = new Phaser.Class({
 
 export default ProcScene
 
-function isAttained()
-{
-    
-}
+function disance(p1, p2) {
+    return Math.sqrt(((p2.x - p1.x) ** 2) + ((p2.y - p1.y) ** 2));
+  }
