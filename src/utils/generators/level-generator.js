@@ -9,14 +9,6 @@ export default class GeneratorLevel {
         this.walkC = config.randomWalk;
     }
 
-    /***
-        Два варианта работы клеточного автомата
-        1. Клеточный автомат основывается на коридорах randomWalk:
-        this.automata.cellmap = temp;  <- устанавливаем начальное состояние
-        2. Клеточный автомат творит в начальном состоянии дичь:
-        this.automata.cellmap = undefined (либо ничего не пишем, оно и так undefined инициализируется)
-        ***/
-
     createMap() {
         let map = [];
         //1. Сначала запускаем RandomWalk

@@ -1,3 +1,5 @@
+import { marking } from './marking'
+
 function fillability(map){
 	let cntBack = 0;
 	let cntLevel = 0;
@@ -10,4 +12,9 @@ function fillability(map){
 	return cntLevel / cntBack;
 }
 
-export { fillability };
+function connectivity(map){
+	//return count of fields in map
+	return marking(map);
+}
+
+export { fillability, connectivity };

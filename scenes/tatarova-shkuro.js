@@ -15,7 +15,7 @@ import GeneratorLevel from '../src/utils/generators/level-generator';
 import MapLayout from '../src/utils/generators/map-layout';
 import TileMapper from '../src/utils/generators/tile-mapper';
 
-import { fillability } from '../src/utils/generators/metrics';
+import { fillability, connectivity } from '../src/utils/generators/metrics';
 
 const config = {
 	cellularAutomata: {
@@ -74,6 +74,8 @@ let TatarovaShkuro = new Phaser.Class({
 					markedMap = (new MapLayout(map, width, height)).getMapLayout();
 				} while (fillability(markedMap) < 0.13);
 			
+				//call connectivity
+				console.log(connectivity(markedMap));
 				
         const layers = (new TileMapper(markedMap, this, width, height, this.tileSize)).generateLevel();
         this.gameObjects.push(this.player);
