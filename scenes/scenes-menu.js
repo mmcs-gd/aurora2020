@@ -17,7 +17,7 @@ import SteeringExploringScene from './steering-exploring-scene';
 import ProcedurallyGeneratedScene from "./procedurally-generated-scene";
 import SteeringUnionGroupScene from './steering-union-group-scene';
 import EffectsScene from './effects-scene'
-
+import SlimeRushScene from "./slime-rush";
 
 const scenes = [
     ['StartingScene', StartingScene],
@@ -26,6 +26,7 @@ const scenes = [
     ['RealLevelScene', RealLevelScene],
     ['SteeringRudnevScene', SteeringRudnevScene],
     [ 'EffectsScene', EffectsScene],
+    ['SlimeRushScene', SlimeRushScene],
   //  ['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
   //  ['SteeringPursuitScene', SteeringPursuitScene],
   //  ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],

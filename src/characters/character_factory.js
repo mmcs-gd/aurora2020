@@ -114,7 +114,9 @@ export default class CharacterFactory {
             slime = new Slime(this.scene, x, y, this.slimeSpriteSheet, 9 * slimeType);
         }
 
-        slime.animations = this.animationLibrary.get(this.slimeSpriteSheet).get(this.slimeNumberToName(slimeType));
+        slime.animations = this.animationLibrary
+                .get(this.slimeSpriteSheet)
+                .get(this.slimeNumberToName(slimeType));
         slime.setCollideWorldBounds(true);
         slime.speed = 40;
         return slime;
