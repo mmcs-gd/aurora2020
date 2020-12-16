@@ -1,9 +1,8 @@
-
 function addNewRuleToMatcher(matcher, from, to) {
 	if (matcher[from] && matcher[from] != to) {
 		const newFrom = Math.max(to, matcher[from]);
 		const newTo = Math.min(to, matcher[from]);
-		this.addNewRuleToMatcher(matcher, newFrom, newTo);
+		addNewRuleToMatcher(matcher, newFrom, newTo);
 	}
 	matcher[from] = to;
 }
@@ -30,7 +29,7 @@ function marking(map) {
 					result[i][j] = 0;
 					break;
 
-				case 1:
+				default:
 					fl = true;
 					if (!i)
 						result[i][j] = label;
@@ -56,7 +55,7 @@ function marking(map) {
 		++label;
 	}
 
-	//console.log(matcher)
+	console.log(matcher)
 
 	//Переразметка с учетом переходов (и сразу запихивание в список??)
 	for (let i = 0; i < map.length; ++i) {
@@ -88,7 +87,7 @@ function marking(map) {
 
 	//console.log(result)
 	//console.log(fields);
-	return fields.length;
+	return fields.filter(x=>x).length;
 }
 
 export { marking }
