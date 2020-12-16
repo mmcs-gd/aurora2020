@@ -11,7 +11,7 @@ export default class EffectsFactory {
         scene.load.spritesheet('magicSpell', magicSpellSpritesheet, frameConfig);
         scene.load.spritesheet('vortex', vortexSpritesheet, frameConfig);
         scene.load.spritesheet('flamelash', flamelashSpritesheet, frameConfig)
-        this.loadAnimations();
+
     }
 
     loadAnimations() {

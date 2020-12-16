@@ -4,10 +4,19 @@ import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 import dungeonRoomJson from '../assets/dungeon_room.json'
 import CharacterFactory from "../src/characters/character_factory";
 import EffectsFactory from "../src/utils/effects-factory";
+import auroraSpriteSheet from "../assets/sprites/characters/aurora.png";
+import blueSpriteSheet from "../assets/sprites/characters/blue.png";
+import greenSpriteSheet from "../assets/sprites/characters/green.png";
+import yellowSpriteSheet from "../assets/sprites/characters/yellow.png";
+import punkSpriteSheet from "../assets/sprites/characters/punk.png";
+import slimeSpriteSheet from "../assets/sprites/characters/slime.png";
+import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
+
 let EffectsScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
     effectsFrameConfig: {frameWidth: 32, frameHeight: 32},
+    characterFrameConfig: {frameWidth: 31, frameHeight: 31},
     initialize: function GroupAligmentScene() {
         Phaser.Scene.call(this, {key: 'EffectsScene'});
     },
@@ -16,14 +25,22 @@ let EffectsScene = new Phaser.Class({
         //loading map tiles and json with positions
         this.load.image("tiles", tilemapPng);
         this.load.tilemapTiledJSON("map", dungeonRoomJson);
+        this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
+        this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
+        this.load.spritesheet('green', greenSpriteSheet, this.characterFrameConfig);
+        this.load.spritesheet('yellow', yellowSpriteSheet, this.characterFrameConfig);
+        this.load.spritesheet('punk', punkSpriteSheet, this.characterFrameConfig);
 
+
+        this.load.audio('footsteps', Footsteps);
+        this.characterFactory = new CharacterFactory(this);
         this.effectsFactory = new EffectsFactory(this);
 
     },
     create: function () {
+        this.effectsFactory.loadAnimations();
         this.gameObjects = [];
         const map = this.make.tilemap({key: "map"});
-        this.characterFactory = new CharacterFactory(this);
         // Parameters are the name you gave the tileset in Tiled and then the key of the tileset image in
         // Phaser's cache (i.e. the name you used in preload)
         const tileset = map.addTilesetImage("Dungeon_Tileset", "tiles");
