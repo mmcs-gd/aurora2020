@@ -15,7 +15,6 @@ let RealLevelScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
-
     initialize: function StartingScene() {
             Phaser.Scene.call(this, {key: 'RealLevelScene'});
         },
@@ -84,4 +83,4 @@ let RealLevelScene = new Phaser.Class({
     }
 });
 
-export default RealLevelScene
+export default RealLevelScene;

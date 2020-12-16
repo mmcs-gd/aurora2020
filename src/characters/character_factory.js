@@ -56,19 +56,12 @@ export default class CharacterFactory {
                 }
             case "slime":
                 return this.buildSlime(x, y, params);
-        }
-    }
-
-    buildNPCCharacter(spriteSheetName, x, y, params) {
-        let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.Steering);
-        // character.maxSpeed = 100;
-        // character.setCollideWorldBounds(true);
-        // character.cursors = this.scene.input.keyboard.createCursorKeys();
             case "mine":
                 return this.buildMine(x, y, params);
         }
     }
-	
+
+
     buildNPCCharacter(spriteSheetName, x, y, params) {
         let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.Steering);
 
@@ -103,9 +96,6 @@ export default class CharacterFactory {
     }
 
     buildSlime(x, y, params) {
-
-        const slimeType = params.slimeType || 1;
-        let slime = new Slime(this.scene, x, y, this.slimeSpriteSheet, 9 * slimeType);
 
         const slimeType = params.slimeType;
         let slime;

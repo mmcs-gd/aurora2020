@@ -55,7 +55,7 @@ export default class Npc extends Phaser.Physics.Arcade.Sprite {
                 this.setTexture(frame.textureKey, frame.textureFrame);
             }
         }
-
+    }
     cntLess(steps) {
         return this.cnt < steps;
     }

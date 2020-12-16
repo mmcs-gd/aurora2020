@@ -3,14 +3,8 @@ import menuBackgroundJson from '../assets/menu_background.json'
 
 
 import StartingScene from "./starting-scene";
-
-
-import SteeringFleeScene from './steering-flee-scene';
-import SteeringExploringScene from './steering-exploring-scene';
 import RealLevelScene from './real-level-scene';
-
 import ExplorationAndShadowingScene from "./exploration-and-shadowing-scene";
-
 import SteeringWanderingScene from "./steering-wandering-scene";
 import SteeringArrivalScene from "./steering-arrival-scene";
 import SteeringPursuitScene from './steering-pursuit-scene';
@@ -36,8 +30,7 @@ const scenes = [
     ['SteeringArrivalScene', SteeringArrivalScene],
     ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
     ['MinerScene', MinerScene],
-    ['SteeringUnionGroupScene', SteeringUnionGroupScene],
-
+    ['SteeringUnionGroupScene', SteeringUnionGroupScene]
 ];
 
 let MenuScene = new Phaser.Class({
@@ -51,7 +44,7 @@ let MenuScene = new Phaser.Class({
     },
 
     preload: function () {
-        //console.log(scenes)
+        console.log(scenes)
         scenes.forEach(s => {
             this.scene.add(s[0], s[1], false);
         });
