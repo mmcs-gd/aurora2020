@@ -89,7 +89,11 @@ export default class TileMapper {
         // randomize player position
         let playerX = 10, playerY = 10;
 
-        while (this.map[playerX][playerY] !== config.FLOOR) {
+        while (this.map[playerX][playerY] !== config.FLOOR 
+					|| this.map[playerX-1][playerY] !== config.FLOOR 
+					|| this.map[playerX+1][playerY] !== config.FLOOR
+					|| this.map[playerX][playerY-1] !== config.FLOOR
+					|| this.map[playerX][playerY+1] !== config.FLOOR) {
             playerX = Math.floor(Math.random() * this.map.length);
             playerY = Math.floor(Math.random() * this.map[0].length);
         }
