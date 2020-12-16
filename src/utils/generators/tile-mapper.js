@@ -80,7 +80,7 @@ export default class TileMapper {
                     floorLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.FLOOR);
                     if (cell !== config.FLOOR) {
                         const type = digitToType[cell];
-                        floorLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.WALL[type]);
+                        groundLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.WALL[type]);
                     }
                 }
             }
