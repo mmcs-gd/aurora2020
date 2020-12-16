@@ -40,6 +40,7 @@ export default class CellularAutomata {
 			for(let y = 0; y < this.height; ++y){
 				const nbs = this.countAliveNeighbours(x,y);
 				map[x][y] = this.cellmap[x][y] ? !(nbs < deathLimit) : nbs > birthLimit;
+				map[x][y] = map[x][y] ? 1 : 0;
 			}
 		}
 		this.cellmap = map;

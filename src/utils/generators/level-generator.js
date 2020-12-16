@@ -43,7 +43,6 @@ export default class GeneratorLevel {
 
         //7. Сглаживаем
         // temp = this.smooth(temp);
-
         return temp;
     }
 
