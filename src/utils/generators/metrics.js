@@ -12,9 +12,15 @@ function fillability(map){
 	return cntLevel / cntBack;
 }
 
-function connectivity(map){
+function info(map){
 	//return count of fields in map
-	return marking(map);
+	const info = marking(map);
+	console.log("connectivity (count fields): " + info.length);
+	
+	console.log("count pixels of field: " + info[0].pixels);
+	
+	console.log("width: "+ (info[0].right - info[0].left) + " height: " + (info[0].top - info[0].bottom));
+	
 }
 
-export { fillability, connectivity };
+export { fillability, info };

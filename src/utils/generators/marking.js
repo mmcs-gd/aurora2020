@@ -87,7 +87,7 @@ function marking(map) {
 
 	//console.log(result)
 	//console.log(fields);
-	return fields.filter(x=>x).length;
+	return fields.filter(x=>x);
 }
 
 export { marking }
