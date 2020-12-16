@@ -61,6 +61,7 @@ export default function buildLevel(width, height, maxRooms, scene){
     camera.setZoom(1.0)
     // Constrain the camera so that it isn't allowed to move outside the width/height of tilemap
     camera.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels);
+    camera.roundPixels = true;
     camera.startFollow(scene.player);
     
     scene.physics.world.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels, true, true, true, true);
