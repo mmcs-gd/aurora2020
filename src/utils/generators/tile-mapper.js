@@ -8,7 +8,7 @@ import { config, digitToType } from './map-config';
 //         TOP_RIGHT: 5,
 //         BOTTOM_RIGHT: 53,
 //         BOTTOM_LEFT: 51,
-        
+
 //         TOP: 4,
 //         LEFT: 18, //35, //18,
 //         RIGHT: 16, // 37, //16,
@@ -25,30 +25,28 @@ import { config, digitToType } from './map-config';
 const TILE_MAPPING = {
     BLANK: 13,
     WALL: {
-        // TOP_LEFT: 3,
-        // TOP_RIGHT: 5,
-        // BOTTOM_RIGHT: 29,
-        // BOTTOM_LEFT: 27,
-        TOP_LEFT: 180,
-        TOP_RIGHT: 181,
-        BOTTOM_RIGHT: 193,
-        BOTTOM_LEFT: 192,
-        
-        // TOP: 4,
-        // LEFT: 15,
-        // RIGHT: 17,
-        // BOTTOM: 28,
-        TOP: 25,
-        LEFT: 14,
-        RIGHT: 12,
-        BOTTOM: 1,
+        TOP_LEFT:[ { index: 180, weight: 9 }],
+        TOP_RIGHT: [{ index: 181, weight: 9 }],
+        BOTTOM_RIGHT: [{ index: 193, weight: 9 }],
+        BOTTOM_LEFT: [{ index: 192, weight: 9 }],
 
-        INNER_TOP_LEFT: 0,
-        INNER_TOP_RIGHT: 2,
-        INNER_BOTTOM_LEFT: 24,
-        INNER_BOTTOM_RIGHT: 26,
+        TOP:[ { index: 25, weight: 7 }, { index: 82, weight: 3 }],
+        LEFT:[ { index: 14, weight: 7 }, { index: 71, weight: 3 }],
+        RIGHT: [{ index: 12, weight: 7 }, { index: 69, weight: 3 }],
+        BOTTOM: [{ index: 1, weight: 7 }, { index: 58, weight: 3 }],
+
+        INNER_TOP_LEFT: [{ index: 0, weight: 9 }],
+        INNER_TOP_RIGHT: [{ index: 2, weight: 9 }],
+        INNER_BOTTOM_LEFT: [{ index: 24, weight: 9 }],
+        INNER_BOTTOM_RIGHT: [{ index: 26, weight: 9 }],
     },
-    FLOOR: 16
+    FLOOR:
+        [
+            { index: 16, weight: 9 },
+            { index: 47, weight: 1 },
+            { index: 45, weight: 1 },
+            { index: 46, weight: 1 },
+        ]
 };
 
 export default class TileMapper {
@@ -79,10 +77,10 @@ export default class TileMapper {
                 if (cell === config.BLANK) {
                     groundLayer.putTileAt(TILE_MAPPING.BLANK, x, y);
                 } else {
-                    floorLayer.putTileAt(TILE_MAPPING.FLOOR, x, y);
+                    floorLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.FLOOR);
                     if (cell !== config.FLOOR) {
                         const type = digitToType[cell];
-                        groundLayer.putTileAt(TILE_MAPPING.WALL[type], x, y);
+                        floorLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.WALL[type]);
                     }
                 }
             }
