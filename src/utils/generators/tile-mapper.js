@@ -105,6 +105,7 @@ export default class TileMapper {
         this.scene.physics.world.setBounds(0, 0, this.scene.map.widthInPixels, this.scene.map.heightInPixels, true);
         camera.setBounds(0, 0, this.scene.map.widthInPixels, this.scene.map.heightInPixels);
         camera.startFollow(this.scene.player);
+        camera.roundPixels = true;
 
         groundLayer.setCollisionBetween(1, 500);
         otherLayer.setDepth(10);
