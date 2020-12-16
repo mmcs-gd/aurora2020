@@ -23,7 +23,7 @@ const scenes = [
     ['StartingScene', StartingScene],
     ['SteeringFleeScene', SteeringFleeScene],
     ['SteeringExploringScene', SteeringExploringScene],
-    ['RealLevelScene', RealLevelScene]
+    ['RealLevelScene', RealLevelScene],
     ['SteeringRudnevScene', SteeringRudnevScene],
     ['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
     ['SteeringPursuitScene', SteeringPursuitScene],
@@ -32,7 +32,7 @@ const scenes = [
     ['SteeringArrivalScene', SteeringArrivalScene],
     ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
     ['MinerScene', MinerScene],
-    ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene]
+    ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
     ['SteeringUnionGroupScene', SteeringUnionGroupScene]
 ];
 

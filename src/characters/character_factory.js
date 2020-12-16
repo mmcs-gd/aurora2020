@@ -3,6 +3,7 @@ import Slime from "./slime";
 import Player from "./player";
 import cyberpunkConfigJson from "../../assets/animations/cyberpunk.json";
 import slimeConfigJson from "../../assets/animations/slime.json";
+import mineConfigJson from '../../assets/animations/mine.json';
 import AnimationLoader from "../utils/animation-loader";
 
 import Mine from "./mine";
@@ -34,8 +35,13 @@ export default class CharacterFactory {
                     element).createAnimations());
             }
         );
-        animationLibrary.set(this.slimeSpriteSheet,
-            new AnimationLoader(scene, this.slimeSpriteSheet, slimeConfigJson, this.slimeSpriteSheet).createAnimations());
+        animationLibrary
+            .set(this.mineSpriteSheet, new AnimationLoader(scene, this.mineSpriteSheet, mineConfigJson, this.mineSpriteSheet)
+            .createAnimations());
+        animationLibrary
+            .set(this.slimeSpriteSheet,
+            new AnimationLoader(scene, this.slimeSpriteSheet, slimeConfigJson, this.slimeSpriteSheet)
+                .createAnimations());
         this.animationLibrary = animationLibrary;
     }
 
@@ -47,7 +53,7 @@ export default class CharacterFactory {
             case 'blue':
             case 'yellow':
                 if (params.player)
-                    return this.buildPlayerCharacter(spriteSheetName, x, y);
+                    return this.buildPlayerCharacter(spriteSheetName, x, y, params);
                 else {
                     if (params.Steering)
                         return this.buildNPCCharacter(spriteSheetName, x, y, params);
@@ -68,8 +74,8 @@ export default class CharacterFactory {
         return character;
     }
 
-    buildPlayerCharacter(spriteSheetName, x, y) {
-        let character = new Player(this.scene, x, y, spriteSheetName, 2);
+    buildPlayerCharacter(spriteSheetName, x, y, params = {}) {
+        let character = new Player(this.scene, x, y, spriteSheetName, 2, params);
         character.maxSpeed = 100;
         character.setCollideWorldBounds(true);
         character.cursors = this.scene.input.keyboard.createCursorKeys();
