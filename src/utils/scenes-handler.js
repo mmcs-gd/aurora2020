@@ -12,6 +12,7 @@ const TILE_MAPPING = {
     WINDOW: 6,
     GRASS: 7,
     DOOR: 8,
+    WOODENFLOOR: 9,
 };
 
 export default function buildLevel(width, height, maxRooms, scene)
@@ -30,44 +31,33 @@ export default function buildLevel(width, height, maxRooms, scene)
 
 
 
-    for(let y = 0; y < height; y++)
-        for(let x = 0; x < width; x++)
+    for(let y = 0 + 1; y < height - 1; y++)
+        for(let x = 0 + 1; x < width - 1; x++)
             if(levelMatrix[y][x] === 0)
-                mygroundLayer.putTileAt(TILE_MAPPING.GRASS, x, y); // BLANK
+                mygroundLayer.putTileAt(TILE_MAPPING.GRASS, x, y);
             else
-                floorLayer.putTileAt(TILE_MAPPING.DIRT, x, y); // floor
+                floorLayer.putTileAt(TILE_MAPPING.DIRT, x, y);
 
-    /*rooms.forEach(room =>
+    for(let x = 0; x < width; x++)
     {
-        const {x, y} = room.startCenter;
-        const {width, height, left, right, top, down } = room;
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, x, 0);
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, x, height - 1);
+        if(floorLayer.getTileAt( x,  0) != null)
+            floorLayer.removeTileAt( x,  0);
+        if(floorLayer.getTileAt( x,  height - 1) != null)
+            floorLayer.removeTileAt( x,  height - 1);
 
-        const w = right - left + 1
-        const h = down - top + 1
-        // отрисовываем стены вернхие и нижние
-        for (let i = 0; i < w; i++)
-        {
-            if(levelMatrix[top - 1][i + left] == 0)
-                mygroundLayer.putTileAt(TILE_MAPPING.WALL, i + left, top);
-            if(levelMatrix.length == down + 1 || levelMatrix[down + 1][i + left] == 0)
-                mygroundLayer.putTileAt(TILE_MAPPING.WALL, i + left, down);
-        }
+    }
 
-        // отрисовываем стены боковые
-        for (let i = 0; i < h; i++)
-        {
-            if(levelMatrix[i + top][left - 1] == 0)
-                mygroundLayer.putTileAt(TILE_MAPPING.WALL, left, i + top);
-            if(levelMatrix[i + top][right + 1] == 0)
-                mygroundLayer.putTileAt(TILE_MAPPING.WALL, right, i + top);
-        }
-
-        // добавляем углы комнаты
-        mygroundLayer.putTileAt(TILE_MAPPING.WALL, left, top);
-        mygroundLayer.putTileAt(TILE_MAPPING.WALL, right, top);
-        mygroundLayer.putTileAt(TILE_MAPPING.WALL, right, down);
-        mygroundLayer.putTileAt(TILE_MAPPING.WALL, left, down);
-    });*/
+    for(let y = 0; y < height; y++)
+    {
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, 0, y);
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL,width - 1, y);
+        if(floorLayer.getTileAt( 0,  y) != null)
+            floorLayer.removeTileAt( 0,  y);
+        if(floorLayer.getTileAt( width - 1,  y) != null)
+            floorLayer.removeTileAt( width - 1,  y);
+    }
 
     // gras can't touch dirt. make from grass walls
     for(let y = 0; y < height; y++)
@@ -86,6 +76,54 @@ export default function buildLevel(width, height, maxRooms, scene)
                     mygroundLayer.putTileAt(TILE_MAPPING.WALL, x, y);
             }
         }
+    }
+
+    // locate doors
+    let door_location_candidates = [];
+    for(let y = 0; y < height-1; y++)
+    {
+        for (let x = 0+1; x < width-2; x++)
+        {
+            if ((mygroundLayer.getTileAt(x-1, y) != null && mygroundLayer.getTileAt(x-1, y).index == 3) &&
+                (mygroundLayer.getTileAt(x, y) != null && mygroundLayer.getTileAt(x, y).index == 3) &&
+                (mygroundLayer.getTileAt(x+1, y) != null && mygroundLayer.getTileAt(x+1, y).index == 3) &&
+                (mygroundLayer.getTileAt(x+2, y) != null && mygroundLayer.getTileAt(x+2, y).index == 3) &&
+                (floorLayer.getTileAt(x-1, y + 1) != null && floorLayer.getTileAt(x-1, y + 1).index == 0) &&
+                (floorLayer.getTileAt(x, y + 1) != null && floorLayer.getTileAt(x, y + 1).index == 0) &&
+                (floorLayer.getTileAt(x+1, y + 1) != null && floorLayer.getTileAt(x+1, y + 1).index == 0) &&
+                (floorLayer.getTileAt(x+2, y + 1) != null && floorLayer.getTileAt(x+2, y + 1).index == 0))
+            {
+                door_location_candidates.push({x:x, y:y});
+            }
+        }
+    }
+    let door_location = door_location_candidates[Math.floor(Math.random() * door_location_candidates.length)];
+
+    mygroundLayer.putTileAt(TILE_MAPPING.WOODENWALL, door_location.x - 1, door_location.y);
+    mygroundLayer.putTileAt(TILE_MAPPING.DOOR, door_location.x , door_location.y);
+    mygroundLayer.putTileAt(TILE_MAPPING.WINDOW, door_location.x + 1, door_location.y);
+    mygroundLayer.putTileAt(TILE_MAPPING.WOODENWALL, door_location.x + 2, door_location.y);
+
+    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door_location.x - 1, door_location.y + 1);
+    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door_location.x , door_location.y + 1);
+    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door_location.x + 1, door_location.y + 1);
+    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door_location.x + 2, door_location.y + 1);
+
+    if(door_location.y != 0)
+    {
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door_location.x - 1, door_location.y-1);
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door_location.x , door_location.y-1);
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door_location.x + 1, door_location.y-1);
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door_location.x + 2, door_location.y-1);
+
+        if(floorLayer.getTileAt( door_location.x - 1,  door_location.y - 1) != null)
+            floorLayer.removeTileAt( door_location.x - 1,  door_location.y - 1);
+        if(floorLayer.getTileAt( door_location.x,  door_location.y - 1) != null)
+            floorLayer.removeTileAt( door_location.x,  door_location.y - 1);
+        if(floorLayer.getTileAt( door_location.x + 1,  door_location.y - 1) != null)
+            floorLayer.removeTileAt( door_location.x + 1,  door_location.y - 1);
+        if(floorLayer.getTileAt( door_location.x + 2,  door_location.y - 1) != null)
+            floorLayer.removeTileAt( door_location.x + 2,  door_location.y - 1);
     }
 
     // set corner wall between grass
@@ -124,6 +162,58 @@ export default function buildLevel(width, height, maxRooms, scene)
         }
     }
     corner_array.forEach(corner => {mygroundLayer.putTileAt(TILE_MAPPING.WALL, corner.x, corner.y);})
+
+    // in free_space could be located hostages, coins, sword
+    let free_space = [];
+    for(let y = 0; y < height; y++)
+    {
+        for (let x = 0; x < width; x++)
+        {
+            if (floorLayer.getTileAt(x, y) != null && floorLayer.getTileAt(x, y).index == 7)
+            {
+                free_space.push({x:x, y:y});
+            }
+        }
+    }
+
+    let sapwn_hostages_location = [];
+    for(let i = 0; i < 4; i++)
+    {
+        let flag = true;
+        while(flag)
+        {
+            let rand_i = Math.floor(Math.random() * free_space.length)
+            if(free_space[rand_i] != {x: -1, y: -1})
+            {
+                sapwn_hostages_location = free_space[rand_i];
+                free_space[rand_i] = {x: -1, y: -1};
+                flag = false;
+            }
+        }
+    }
+
+    // NEED TO SPAWN HERE HOSTAGES
+    // ...
+
+    console.log("locate coins and sword ... ")
+    // locate coins and sword
+    let perks = [TILE_MAPPING.COIN, TILE_MAPPING.COIN, TILE_MAPPING.COIN, TILE_MAPPING.COIN, TILE_MAPPING.SWORD];
+    for(let i = 0; i < perks.length; i++)
+    {
+        let flag = true;
+        while(flag)
+        {
+            let rand_i = Math.floor(Math.random() * free_space.length)
+            if(free_space[rand_i] != {x: -1, y: -1})
+            {
+                console.log("putting ", perks[i])
+                floorLayer.putTileAt(perks[i], free_space[rand_i].x , free_space[rand_i].y);
+                free_space[rand_i] = {x: -1, y: -1};
+                flag = false;
+            }
+        }
+    }
+    console.log("done")
 
     // считаем положение где заспавнится игрок
     let palyerSpawnX = 0;
