@@ -1,5 +1,9 @@
 import Vector2 from 'phaser/src/math/Vector2'
 const eps = 20;
+
+const delay = 500;
+
+
 export default class Slime extends Phaser.Physics.Arcade.Sprite{
     constructor(scene, x, y, name, frame) {
         super(scene, x, y, name, frame);

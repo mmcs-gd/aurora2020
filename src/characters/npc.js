@@ -1,12 +1,15 @@
-export default class Npc extends Phaser.Physics.Arcade.Sprite{
-    constructor(scene, x, y, name, frame, Steering) {
+export default class Npc extends Phaser.Physics.Arcade.Sprite {
+    constructor(scene, x, y, name, frame, steering) {
         super(scene, x, y, name, frame);
         scene.physics.world.enable(this);
         scene.add.existing(this);
+        this.steering = steering;
+        this.cnt = 0;
 
-        this.Steering =  Steering;
     }
+
     update() {
+
         const body = this.body;
         this.body.setVelocity(0);
         if (this.Steering != 1)
@@ -18,9 +21,20 @@ export default class Npc extends Phaser.Physics.Arcade.Sprite{
 
             this.updateAnimation();
         }
+
+        if (this.steering) {
+            const dir = this.steering.calculateImpulse(!this.cntLess(delay));
+            this.body.setVelocityX(dir.x)
+            this.body.setVelocityY(dir.y)
+            this.cnt = this.cntLess(delay) ? this.cnt + 1 : 0;
+        }
+        this.updateAnimation();
+
     }
+
     updateAnimation() {
         const animations = this.animationSets.get('Walk');
+
 
         const animsController = this.anims;
         const x = this.body.velocity.x;
@@ -42,5 +56,8 @@ export default class Npc extends Phaser.Physics.Arcade.Sprite{
             }
         }
 
+    cntLess(steps) {
+        return this.cnt < steps;
     }
 }
+

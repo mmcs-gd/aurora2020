@@ -12,7 +12,7 @@ export default class Exploring extends Steering {
     }
 
     calculateImpulse () {
-        const angle = Phaser.Math.RND.realInRange(-Math.PI / 10, Math.PI / 10);
+        const angle = Phaser.Math.RND.realInRange(-Math.PI / 5, Math.PI / 5);
         let currentAngle = this.direction.angle()
         this.direction = new Vector2(Math.cos(currentAngle + angle), Math.sin(currentAngle + angle)).scale(this.ownerSpeed);
         return this.direction;

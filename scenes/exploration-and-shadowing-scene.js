@@ -10,10 +10,10 @@ import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 import {Shadowing} from "../src/ai/steerings/shadowing";
-import {Exploration} from "../src/ai/steerings/exploration";
+import {Exploring} from "../src/ai/steerings/exploring";
 
 
-let explorationAndShadowingScene = new Phaser.Class({
+let ExplorationAndShadowingScene = new Phaser.Class({
 
     Extends: Phaser.scene,
     initialize:
@@ -27,7 +27,6 @@ let explorationAndShadowingScene = new Phaser.Class({
         //loading map tiles and json with positions
         this.load.image("tiles", tilemapPng);
         this.load.tilemapTiledJSON("map", dungeonRoomJson);
-
         //loading spitesheets
         this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
@@ -67,12 +66,12 @@ let explorationAndShadowingScene = new Phaser.Class({
         this.characterFactory = new CharacterFactory(this);
         console.log(this.characterFactory)
 
-        const walker = this.characterFactory.buildNpcCharacter(
-           "green","green",200,300,{Steering: new Exploration(this,this)}
+        const walker = this.characterFactory.buildNPCCharacter(
+           "green",200,300,{Steering: new Exploring(this)}
         );
 
-        const shadowing = this.characterFactory.buildNpcCharacter(
-            "punk","punk",500,100,{Steering: new Shadowing(this,walker)}
+        const shadowing = this.characterFactory.buildNPCCharacter(
+            "punk",500,100,{Steering: new Shadowing(this,walker)}
         );
         this.gameObject.push(walker);
         this.gameObject.push(shadowing);
@@ -102,4 +101,4 @@ let explorationAndShadowingScene = new Phaser.Class({
     }
 })
 
-export default explorationAndShadowingScene
+export default ExplorationAndShadowingScene
