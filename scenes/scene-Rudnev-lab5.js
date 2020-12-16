@@ -1,6 +1,6 @@
 import buildLevel from "../src/utils/scenes-handler";
 
-import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
+import tilemapPng from '../assets/tileset/Rudnev_Tileset.png'
 import auroraSpriteSheet from '../assets/sprites/characters/aurora.png'
 import punkSpriteSheet from '../assets/sprites/characters/punk.png'
 import blueSpriteSheet from '../assets/sprites/characters/blue.png'
@@ -21,7 +21,8 @@ let Rudnev_lab5_scene = new Phaser.Class(
     characterFrameConfig: {frameWidth: 31, frameHeight: 31},
     slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
     preload: function () {
-        this.load.image("Dungeon_Tileset", tilemapPng);
+        //this.load.image("Dungeon_Tileset", tilemapPng);
+        this.load.image("Rudnev_Tileset", tilemapPng);
         this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('green', greenSpriteSheet, this.characterFrameConfig);
