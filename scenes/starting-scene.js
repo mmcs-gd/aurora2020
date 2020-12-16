@@ -68,19 +68,19 @@ let StartingScene = new Phaser.Class({
 
         worldLayer.setCollisionBetween(1, 500);
         aboveLayer.setDepth(10);
+
         this.physics.world.bounds.width = map.widthInPixels;
         this.physics.world.bounds.height = map.heightInPixels;
         this.characterFactory = new CharacterFactory(this);
 
         // Creating characters
-        this.player = this.characterFactory.buildCharacter('punk', 100, 100, {player: true});
+        this.player = this.characterFactory.buildCharacter('aurora', 100, 100, {player: true});
         this.gameObjects.push(this.player);
         this.physics.add.collider(this.player, worldLayer);
+
         this.slimes =  this.physics.add.group();
         let params = {};
-
-        for(let i = 0; i < 50; i++) {
-
+        for(let i = 0; i < 100; i++) {
             const x = Phaser.Math.RND.between(50, this.physics.world.bounds.width - 50 );
             const y = Phaser.Math.RND.between(50, this.physics.world.bounds.height -50 );
             params.slimeType = Phaser.Math.RND.between(0, 4);

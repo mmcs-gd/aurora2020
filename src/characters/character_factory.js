@@ -7,19 +7,22 @@ import mineConfigJson from '../../assets/animations/mine.json';
 import AnimationLoader from "../utils/animation-loader";
 import Mine from "./mine";
 import SmartSlime from './minerScene/smartSlime';
-
 import NPC from "../characters/npc";
-
 
 export default class CharacterFactory {
     constructor(scene) {
         this.scene = scene;
+
         this.cyberSpritesheets =  ['aurora', 'blue', 'yellow', 'green', 'punk'];
         this.slimeSpriteSheet = 'slime';
+
+
         this.mineSpriteSheet = 'mine';
+
         const slimeStateTable = new StateTable(this);
         slimeStateTable.addState(new StateTableRow('searching', this.foundTarget, 'jumping'));
         slimeStateTable.addState(new StateTableRow('jumping', this.lostTarget, 'searching'));
+
         let animationLibrary =  new Map();
         this.cyberSpritesheets.forEach(
             function (element) {
@@ -42,29 +45,40 @@ export default class CharacterFactory {
             case 'aurora':
             case 'blue':
             case 'yellow':
-              if (params.player)
-                return this.buildPlayerCharacter(spriteSheetName, x, y);
-              else{
-                return this.buildNPCCharacter(spriteSheetName, x, y, params);
-              }
-
+                if (params.player)
+                    return this.buildPlayerCharacter(spriteSheetName, x, y);
+                else
+                {
+                   if (params.Steering)
+                        return this.buildNPCCharacter(spriteSheetName, x, y, params);
+                    else
+                        return this.buildCyberpunkCharacter(spriteSheetName, x, y, params);
+                }
             case "slime":
                 return this.buildSlime(x, y, params);
+        }
+    }
+
+    buildNPCCharacter(spriteSheetName, x, y, params) {
+        let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.Steering);
+        // character.maxSpeed = 100;
+        // character.setCollideWorldBounds(true);
+        // character.cursors = this.scene.input.keyboard.createCursorKeys();
             case "mine":
                 return this.buildMine(x, y, params);
         }
     }
 	
-
     buildNPCCharacter(spriteSheetName, x, y, params) {
         let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.Steering);
+
         character.animationSets = this.animationLibrary.get(spriteSheetName);
         return character;
 
     }
 
     buildPlayerCharacter(spriteSheetName, x, y) {
-        let character = new Player(this.scene, x, y, spriteSheetName,2);
+        let character = new Player(this.scene, x, y, spriteSheetName, 2);
         character.maxSpeed = 100;
         character.setCollideWorldBounds(true);
         character.cursors = this.scene.input.keyboard.createCursorKeys();
@@ -80,7 +94,6 @@ export default class CharacterFactory {
           delay: 0
       });
       //todo uncomment at your won risk - these footsteps will get you insane
-
         return character;
 
     }
@@ -90,6 +103,10 @@ export default class CharacterFactory {
     }
 
     buildSlime(x, y, params) {
+
+        const slimeType = params.slimeType || 1;
+        let slime = new Slime(this.scene, x, y, this.slimeSpriteSheet, 9 * slimeType);
+
         const slimeType = params.slimeType;
         let slime;
         if (params.useSteering) {
@@ -97,12 +114,12 @@ export default class CharacterFactory {
         } else {
             slime = new Slime(this.scene, x, y, this.slimeSpriteSheet, 9 * slimeType);
         }
-
         slime.animations = this.animationLibrary.get(this.slimeSpriteSheet).get(this.slimeNumberToName(slimeType));
         slime.setCollideWorldBounds(true);
         slime.speed = 40;
         return slime;
     }
+
 		
     slimeNumberToName(n){
       switch (n) {
