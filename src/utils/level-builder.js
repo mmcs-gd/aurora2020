@@ -3,7 +3,7 @@ import Exploring from "../ai/steerings/exploring";
 
 const TILE_MAPPING = {
     BLANK: 17,
-    FLOOR: 95,
+    FLOOR: [{index: 95, weight: 8}, {index: 172, weight: 2}],
 };
 const LEVEL_TO_TILE = {
     0: TILE_MAPPING.BLANK,
@@ -39,7 +39,7 @@ export default function buildLevel(width, height, maxRooms, scene){
             if(index === 0)
                 outsideLayer.putTileAt(LEVEL_TO_TILE[index], x, y);
             else 
-                groundLayer.putTileAt(LEVEL_TO_TILE[index], x, y);
+                groundLayer.weightedRandomize(x, y, 1, 1, LEVEL_TO_TILE[index]);
         }
 
     if (rooms.length != 0)
