@@ -1,5 +1,3 @@
-import buildLevel from "../src/utils/scenes-handler";
-
 import tilemapPng from '../assets/tileset/Rudnev_Tileset.png'
 import auroraSpriteSheet from '../assets/sprites/characters/aurora.png'
 import punkSpriteSheet from '../assets/sprites/characters/punk.png'
@@ -9,22 +7,348 @@ import greenSpriteSheet from '../assets/sprites/characters/green.png'
 import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 
-import Wander from "../src/ai/steerings/wander";
-import Exploring from "../src/ai/steerings/exploring";
+import Scene from "../src/utils/scenes-maker.js"
+import Player from "../src/characters/player";
+import Slime from "../src/characters/slime";
+
+const TILE_MAPPING = {
+    DIRT: 0,
+    WATER: 1,
+    COIN: 2,
+    WALL: 3,
+    SWORD: 4,
+    WOODENWALL:5,
+    WINDOW: 6,
+    GRASS: 7,
+    DOOR: 8,
+    WOODENFLOOR: 9,
+};
+const tilesize = 32;
+let floorLayer = null;
+let rudnev_scene = null;
+
+function isTileIndex(layer, x, y, tileIndex)
+{
+    return (layer.getTileAt(x,y) != null && layer.getTileAt(x,y).index == tileIndex)
+};
+
+// get random free tile
+function get_free_rand(arr)
+{
+    let flag = true;
+    let empty_marker = {x: -1, y: -1};
+    let ret_val = {x: -1, y: -1};
+    while(flag)
+    {
+        let rand_i = Math.floor(Math.random() * arr.length)
+        if(arr[rand_i] != empty_marker)
+        {
+            ret_val = arr[rand_i];
+            arr[rand_i] = empty_marker;
+            flag = false;
+        }
+    }
+    return ret_val
+}
+
+function build_Rudnev_Level(width, height, maxRooms, scene)
+{
+    let level = new Scene(width, height, maxRooms);
+    const rooms = level.generateScene();
+    const levelMatrix = level.SceneMatrix;
+
+
+    scene.map = scene.make.tilemap({tileWidth: tilesize, tileHeight: tilesize, width: width, height: height});
+
+    const tileset = scene.map.addTilesetImage("Rudnev_Tileset", null, tilesize, tilesize);
+    floorLayer = scene.map.createBlankDynamicLayer("Floor", tileset);
+    const mygroundLayer = scene.map.createBlankDynamicLayer("Ground", tileset);
+    const OtherSubjLayer = scene.map.createBlankDynamicLayer("OtherSubj", tileset);
+
+    for(let y = 0 + 1; y < height - 1; y++)
+        for(let x = 0 + 1; x < width - 1; x++)
+            if(levelMatrix[y][x] === 0)
+                mygroundLayer.putTileAt(TILE_MAPPING.GRASS, x, y);
+            else
+                floorLayer.putTileAt(TILE_MAPPING.DIRT, x, y);
+
+    for(let x = 0; x < width; x++)
+    {
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, x, 0);
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, x, height - 1);
+        if(floorLayer.getTileAt( x,  0) != null)
+            floorLayer.removeTileAt( x,  0);
+        if(floorLayer.getTileAt( x,  height - 1) != null)
+            floorLayer.removeTileAt( x,  height - 1);
+
+    }
+
+    for(let y = 0; y < height; y++)
+    {
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, 0, y);
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL,width - 1, y);
+        if(floorLayer.getTileAt( 0,  y) != null)
+            floorLayer.removeTileAt( 0,  y);
+        if(floorLayer.getTileAt( width - 1,  y) != null)
+            floorLayer.removeTileAt( width - 1,  y);
+    }
+
+    // gras can't touch dirt. make from grass walls
+    for(let y = 0; y < height; y++)
+    {
+        for (let x = 0; x < width; x++)
+        {
+            //if(mygroundLayer.getTileAt(x,y) != null && mygroundLayer.getTileAt(x,y).index == 7) // for all grass
+            if(isTileIndex(mygroundLayer,x,y,7))
+            {
+                if(x != 0 && isTileIndex(floorLayer,x - 1,y,0))// if left dirt
+                    //if(x != 0 && floorLayer.getTileAt(x - 1,y) != null && floorLayer.getTileAt(x - 1,y).index == 0) // if left dirt
+                    mygroundLayer.putTileAt(TILE_MAPPING.WALL, x, y);
+                else if(x != width - 1 && isTileIndex(floorLayer,x + 1,y,0))// if right dirt
+                    //else if(x != width - 1 && floorLayer.getTileAt(x + 1,y) != null && floorLayer.getTileAt(x + 1,y).index == 0) // if right dirt
+                    mygroundLayer.putTileAt(TILE_MAPPING.WALL, x, y);
+                else if(y != 0 && isTileIndex(floorLayer,x,y - 1,0))// if top dirt
+                    //else if(y != 0 && floorLayer.getTileAt(x,y - 1) != null && floorLayer.getTileAt(x,y - 1).index == 0) // if top dirt
+                    mygroundLayer.putTileAt(TILE_MAPPING.WALL, x, y);
+                else if(y != height - 1 && isTileIndex(floorLayer,x,y + 1,0))// if top dirt
+                    //else if(y != height - 1 && floorLayer.getTileAt(x,y + 1) != null && floorLayer.getTileAt(x,y + 1).index == 0) // if bottom dirt
+                    mygroundLayer.putTileAt(TILE_MAPPING.WALL, x, y);
+            }
+        }
+    }
+
+    // locate doors
+    let door_candidates = [];
+    for(let y = 0; y < height-1; y++)
+    {
+        for (let x = 0+1; x < width-2; x++)
+        {
+            if( isTileIndex(mygroundLayer,x - 1,y,3) &&
+                isTileIndex(mygroundLayer,x,y,3) &&
+                isTileIndex(mygroundLayer,x + 1,y,3) &&
+                isTileIndex(mygroundLayer,x + 2,y,3) &&
+                isTileIndex(floorLayer,x - 1,y + 1,0) &&
+                isTileIndex(floorLayer,x,y + 1,0) &&
+                isTileIndex(floorLayer,x + 1,y + 1,0) &&
+                isTileIndex(floorLayer,x + 2,y + 1,0))
+            {
+                door_candidates.push({x:x, y:y});
+            }
+        }
+    }
+    let door = door_candidates[Math.floor(Math.random() * door_candidates.length)];
+
+    mygroundLayer.putTileAt(TILE_MAPPING.WOODENWALL, door.x - 1, door.y);
+    mygroundLayer.putTileAt(TILE_MAPPING.DOOR, door.x , door.y);
+    mygroundLayer.putTileAt(TILE_MAPPING.WINDOW, door.x + 1, door.y);
+    mygroundLayer.putTileAt(TILE_MAPPING.WOODENWALL, door.x + 2, door.y);
+
+    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door.x - 1, door.y + 1);
+    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door.x , door.y + 1);
+    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door.x + 1, door.y + 1);
+    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door.x + 2, door.y + 1);
+
+    if(door.y != 0)
+    {
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door.x - 1, door.y-1);
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door.x , door.y-1);
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door.x + 1, door.y-1);
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door.x + 2, door.y-1);
+
+        if(floorLayer.getTileAt( door.x - 1,  door.y - 1) != null)
+            floorLayer.removeTileAt( door.x - 1,  door.y - 1);
+        if(floorLayer.getTileAt( door.x,  door.y - 1) != null)
+            floorLayer.removeTileAt( door.x,  door.y - 1);
+        if(floorLayer.getTileAt( door.x + 1,  door.y - 1) != null)
+            floorLayer.removeTileAt( door.x + 1,  door.y - 1);
+        if(floorLayer.getTileAt( door.x + 2,  door.y - 1) != null)
+            floorLayer.removeTileAt( door.x + 2,  door.y - 1);
+    }
+
+    if(door.x > 1 && !isTileIndex(mygroundLayer,door.x - 2,door.y,3))
+    {
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door.x - 2, door.y);
+        if(floorLayer.getTileAt( door.x - 2,  door.y) != null)
+            floorLayer.removeTileAt( door.x - 2,  door.y);
+    }
+
+    if(door.x < width-3 && !isTileIndex(mygroundLayer,door.x + 3,door.y,3))
+    {
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door.x + 3, door.y);
+        if(floorLayer.getTileAt( door.x + 3,  door.y) != null)
+            floorLayer.removeTileAt( door.x + 3,  door.y);
+    }
+
+    // set corner wall between grass
+    let corner_array = [];
+    for(let y = 0; y < height; y++)
+    {
+        for (let x = 0; x < width; x++)
+        {
+            if(isTileIndex(mygroundLayer,x,y,7))// for all grass
+                //if (mygroundLayer.getTileAt(x, y) != null && mygroundLayer.getTileAt(x, y).index == 7) // for all grass
+            {
+                let wall_counter = 0;
+
+                // bot right corner
+                if(x != 0 && isTileIndex(mygroundLayer,x - 1,y,3) && y != 0 && isTileIndex(mygroundLayer,x,y - 1,3))
+                    //if((x != 0 && mygroundLayer.getTileAt(x - 1,y) != null && mygroundLayer.getTileAt(x - 1,y).index == 3) &&
+                    //    (y != 0 && mygroundLayer.getTileAt(x,y - 1) != null && mygroundLayer.getTileAt(x,y - 1).index == 3))
+                    wall_counter += 1;
+
+                // top right corner
+                if(x != 0 && isTileIndex(mygroundLayer,x - 1,y,3) && y != height - 1 && isTileIndex(mygroundLayer,x,y + 1,3))
+                    //if((x != 0 && mygroundLayer.getTileAt(x - 1,y) != null && mygroundLayer.getTileAt(x - 1,y).index == 3) &&
+                    //    (y != height - 1 && mygroundLayer.getTileAt(x,y + 1) != null && mygroundLayer.getTileAt(x,y + 1).index == 3))
+                    wall_counter += 1;
+
+                // bot left corner
+                if(x != width - 1 && isTileIndex(mygroundLayer,x + 1,y,3) && y != 0 && isTileIndex(mygroundLayer,x,y - 1,3))
+                    //if((x != width - 1 && mygroundLayer.getTileAt(x + 1,y) != null && mygroundLayer.getTileAt(x + 1,y).index == 3) &&
+                    //    (y != 0 && mygroundLayer.getTileAt(x,y - 1) != null && mygroundLayer.getTileAt(x,y - 1).index == 3))
+                    wall_counter += 1;
+
+                // top left corner
+                if(x != width - 1 && isTileIndex(mygroundLayer,x + 1,y,3) && y != height - 1 && isTileIndex(mygroundLayer,x,y + 1,3))
+                    //if((x != width - 1 && mygroundLayer.getTileAt(x + 1,y) != null && mygroundLayer.getTileAt(x + 1,y).index == 3) &&
+                    //  (y != height - 1 && mygroundLayer.getTileAt(x,y + 1) != null && mygroundLayer.getTileAt(x,y + 1).index == 3))
+                    wall_counter += 1;
+
+                if(wall_counter >= 1)
+                    corner_array.push({x:x,y:y});
+            }
+        }
+    }
+    corner_array.forEach(corner => {mygroundLayer.putTileAt(TILE_MAPPING.WALL, corner.x, corner.y);})
+
+    // in free_space could be located hostages, coins, sword
+    let free_space = [];
+    for(let y = 0; y < height; y++)
+    {
+        for (let x = 0; x < width; x++)
+        {
+            if(isTileIndex(floorLayer,x,y,0))
+                //if (floorLayer.getTileAt(x, y) != null && floorLayer.getTileAt(x, y).index == 7)
+            {
+                free_space.push({x:x, y:y});
+            }
+        }
+    }
+
+    // locate coins and sword
+    let perks = [TILE_MAPPING.COIN, TILE_MAPPING.COIN, TILE_MAPPING.COIN, TILE_MAPPING.COIN, TILE_MAPPING.SWORD];
+    for(let i = 0; i < perks.length; i++)
+    {
+        let coords = get_free_rand(free_space)
+        floorLayer.putTileAt(perks[i], coords.x , coords.y);
+    }
+
+    // spawn player
+    let palyerSpawnPosition = get_free_rand(free_space);
+    palyerSpawnPosition.x = palyerSpawnPosition.x * tilesize + Math.floor(tilesize / 2)
+    palyerSpawnPosition.y = palyerSpawnPosition.y * tilesize + Math.floor(tilesize / 2)
+    scene.player = scene.characterFactory.buildCharacter("green", palyerSpawnPosition.x , palyerSpawnPosition.y , {player: true});
+    scene.physics.add.collider(scene.player, mygroundLayer);
+    scene.physics.add.collider(scene.player, OtherSubjLayer);
+
+    // spawn hostages
+    let hostages_colors = ["aurora","blue","yellow","punk"]
+    for(let i = 0; i < 4; i++)
+    {
+        let hostageSpawnPosition = get_free_rand(free_space)
+        hostageSpawnPosition.x = hostageSpawnPosition.x * tilesize + Math.floor(tilesize / 2)
+        hostageSpawnPosition.y = hostageSpawnPosition.y * tilesize + Math.floor(tilesize / 2)
+
+        let curentHostage = scene.characterFactory.buildCharacter(hostages_colors[i], hostageSpawnPosition.x, hostageSpawnPosition.y, {isHostage: true});
+        scene.physics.add.collider(curentHostage, mygroundLayer);
+        scene.physics.add.collider(curentHostage, OtherSubjLayer);
+        scene.physics.add.collider(curentHostage, scene.player);
+        scene.hostages.push(curentHostage);
+    }
+
+    // spawn slimes
+    for(let i = 0; i < 4; i++)
+    {
+        let slime = scene.characterFactory.buildSlime((door.x - 1 + i) * tilesize + Math.floor(tilesize / 2), (door.y + 1) * tilesize + Math.floor(tilesize / 2), {slimeType: i});
+
+        scene.physics.add.collider(slime, mygroundLayer);
+        scene.physics.add.collider(slime, OtherSubjLayer);
+        scene.slimes.push(slime);
+
+    }
+
+    // Меняем настройки камеры, а так же размер карты
+    const camera = scene.cameras.main;
+    camera.setZoom(1.0)
+    scene.physics.world.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels, true, true, true, true);
+    camera.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels);
+    camera.startFollow(scene.player);
+    mygroundLayer.setCollisionBetween(1, 500);
+    OtherSubjLayer.setDepth(10);
+
+    return {"Ground" : mygroundLayer, "OtherSubj" : OtherSubjLayer}
+};
+
+function distance(obj1, obj2)
+{
+    return Math.sqrt((obj2.x - obj1.x) * (obj2.x - obj1.x) + (obj2.y - obj1.y) * (obj2.y - obj1.y))
+}
+
+function interaction(obj)
+{
+    if(obj instanceof Player)
+    {
+        let tileIndex = {x: Math.floor(obj.x / tilesize), y: Math.floor(obj.y / tilesize)}
+        let curTile = floorLayer.getTileAt(tileIndex.x ,tileIndex.y )
+        if(curTile != null && curTile.index != 0)
+        {
+            if(curTile.index == 2)
+            {
+                rudnev_scene.gs.coins += 1;
+                curTile.index = 0;
+                console.log("Founded a coin!")
+            }
+            else if(curTile.index == 4)
+            {
+                rudnev_scene.gs.sword = true;
+                curTile.index = 0;
+                console.log("Founded a sword!")
+            }
+        }
+
+        for(let i = 0; i < 4; i++)
+        {
+            rudnev_scene.gameObjects.forEach( function(element) {
+                if(element instanceof Slime && obj.isAlive && element.isAlive) {
+                    if (distance(obj, element) < 20) {
+                        // kill slime or player
+                        if (rudnev_scene.gs.sword)
+                        {
+                            console.log("slime killed")
+                            element.isAlive = false;
+                            element.destroy()
+
+                        } else {
+                            alert("Вы умерли. В следующий раз найдите сначала меч.")
+                            obj.isAlive = false
+                        }
+
+                    }
+                }
+            });
+        }
+    }
+};
 
 let Rudnev_lab5_scene = new Phaser.Class(
     {
-
-    Extends: Phaser.Scene,
-
-
-    initialize: function ProceduralScene() {
+        Extends: Phaser.Scene,
+        initialize: function ProceduralScene() {
         Phaser.Scene.call(this, {key: 'Rudnev_lab5_scene'});
     },
     characterFrameConfig: {frameWidth: 31, frameHeight: 31},
     slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
     preload: function () {
-        //this.load.image("Dungeon_Tileset", tilemapPng);
         this.load.image("Rudnev_Tileset", tilemapPng);
         this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
@@ -35,24 +359,29 @@ let Rudnev_lab5_scene = new Phaser.Class(
     },
 
     create: function () {
+        rudnev_scene = this;
         this.characterFactory = new CharacterFactory(this);
         this.gameObjects = [];
         this.hostages = [];
         this.slimes = [];
+        this.gs = {
+            coins: 0,
+            sword: false,
+        };
 
         let width = 50;
         let height = 30;
         let maxRooms = 20;
 
-        const layers = buildLevel(width, height, maxRooms, this);
+        const layers = build_Rudnev_Level(width, height, maxRooms, this);
+        this.player.isAlive = true;
         this.gameObjects.push(this.player);
         for(let i = 0; i < 4; i++)
         {
-            //this.hostages[i].steering = new Exploring(this.hostages[i], 30, 10)
+            this.hostages[i].isAlive = true;
             this.gameObjects.push(this.hostages[i]);
+            this.slimes[i].isAlive = true;
             this.gameObjects.push(this.slimes[i]);
-            console.log(this.slimes[i].x,this.slimes[i].y)
-
         }
         this.groundLayer = layers["Ground"];
         this.OtherSubjLayer = layers["OtherSubj"];
@@ -65,24 +394,28 @@ let Rudnev_lab5_scene = new Phaser.Class(
                 .setAlpha(0.75)
                 .setDepth(20);
         });
+        console.log(this)
     },
 
     update: function () {
         if (this.gameObjects) {
             this.gameObjects.forEach( function(element) {
-                element.update();
+                if(element.isAlive)
+                {
+                    element.update();
+                    interaction(element);
+                }
+                else if(element instanceof Player)
+                {
+                    if (rudnev_scene._runningScene !== null) {
+                        rudnev_scene.scene.pause(rudnev_scene._runningScene);
+                        rudnev_scene.scene.stop(rudnev_scene._runningScene);
+                        rudnev_scene._runningScene = null;
+                    }
+                    location.reload()
+                }
             });
         }
-        /*if (this.hostages) {
-            this.hostages.forEach( function(element) {
-                element.update();
-            });
-        }*/
-        /*if (this.slimes) {
-            this.slimes.forEach( function(element) {
-                element.update();
-            });
-        }*/
     },
     tilesToPixels(tileX, tileY) {
         return [tileX*this.tileSize, tileY*this.tileSize];
