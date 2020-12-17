@@ -1,4 +1,4 @@
-import Vector2 from 'phaser/src/math/Vector2'
+/*import Vector2 from 'phaser/src/math/Vector2'
 
 export default class Scene{
     constructor(width, height, roomsCount, minRoomWidth = 5, maxRoomWidth = 10, 
@@ -307,4 +307,4 @@ export default class Scene{
             this.scatterPointsQT(points, quadrants[3], xCenter+1, right, yCenter+1, down);
         }
     }
-}
+}*/

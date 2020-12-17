@@ -10,7 +10,7 @@ import SmartSlime from './minerScene/smartSlime';
 import Footsteps from "../../assets/audio/footstep_ice_crunchy_run_01.wav";
 
 import NPC from "../characters/npc";
-
+import Hostage from "../characters/hostage";
 
 export default class CharacterFactory {
     constructor(scene) {
@@ -45,9 +45,10 @@ export default class CharacterFactory {
             case 'yellow':
               if (params.player)
                 return this.buildPlayerCharacter(spriteSheetName, x, y);
-              else{
-                return this.buildNPCCharacter(spriteSheetName, x, y, params);
-              }
+              else if(params.isHostage)
+                  return this.buildHostageCharacter(spriteSheetName, x, y);
+              else if(params.Steering)
+                  return this.buildNPCCharacter(spriteSheetName, x, y, params);
 
             case "slime":
                 return this.buildSlime(x, y, params);
@@ -59,6 +60,13 @@ export default class CharacterFactory {
 
     buildNPCCharacter(spriteSheetName, x, y, params) {
         let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.Steering);
+        character.animationSets = this.animationLibrary.get(spriteSheetName);
+        return character;
+
+    }
+
+    buildHostageCharacter(spriteSheetName, x, y) {
+        let character = new Hostage(this.scene, x, y, spriteSheetName, 2);
         character.animationSets = this.animationLibrary.get(spriteSheetName);
         return character;
 

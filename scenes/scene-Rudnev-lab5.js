@@ -9,6 +9,9 @@ import greenSpriteSheet from '../assets/sprites/characters/green.png'
 import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 
+import Wander from "../src/ai/steerings/wander";
+import Exploring from "../src/ai/steerings/exploring";
+
 let Rudnev_lab5_scene = new Phaser.Class(
     {
 
@@ -34,6 +37,8 @@ let Rudnev_lab5_scene = new Phaser.Class(
     create: function () {
         this.characterFactory = new CharacterFactory(this);
         this.gameObjects = [];
+        this.hostages = [];
+        this.slimes = [];
 
         let width = 50;
         let height = 30;
@@ -41,6 +46,14 @@ let Rudnev_lab5_scene = new Phaser.Class(
 
         const layers = buildLevel(width, height, maxRooms, this);
         this.gameObjects.push(this.player);
+        for(let i = 0; i < 4; i++)
+        {
+            //this.hostages[i].steering = new Exploring(this.hostages[i], 30, 10)
+            this.gameObjects.push(this.hostages[i]);
+            this.gameObjects.push(this.slimes[i]);
+            console.log(this.slimes[i].x,this.slimes[i].y)
+
+        }
         this.groundLayer = layers["Ground"];
         this.OtherSubjLayer = layers["OtherSubj"];
         this.input.keyboard.once("keydown_D", event => {
@@ -60,6 +73,16 @@ let Rudnev_lab5_scene = new Phaser.Class(
                 element.update();
             });
         }
+        /*if (this.hostages) {
+            this.hostages.forEach( function(element) {
+                element.update();
+            });
+        }*/
+        /*if (this.slimes) {
+            this.slimes.forEach( function(element) {
+                element.update();
+            });
+        }*/
     },
     tilesToPixels(tileX, tileY) {
         return [tileX*this.tileSize, tileY*this.tileSize];

@@ -15,6 +15,29 @@ const TILE_MAPPING = {
     WOODENFLOOR: 9,
 };
 
+function isTileIndex(layer, x, y, tileIndex)
+{
+    return (layer.getTileAt(x,y) != null && layer.getTileAt(x,y).index == tileIndex)
+};
+
+function get_free_rand(arr)
+{
+    let flag = true;
+    let empty_marker = {x: -1, y: -1};
+    let ret_val = {x: -1, y: -1};
+    while(flag)
+    {
+        let rand_i = Math.floor(Math.random() * arr.length)
+        if(arr[rand_i] != empty_marker)
+        {
+            ret_val = arr[rand_i];
+            arr[rand_i] = empty_marker;
+            flag = false;
+        }
+    }
+    return ret_val
+}
+
 export default function buildLevel(width, height, maxRooms, scene)
 {
     let level = new Scene(width, height, maxRooms);
@@ -64,66 +87,85 @@ export default function buildLevel(width, height, maxRooms, scene)
     {
         for (let x = 0; x < width; x++)
         {
-            if(mygroundLayer.getTileAt(x,y) != null && mygroundLayer.getTileAt(x,y).index == 7) // for all grass
+            //if(mygroundLayer.getTileAt(x,y) != null && mygroundLayer.getTileAt(x,y).index == 7) // for all grass
+            if(isTileIndex(mygroundLayer,x,y,7))
             {
-                if(x != 0 && floorLayer.getTileAt(x - 1,y) != null && floorLayer.getTileAt(x - 1,y).index == 0) // if left dirt
+                if(x != 0 && isTileIndex(floorLayer,x - 1,y,0))// if left dirt
+                //if(x != 0 && floorLayer.getTileAt(x - 1,y) != null && floorLayer.getTileAt(x - 1,y).index == 0) // if left dirt
                     mygroundLayer.putTileAt(TILE_MAPPING.WALL, x, y);
-                else if(x != width - 1 && floorLayer.getTileAt(x + 1,y) != null && floorLayer.getTileAt(x + 1,y).index == 0) // if right dirt
+                else if(x != width - 1 && isTileIndex(floorLayer,x + 1,y,0))// if right dirt
+                //else if(x != width - 1 && floorLayer.getTileAt(x + 1,y) != null && floorLayer.getTileAt(x + 1,y).index == 0) // if right dirt
                     mygroundLayer.putTileAt(TILE_MAPPING.WALL, x, y);
-                else if(y != 0 && floorLayer.getTileAt(x,y - 1) != null && floorLayer.getTileAt(x,y - 1).index == 0) // if top dirt
+                else if(y != 0 && isTileIndex(floorLayer,x,y - 1,0))// if top dirt
+                //else if(y != 0 && floorLayer.getTileAt(x,y - 1) != null && floorLayer.getTileAt(x,y - 1).index == 0) // if top dirt
                     mygroundLayer.putTileAt(TILE_MAPPING.WALL, x, y);
-                else if(y != height - 1 && floorLayer.getTileAt(x,y + 1) != null && floorLayer.getTileAt(x,y + 1).index == 0) // if bottom dirt
+                else if(y != height - 1 && isTileIndex(floorLayer,x,y + 1,0))// if top dirt
+                //else if(y != height - 1 && floorLayer.getTileAt(x,y + 1) != null && floorLayer.getTileAt(x,y + 1).index == 0) // if bottom dirt
                     mygroundLayer.putTileAt(TILE_MAPPING.WALL, x, y);
             }
         }
     }
 
     // locate doors
-    let door_location_candidates = [];
+    let door_candidates = [];
     for(let y = 0; y < height-1; y++)
     {
         for (let x = 0+1; x < width-2; x++)
         {
-            if ((mygroundLayer.getTileAt(x-1, y) != null && mygroundLayer.getTileAt(x-1, y).index == 3) &&
-                (mygroundLayer.getTileAt(x, y) != null && mygroundLayer.getTileAt(x, y).index == 3) &&
-                (mygroundLayer.getTileAt(x+1, y) != null && mygroundLayer.getTileAt(x+1, y).index == 3) &&
-                (mygroundLayer.getTileAt(x+2, y) != null && mygroundLayer.getTileAt(x+2, y).index == 3) &&
-                (floorLayer.getTileAt(x-1, y + 1) != null && floorLayer.getTileAt(x-1, y + 1).index == 0) &&
-                (floorLayer.getTileAt(x, y + 1) != null && floorLayer.getTileAt(x, y + 1).index == 0) &&
-                (floorLayer.getTileAt(x+1, y + 1) != null && floorLayer.getTileAt(x+1, y + 1).index == 0) &&
-                (floorLayer.getTileAt(x+2, y + 1) != null && floorLayer.getTileAt(x+2, y + 1).index == 0))
+            if( isTileIndex(mygroundLayer,x - 1,y,3) &&
+                isTileIndex(mygroundLayer,x,y,3) &&
+                isTileIndex(mygroundLayer,x + 1,y,3) &&
+                isTileIndex(mygroundLayer,x + 2,y,3) &&
+                isTileIndex(floorLayer,x - 1,y + 1,0) &&
+                isTileIndex(floorLayer,x,y + 1,0) &&
+                isTileIndex(floorLayer,x + 1,y + 1,0) &&
+                isTileIndex(floorLayer,x + 2,y + 1,0))
             {
-                door_location_candidates.push({x:x, y:y});
+                door_candidates.push({x:x, y:y});
             }
         }
     }
-    let door_location = door_location_candidates[Math.floor(Math.random() * door_location_candidates.length)];
+    let door = door_candidates[Math.floor(Math.random() * door_candidates.length)];
 
-    mygroundLayer.putTileAt(TILE_MAPPING.WOODENWALL, door_location.x - 1, door_location.y);
-    mygroundLayer.putTileAt(TILE_MAPPING.DOOR, door_location.x , door_location.y);
-    mygroundLayer.putTileAt(TILE_MAPPING.WINDOW, door_location.x + 1, door_location.y);
-    mygroundLayer.putTileAt(TILE_MAPPING.WOODENWALL, door_location.x + 2, door_location.y);
+    mygroundLayer.putTileAt(TILE_MAPPING.WOODENWALL, door.x - 1, door.y);
+    mygroundLayer.putTileAt(TILE_MAPPING.DOOR, door.x , door.y);
+    mygroundLayer.putTileAt(TILE_MAPPING.WINDOW, door.x + 1, door.y);
+    mygroundLayer.putTileAt(TILE_MAPPING.WOODENWALL, door.x + 2, door.y);
 
-    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door_location.x - 1, door_location.y + 1);
-    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door_location.x , door_location.y + 1);
-    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door_location.x + 1, door_location.y + 1);
-    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door_location.x + 2, door_location.y + 1);
+    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door.x - 1, door.y + 1);
+    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door.x , door.y + 1);
+    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door.x + 1, door.y + 1);
+    floorLayer.putTileAt(TILE_MAPPING.WOODENFLOOR, door.x + 2, door.y + 1);
 
-    if(door_location.y != 0)
+    if(door.y != 0)
     {
-        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door_location.x - 1, door_location.y-1);
-        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door_location.x , door_location.y-1);
-        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door_location.x + 1, door_location.y-1);
-        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door_location.x + 2, door_location.y-1);
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door.x - 1, door.y-1);
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door.x , door.y-1);
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door.x + 1, door.y-1);
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door.x + 2, door.y-1);
 
-        if(floorLayer.getTileAt( door_location.x - 1,  door_location.y - 1) != null)
-            floorLayer.removeTileAt( door_location.x - 1,  door_location.y - 1);
-        if(floorLayer.getTileAt( door_location.x,  door_location.y - 1) != null)
-            floorLayer.removeTileAt( door_location.x,  door_location.y - 1);
-        if(floorLayer.getTileAt( door_location.x + 1,  door_location.y - 1) != null)
-            floorLayer.removeTileAt( door_location.x + 1,  door_location.y - 1);
-        if(floorLayer.getTileAt( door_location.x + 2,  door_location.y - 1) != null)
-            floorLayer.removeTileAt( door_location.x + 2,  door_location.y - 1);
+        if(floorLayer.getTileAt( door.x - 1,  door.y - 1) != null)
+            floorLayer.removeTileAt( door.x - 1,  door.y - 1);
+        if(floorLayer.getTileAt( door.x,  door.y - 1) != null)
+            floorLayer.removeTileAt( door.x,  door.y - 1);
+        if(floorLayer.getTileAt( door.x + 1,  door.y - 1) != null)
+            floorLayer.removeTileAt( door.x + 1,  door.y - 1);
+        if(floorLayer.getTileAt( door.x + 2,  door.y - 1) != null)
+            floorLayer.removeTileAt( door.x + 2,  door.y - 1);
+    }
+
+    if(door.x > 1 && !isTileIndex(mygroundLayer,door.x - 2,door.y,3))
+    {
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door.x - 2, door.y);
+        if(floorLayer.getTileAt( door.x - 2,  door.y) != null)
+            floorLayer.removeTileAt( door.x - 2,  door.y);
+    }
+
+    if(door.x < width-3 && !isTileIndex(mygroundLayer,door.x + 3,door.y,3))
+    {
+        mygroundLayer.putTileAt(TILE_MAPPING.WALL, door.x + 3, door.y);
+        if(floorLayer.getTileAt( door.x + 3,  door.y) != null)
+            floorLayer.removeTileAt( door.x + 3,  door.y);
     }
 
     // set corner wall between grass
@@ -132,28 +174,33 @@ export default function buildLevel(width, height, maxRooms, scene)
     {
         for (let x = 0; x < width; x++)
         {
-            if (mygroundLayer.getTileAt(x, y) != null && mygroundLayer.getTileAt(x, y).index == 7) // for all grass
+            if(isTileIndex(mygroundLayer,x,y,7))// for all grass
+            //if (mygroundLayer.getTileAt(x, y) != null && mygroundLayer.getTileAt(x, y).index == 7) // for all grass
             {
                 let wall_counter = 0;
 
                 // bot right corner
-                if((x != 0 && mygroundLayer.getTileAt(x - 1,y) != null && mygroundLayer.getTileAt(x - 1,y).index == 3) &&
-                    (y != 0 && mygroundLayer.getTileAt(x,y - 1) != null && mygroundLayer.getTileAt(x,y - 1).index == 3))
+                if(x != 0 && isTileIndex(mygroundLayer,x - 1,y,3) && y != 0 && isTileIndex(mygroundLayer,x,y - 1,3))
+                //if((x != 0 && mygroundLayer.getTileAt(x - 1,y) != null && mygroundLayer.getTileAt(x - 1,y).index == 3) &&
+                //    (y != 0 && mygroundLayer.getTileAt(x,y - 1) != null && mygroundLayer.getTileAt(x,y - 1).index == 3))
                     wall_counter += 1;
 
                 // top right corner
-                if((x != 0 && mygroundLayer.getTileAt(x - 1,y) != null && mygroundLayer.getTileAt(x - 1,y).index == 3) &&
-                    (y != height - 1 && mygroundLayer.getTileAt(x,y + 1) != null && mygroundLayer.getTileAt(x,y + 1).index == 3))
+                if(x != 0 && isTileIndex(mygroundLayer,x - 1,y,3) && y != height - 1 && isTileIndex(mygroundLayer,x,y + 1,3))
+                //if((x != 0 && mygroundLayer.getTileAt(x - 1,y) != null && mygroundLayer.getTileAt(x - 1,y).index == 3) &&
+                //    (y != height - 1 && mygroundLayer.getTileAt(x,y + 1) != null && mygroundLayer.getTileAt(x,y + 1).index == 3))
                     wall_counter += 1;
 
                 // bot left corner
-                if((x != width - 1 && mygroundLayer.getTileAt(x + 1,y) != null && mygroundLayer.getTileAt(x + 1,y).index == 3) &&
-                    (y != 0 && mygroundLayer.getTileAt(x,y - 1) != null && mygroundLayer.getTileAt(x,y - 1).index == 3))
+                if(x != width - 1 && isTileIndex(mygroundLayer,x + 1,y,3) && y != 0 && isTileIndex(mygroundLayer,x,y - 1,3))
+                //if((x != width - 1 && mygroundLayer.getTileAt(x + 1,y) != null && mygroundLayer.getTileAt(x + 1,y).index == 3) &&
+                //    (y != 0 && mygroundLayer.getTileAt(x,y - 1) != null && mygroundLayer.getTileAt(x,y - 1).index == 3))
                     wall_counter += 1;
 
                 // top left corner
-                if((x != width - 1 && mygroundLayer.getTileAt(x + 1,y) != null && mygroundLayer.getTileAt(x + 1,y).index == 3) &&
-                    (y != height - 1 && mygroundLayer.getTileAt(x,y + 1) != null && mygroundLayer.getTileAt(x,y + 1).index == 3))
+                if(x != width - 1 && isTileIndex(mygroundLayer,x + 1,y,3) && y != height - 1 && isTileIndex(mygroundLayer,x,y + 1,3))
+                //if((x != width - 1 && mygroundLayer.getTileAt(x + 1,y) != null && mygroundLayer.getTileAt(x + 1,y).index == 3) &&
+                //  (y != height - 1 && mygroundLayer.getTileAt(x,y + 1) != null && mygroundLayer.getTileAt(x,y + 1).index == 3))
                     wall_counter += 1;
 
                 if(wall_counter >= 1)
@@ -169,63 +216,91 @@ export default function buildLevel(width, height, maxRooms, scene)
     {
         for (let x = 0; x < width; x++)
         {
-            if (floorLayer.getTileAt(x, y) != null && floorLayer.getTileAt(x, y).index == 7)
+            if(isTileIndex(floorLayer,x,y,0))
+            //if (floorLayer.getTileAt(x, y) != null && floorLayer.getTileAt(x, y).index == 7)
             {
                 free_space.push({x:x, y:y});
             }
         }
     }
 
-    let sapwn_hostages_location = [];
-    for(let i = 0; i < 4; i++)
-    {
-        let flag = true;
-        while(flag)
-        {
-            let rand_i = Math.floor(Math.random() * free_space.length)
-            if(free_space[rand_i] != {x: -1, y: -1})
-            {
-                sapwn_hostages_location = free_space[rand_i];
-                free_space[rand_i] = {x: -1, y: -1};
-                flag = false;
-            }
-        }
-    }
-
-    // NEED TO SPAWN HERE HOSTAGES
-    // ...
-
-    console.log("locate coins and sword ... ")
     // locate coins and sword
     let perks = [TILE_MAPPING.COIN, TILE_MAPPING.COIN, TILE_MAPPING.COIN, TILE_MAPPING.COIN, TILE_MAPPING.SWORD];
     for(let i = 0; i < perks.length; i++)
     {
-        let flag = true;
-        while(flag)
-        {
-            let rand_i = Math.floor(Math.random() * free_space.length)
-            if(free_space[rand_i] != {x: -1, y: -1})
-            {
-                console.log("putting ", perks[i])
-                floorLayer.putTileAt(perks[i], free_space[rand_i].x , free_space[rand_i].y);
-                free_space[rand_i] = {x: -1, y: -1};
-                flag = false;
-            }
-        }
+        let coords = get_free_rand(free_space)
+        floorLayer.putTileAt(perks[i], coords.x , coords.y);
     }
-    console.log("done")
 
-    // считаем положение где заспавнится игрок
-    let palyerSpawnX = 0;
-    let palyerSpawnY = 0;
-    if (rooms.length != 0)
-    {
-        palyerSpawnX = rooms[0].startCenter.x * tilesize + 10;
-        palyerSpawnY = rooms[0].startCenter.y * tilesize + 10;
-    }
-    scene.player = scene.characterFactory.buildCharacter("green", palyerSpawnX, palyerSpawnY, {player: true});
+    // spawn player
+    let palyerSpawnPosition = get_free_rand(free_space);
+    palyerSpawnPosition.x = palyerSpawnPosition.x * tilesize + Math.floor(tilesize / 2)
+    palyerSpawnPosition.y = palyerSpawnPosition.y * tilesize + Math.floor(tilesize / 2)
+    scene.player = scene.characterFactory.buildCharacter("green", palyerSpawnPosition.x , palyerSpawnPosition.y , {player: true});
     scene.physics.add.collider(scene.player, mygroundLayer);
     scene.physics.add.collider(scene.player, OtherSubjLayer);
+
+    // spawn hostages
+    let hostages_colors = ["aurora","blue","yellow","punk"]
+    for(let i = 0; i < 4; i++)
+    {
+        let hostageSpawnPosition = get_free_rand(free_space)
+        hostageSpawnPosition.x = hostageSpawnPosition.x * tilesize + Math.floor(tilesize / 2)
+        hostageSpawnPosition.y = hostageSpawnPosition.y * tilesize + Math.floor(tilesize / 2)
+
+        scene.curentHostage = scene.characterFactory.buildCharacter(hostages_colors[i], hostageSpawnPosition.x, hostageSpawnPosition.y, {isHostage: true});
+        scene.physics.add.collider(scene.curentHostage, mygroundLayer);
+        scene.physics.add.collider(scene.curentHostage, OtherSubjLayer);
+        scene.physics.add.collider(scene.curentHostage, scene.player);
+        scene.hostages.push(scene.curentHostage);
+    }
+
+    // spawn slimes
+    for(let i = 0; i < 4; i++)
+    {
+        let slime = scene.characterFactory.buildSlime((door.x - 1 + i) * tilesize + Math.floor(tilesize / 2), (door.y + 1) * tilesize + Math.floor(tilesize / 2), {slimeType: i});
+
+        scene.physics.add.collider(scene.curentHostage, mygroundLayer);
+        scene.physics.add.collider(scene.curentHostage, OtherSubjLayer);
+        scene.physics.add.collider(scene.curentHostage, scene.player);
+        for(let j = 0; j < 4; j++)
+            scene.physics.add.collider(scene.curentHostage, scene.hostages[j]);
+        scene.slimes.push(slime);
+        //scene.gameObjects.push(slime);
+        /*this.player = this.characterFactory.buildCharacter('punk', 100, 100, {player: true});
+        this.gameObjects.push(this.player);
+        this.physics.add.collider(this.player, worldLayer);
+        this.slimes =  this.physics.add.group();
+        let params = {};
+
+        for(let i = 0; i < 50; i++) {
+
+            const x = Phaser.Math.RND.between(50, this.physics.world.bounds.width - 50 );
+            const y = Phaser.Math.RND.between(50, this.physics.world.bounds.height -50 );
+            params.slimeType = Phaser.Math.RND.between(0, 4);
+            const slime = this.characterFactory.buildSlime(x, y, params);
+            this.slimes.add(slime);
+            this.physics.add.collider(slime, worldLayer);
+            this.gameObjects.push(slime);
+        }
+        this.physics.add.collider(this.player, this.slimes);*/
+
+        /*let hostageSpawnPosition = get_free_rand(free_space)
+        hostageSpawnPosition.x = hostageSpawnPosition.x * tilesize + Math.floor(tilesize / 2)
+        hostageSpawnPosition.y = hostageSpawnPosition.y * tilesize + Math.floor(tilesize / 2)
+
+        scene.curentHostage = scene.characterFactory.buildCharacter(hostages_colors[i], hostageSpawnPosition.x, hostageSpawnPosition.y, {isHostage: true});
+        scene.physics.add.collider(scene.curentHostage, mygroundLayer);
+        scene.physics.add.collider(scene.curentHostage, OtherSubjLayer);
+        scene.physics.add.collider(scene.curentHostage, scene.player);
+        scene.hostages.push(scene.curentHostage);*/
+    }
+/*
+    scene.physics.add.collider(scene.player, scene.slimes);
+    for(let i = 0; i < 4; i++)
+        scene.physics.add.collider(scene.hostages[i], scene.slimes);
+*/
+
 
     // Берем рандомную комнату для добавления персонажа, его ещё найти надо будет
     /*let randdd = Math.floor(Math.random() * rooms.length) + 1
