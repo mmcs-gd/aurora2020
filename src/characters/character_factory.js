@@ -54,10 +54,7 @@ export default class CharacterFactory {
                 if (params.player)
                     return this.buildPlayerCharacter(spriteSheetName, x, y, params);
                 else {
-                    if (params.Steering)
                         return this.buildNPCCharacter(spriteSheetName, x, y, params);
-                    else
-                        return this.buildCyberpunkCharacter(spriteSheetName, x, y, params);
                 }
             case "slime":
                 return this.buildSlime(x, y, params);
@@ -68,7 +65,10 @@ export default class CharacterFactory {
 
 
     buildNPCCharacter(spriteSheetName, x, y, params) {
-        let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.Steering);
+        let character = new NPC(this.scene, x, y,
+            spriteSheetName, 2,
+            params.Steering);
+
         character.animationSets = this.animationLibrary.get(spriteSheetName);
         return character;
     }
