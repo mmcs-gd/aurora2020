@@ -1,4 +1,4 @@
-import { marking } from './marking'
+//import { marking } from './marking'
 
 function fillability(map){
 	let cntBack = 0;
@@ -14,12 +14,12 @@ function fillability(map){
 
 function info(map){
 	//return count of fields in map
-	const info = marking(map);
-	console.log("connectivity (count fields): " + info.length);
+	//const info = marking(map);
+	//console.log("connectivity (count fields): " + info.length);
 	
-	console.log("count pixels of field: " + info[0].pixels);
+	//console.log("count pixels of field: " + info[0].pixels);
 	
-	console.log("width: "+ (info[0].right - info[0].left) + " height: " + (info[0].top - info[0].bottom));
+	//console.log("width: "+ (info[0].right - info[0].left) + " height: " + (info[0].top - info[0].bottom));
 	
 }
 

@@ -1,5 +1,6 @@
 import CellularAutomata from './cellular-automata'
 import RandomWalk from './random-walk'
+import { connectionFields } from './connection-fields'
 
 export default class GeneratorLevel {
     constructor(width, height, config) {
@@ -11,52 +12,39 @@ export default class GeneratorLevel {
 
     createMap() {
         let map = [];
-        //1. Сначала запускаем RandomWalk
+        //1. Start RandomWalk
         const walker = new RandomWalk(this.width, this.height);
-        let temp = walker.createMap(this.walkC.maxTunnels, this.walkC.maxLength, this.walkC.minWidth, this.walkC.maxWidth);
-        // return temp;
+				let temp = [];
+        temp = walker.createMap(this.walkC.maxTunnels, this.walkC.maxLength, this.walkC.minWidth, this.walkC.maxWidth);
 
-        //2. Запускаем на основе RandomWalk клеточный автомат
+        //2. Start cellular automata with initState from RandomWalk
         const automataOrder = new CellularAutomata(this.width, this.height, temp,
-            this.autoC.chanceToStartAlive);
+          this.autoC.chanceToStartAlive);
         map = automataOrder.createMap(3, this.autoC.deathLimit, this.autoC.birthLimit)
 
-        //3. Соединяем маски
+        //3. Union maps
         map = this.OR(map, temp);
-        // return map;
 
-        //4. Генерируем дикий клеточный автомат
+        //4. Start wild cellular automata
         const automataWild = new CellularAutomata(this.width, this.height, undefined,
             this.autoC.chanceToStartAlive);
         temp = automataWild.createMap(3, 4, 5)
-
-        //5. Снова соединяем и смотрим на дичь
-        //temp = this.OR(map, temp);
-				temp = map; //не генерируем дичь
-
-        //6. Наращиваем карту на 1 (на 2)
-        temp = this.enlarge(temp);
-        //temp = this.enlarge(temp);
-				//temp = this.enlarge(temp);
+				
+        //5. Union maps
+        map = this.OR(map, temp);
+				
+				//6. Connect different fields
+				let markedMap = connectionFields(map);
+				
+				//7. Union with markedMap
+				map = this.OR(map, markedMap);
         
-        
+				//8. Enlarge map by 1
+        map = this.enlarge(map);
 
-        //7. Сглаживаем
-        // temp = this.smooth(temp);
-        return temp;
-    }
-
-    invert(arr) {
-        let map = [];
-        for (let x = 0; x < arr.length; ++x) {
-            map[x] = [];
-            for (let y = 0; y < arr[0].length; ++y)
-                map[x][y] = arr[x][y] ? 0 : 1
-        }
         return map;
     }
-
-
+			
     OR(arr1, arr2) {
         let map = [];
         for (let x = 0; x < arr1.length; ++x) {
@@ -88,7 +76,6 @@ export default class GeneratorLevel {
             for (let j = 1; j < map[0].length - 1; ++j)
                 if (map[i][j])
                     map[i][j] = map[i - 1][j] + map[i + 1][j] + map[i][j - 1] + map[i][j + 1] < 2 ? 0 : 1;
-        return map;
     }
 
     debugMap() {

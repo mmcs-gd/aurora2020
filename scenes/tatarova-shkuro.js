@@ -17,15 +17,15 @@ import { fillability, info } from '../src/utils/generators/metrics';
 
 const config = {
 	cellularAutomata: {
-		deathLimit: 3,
-		birthLimit: 3, 
-		chanceToStartAlive: 0.45
+		deathLimit: 4,
+		birthLimit: 5, 
+		chanceToStartAlive: 0.33
 	},
 	randomWalk: {
-		maxTunnels: 20, 
-		maxLength: 30,
+		maxTunnels: 7, 
+		maxLength: 20,
 		minWidth: 2,
-		maxWidth: 4
+		maxWidth: 3
 	}
 };
 
@@ -65,13 +65,12 @@ let TatarovaShkuro = new Phaser.Class({
 				
 				let map = [];
 				let markedMap = [];
-				do {
+				//do {
 					map = (new GeneratorLevel(width, height, config)).createMap();
 					markedMap = (new MapLayout(map, width, height)).getMapLayout();
-				} while (fillability(markedMap) < 0.13);
+				//} while (fillability(markedMap) < 0.3);
 			
-				//call connectivity
-				info(map);
+				//info(map);
 				
         const layers = (new TileMapper(markedMap, this, width, height, this.tileSize)).generateLevel();
         this.gameObjects.push(this.player);
