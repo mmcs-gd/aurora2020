@@ -35,7 +35,6 @@ const scenes = [
   //  ['SteeringArrivalScene', SteeringArrivalScene],
     ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
     ['MinerScene', MinerScene],
-    ['SteeringUnionGroupScene', SteeringUnionGroupScene]
     ['SteeringUnionGroupScene', SteeringUnionGroupScene],
     ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
     ['Tatarova-Shkuro', TatarovaShkuro]
