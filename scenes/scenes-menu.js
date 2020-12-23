@@ -3,8 +3,8 @@ import menuBackgroundJson from '../assets/menu_background.json'
 
 
 import StartingScene from "./starting-scene";
+import RealLevelScene from './real-level-scene';
 import ExplorationAndShadowingScene from "./exploration-and-shadowing-scene";
-
 import SteeringWanderingScene from "./steering-wandering-scene";
 import SteeringArrivalScene from "./steering-arrival-scene";
 import SteeringPursuitScene from './steering-pursuit-scene';
@@ -14,22 +14,30 @@ import SteeringRudnevScene from './scene-Rudnev';
 import SteeringPursuitWithDistanceScene from './steering-pursuit-with-distance'
 import SteeringFleeScene from './steering-flee-scene';
 import SteeringExploringScene from './steering-exploring-scene';
+import ProcedurallyGeneratedScene from "./procedurally-generated-scene";
 import SteeringUnionGroupScene from './steering-union-group-scene';
+import EffectsScene from './effects-scene'
+import SlimeRushScene from "./slime-rush";
 import TatarovaShkuro from './tatarova-shkuro';
 
 const scenes = [
     ['StartingScene', StartingScene],
     ['SteeringFleeScene', SteeringFleeScene],
     ['SteeringExploringScene', SteeringExploringScene],
+    ['RealLevelScene', RealLevelScene],
     ['SteeringRudnevScene', SteeringRudnevScene],
-    ['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
-    ['SteeringPursuitScene', SteeringPursuitScene],
-    ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
-    ['SteeringWanderingScene', SteeringWanderingScene],
-    ['SteeringArrivalScene', SteeringArrivalScene],
+    [ 'EffectsScene', EffectsScene],
+    ['SlimeRushScene', SlimeRushScene],
+  //  ['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
+  //  ['SteeringPursuitScene', SteeringPursuitScene],
+  //  ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
+  //  ['SteeringWanderingScene', SteeringWanderingScene],
+  //  ['SteeringArrivalScene', SteeringArrivalScene],
     ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
-   ['MinerScene', MinerScene],
+    ['MinerScene', MinerScene],
+    ['SteeringUnionGroupScene', SteeringUnionGroupScene]
     ['SteeringUnionGroupScene', SteeringUnionGroupScene],
+    ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
     ['Tatarova-Shkuro', TatarovaShkuro]
 
 ];
@@ -45,6 +53,7 @@ let MenuScene = new Phaser.Class({
     },
 
     preload: function () {
+        console.log(scenes)
         scenes.forEach(s => {
             this.scene.add(s[0], s[1], false);
         });
