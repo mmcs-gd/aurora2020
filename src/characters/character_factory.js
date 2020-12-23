@@ -20,7 +20,6 @@ export default class CharacterFactory {
         this.cyberSpritesheets =  ['aurora', 'blue', 'yellow', 'green', 'punk'];
         this.slimeSpriteSheet = 'slime';
 
-
         this.mineSpriteSheet = 'mine';
         const slimeStateTable = new StateTable(this);
         slimeStateTable.addState(new StateTableRow('searching', this.foundTarget, 'jumping'));
