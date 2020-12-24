@@ -465,7 +465,6 @@ function check_win()
         //if(element.isAlive) {
             if (element instanceof Player)
             {
-                console.log(gs_door.x, element.x, gs_door.y, element.y)
                 if (distance(element, gs_door) < settings.distToDoorForWining)
                 {
                     isPlayerCloseToDoor = true;
@@ -482,8 +481,6 @@ function check_win()
         //}
     });
 
-
-    console.log(amoutHostagesCloseToDoor, isPlayerCloseToDoor, rudnev_scene.gameObjects)
     if(isPlayerCloseToDoor && amoutHostagesCloseToDoor == 4)
         return true;
     return false;
@@ -542,6 +539,15 @@ let Rudnev_lab5_scene = new Phaser.Class(
             this.slimes[i].isAlive = true;
             this.gameObjects.push(this.slimes[i]);
         }
+
+        for(let i = 0; i < this.gameObjects.length; i++)
+        {
+            for(let j = i + 1; j < this.gameObjects.length; j++)
+            {
+                this.physics.add.collider(this.gameObjects[i], this.gameObjects[j]);
+            }
+        }
+
         this.groundLayer = layers["Ground"];
         this.OtherSubjLayer = layers["OtherSubj"];
         this.input.keyboard.once("keydown_D", event => {
@@ -553,7 +559,6 @@ let Rudnev_lab5_scene = new Phaser.Class(
                 .setAlpha(0.75)
                 .setDepth(20);
         });
-        console.log(this)
     },
 
     update: function () {
