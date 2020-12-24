@@ -7,6 +7,7 @@ export default class Evade extends Steering {
 
     constructor(owner, pursuer, force = 1, ownerMaxSpeed=100, panicDistSquare = 10e3) {
         super(owner, [pursuer], force);
+        this.target = pursuer;
         this.panicDistSq = panicDistSquare;
         this.ownerMaxSpeed = ownerMaxSpeed;
     }
@@ -22,21 +23,20 @@ export default class Evade extends Steering {
         return desiredVelocity.subtract(prevVelocity);
     }
 
-    calculateImpulse () {
-
-
-        const pursuer = this.objects[0];
-        let owner;
-        if (pursuer instanceof Npc)
-            owner = this.objects[0].steering.objects[0];
-        else    
-            owner = this.owner.evader;
-
+    calculateImpulse ()
+    {
+        const pursuer = this.target//this.objects[0];
+        let owner = this.owner;
+        //if (pursuer instanceof Npc)
+        //    owner = this.objects[0].steering.objects[0];
+        //else
+        //    owner = this.owner.evader;
 
         const toPursuer = new Vector2(pursuer.x - owner.x, pursuer.y-owner.y);
 
-
-        const prevPursuerVelocity = new Vector2(pursuer.body.x-pursuer.body.prev.x, 
+        if(pursuer.body == undefined)
+            return new Vector2(0, 0);
+        const prevPursuerVelocity = new Vector2(pursuer.body.x-pursuer.body.prev.x,
             pursuer.body.y-pursuer.body.prev.y); 
         const lookAheadTime = toPursuer.length() / 
                         (this.ownerMaxSpeed + prevPursuerVelocity.length());                                    

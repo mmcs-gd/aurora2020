@@ -18,6 +18,7 @@ export default class Arrival extends Steering {
 		if(distance < this.slowingRadius){
 			desiredVelocity = desiredVelocity.scale(distance/this.slowingRadius);
 		}
+		console.log("owner position : ", owner.x, owner.y)
 		const prevVelocity = new Vector2(owner.x - owner.player.body.prev.x,
 			owner.y - owner.player.body.prev.y);
 		return desiredVelocity.subtract(prevVelocity);

@@ -6,6 +6,7 @@ export default class Hostage extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         //this.steering = steering;
         this.cnt = 0;
+        this.isPayed = false;
     }
 
     update() {

@@ -10,6 +10,11 @@ import CharacterFactory from "../src/characters/character_factory";
 import Scene from "../src/utils/scenes-maker.js"
 import Player from "../src/characters/player";
 import Slime from "../src/characters/slime";
+import Hostage from "../src/characters/hostage";
+
+import Evade from "../src/ai/steerings/evade";
+import Pursuit from "../src/ai/steerings/pursuit";
+import Wandering from "../src/ai/steerings/wandering";
 
 const TILE_MAPPING = {
     DIRT: 0,
@@ -26,6 +31,16 @@ const TILE_MAPPING = {
 const tilesize = 32;
 let floorLayer = null;
 let rudnev_scene = null;
+
+let settings = {
+    takingHostageDist: 50,
+    hostageRunAwayDist: 150,
+    slimeMaxDistFromDoor: 500,
+    slimeFindingDist: 200,
+    killDist: 23,
+    distToDoorForWining: 100,
+}
+let gs_door = {x: -1, y: -1};
 
 function isTileIndex(layer, x, y, tileIndex)
 {
@@ -137,6 +152,8 @@ function build_Rudnev_Level(width, height, maxRooms, scene)
         }
     }
     let door = door_candidates[Math.floor(Math.random() * door_candidates.length)];
+    gs_door.x = door.x * tilesize;
+    gs_door.y = door.y * tilesize;
 
     mygroundLayer.putTileAt(TILE_MAPPING.WOODENWALL, door.x - 1, door.y);
     mygroundLayer.putTileAt(TILE_MAPPING.DOOR, door.x , door.y);
@@ -273,6 +290,7 @@ function build_Rudnev_Level(width, height, maxRooms, scene)
 
         scene.physics.add.collider(slime, mygroundLayer);
         scene.physics.add.collider(slime, OtherSubjLayer);
+        slime.steering = new Wandering(slime, door, 1, 40, 100);
         scene.slimes.push(slime);
 
     }
@@ -285,6 +303,14 @@ function build_Rudnev_Level(width, height, maxRooms, scene)
     camera.startFollow(scene.player);
     mygroundLayer.setCollisionBetween(1, 500);
     OtherSubjLayer.setDepth(10);
+
+    alert("In this game you have to find 4 coins, n\n" +
+        "pay them for hostages and save them.\n" +
+        "They will not follow you until you'll not payed them.\n" +
+        "Slimes want kill everyone. Be careful!\n" +
+        "If hostage will scare and run away - take him once\n" +
+        "If you find a sword you could kill them.\n" +
+        "Came to door with all hostages for win.")
 
     return {"Ground" : mygroundLayer, "OtherSubj" : OtherSubjLayer}
 };
@@ -320,25 +346,158 @@ function interaction(obj)
         {
             rudnev_scene.gameObjects.forEach( function(element) {
                 if(element instanceof Slime && obj.isAlive && element.isAlive) {
-                    if (distance(obj, element) < 20) {
+                    if (distance(obj, element) < settings.killDist && obj.isAlive) {
                         // kill slime or player
                         if (rudnev_scene.gs.sword)
                         {
                             console.log("slime killed")
                             element.isAlive = false;
                             element.destroy()
-
                         } else {
                             alert("Вы умерли. В следующий раз найдите сначала меч.")
                             obj.isAlive = false
                         }
-
                     }
                 }
             });
         }
     }
+
+    if(obj instanceof Hostage)
+    {
+        rudnev_scene.gameObjects.forEach( function(element)
+        {
+            if(element instanceof Player || (!(element instanceof Player) && element.isAlive))
+            {
+
+                if(element instanceof Player)
+                {
+                    if(distance(obj, element) < settings.takingHostageDist)
+                    {
+                        if(rudnev_scene.gs.coins > 0 && !obj.isPayed)
+                        {
+                            console.log("hostage taked.")
+                            rudnev_scene.gs.coins -= 1;
+                            obj.steering = new Pursuit(obj, element, 1, 80, 100, 50);
+                            obj.isPayed = true;
+                        }
+                        if(obj.isPayed && !(obj.steering instanceof Pursuit))
+                        {
+                            console.log("hostage retaked.")
+                            if((obj.steering instanceof Evade) && distance(obj, obj.steering.target) > settings.hostageRunAwayDist)
+                                obj.steering = new Pursuit(obj, element, 1, 80, 100, 50);
+                        }
+                    }
+                }
+
+                if(element instanceof Slime)
+                {
+                    if(distance(obj, element) < settings.hostageRunAwayDist && !(obj.steering instanceof Evade))
+                    {
+                        console.log("hostage scared!")
+                        obj.steering = new Evade(obj, element, 1, 100, 1e5)
+                    }
+                }
+            }
+        });
+    }
+
+    if(obj instanceof Slime)
+    {
+        if(obj.isAlive)
+        {
+            if (distance(obj, gs_door) > settings.slimeMaxDistFromDoor && !(obj.steering instanceof Wandering))
+            {
+                obj.steering = new Wandering(obj, gs_door, 1, 40, 100);
+            }
+            else
+            {
+                rudnev_scene.gameObjects.forEach(function (element)
+                {
+                    if(element instanceof Player || (!(element instanceof Player) && element.isAlive))
+                    {
+                        if (element instanceof Player || element instanceof Hostage)
+                        {
+                            if((element instanceof Hostage) && distance(obj,element) < settings.killDist)
+                            {
+                                rudnev_scene.gameObjects.forEach(function (el)
+                                {
+                                    if(el instanceof Slime)
+                                        obj.steering = new Wandering(obj, gs_door, 1, 40, 100);
+                                });
+                                console.log("hostage killed")
+                                element.isAlive = false;
+                                //element.destroy()
+                            }
+
+                            if((element instanceof Player) && distance(obj,element) < settings.killDist && obj.isAlive)
+                            {
+                                if (rudnev_scene.gs.sword)
+                                {
+                                    console.log("slime killed")
+                                    element.isAlive = false;
+                                    element.destroy()
+                                } else {
+                                    alert("You are died. Try to find a sword next time.")
+                                    obj.isAlive = false
+                                }
+                            }
+
+                            if(element.isAlive && distance(obj,element) < settings.slimeFindingDist)
+                            {
+                                console.log("slime found target.")
+                                obj.steering = new Pursuit(obj, element);
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    }
 };
+
+function check_win()
+{
+    let isPlayerCloseToDoor = false;
+    let amoutHostagesCloseToDoor = 0;
+    rudnev_scene.gameObjects.forEach(function (element)
+    {
+        //if(element.isAlive) {
+            if (element instanceof Player)
+            {
+                console.log(gs_door.x, element.x, gs_door.y, element.y)
+                if (distance(element, gs_door) < settings.distToDoorForWining)
+                {
+                    isPlayerCloseToDoor = true;
+                }
+            }
+
+            if (element instanceof Hostage)
+            {
+                if (distance(element, gs_door) < settings.distToDoorForWining)
+                {
+                    amoutHostagesCloseToDoor += 1;
+                }
+            }
+        //}
+    });
+
+
+    console.log(amoutHostagesCloseToDoor, isPlayerCloseToDoor, rudnev_scene.gameObjects)
+    if(isPlayerCloseToDoor && amoutHostagesCloseToDoor == 4)
+        return true;
+    return false;
+}
+
+function close_scene()
+{
+    if (rudnev_scene._runningScene !== null) {
+        rudnev_scene.scene.pause(rudnev_scene._runningScene);
+        rudnev_scene.scene.stop(rudnev_scene._runningScene);
+        rudnev_scene._runningScene = null;
+    }
+    location.reload()
+}
 
 let Rudnev_lab5_scene = new Phaser.Class(
     {
@@ -369,9 +528,9 @@ let Rudnev_lab5_scene = new Phaser.Class(
             sword: false,
         };
 
-        let width = 50;
-        let height = 30;
-        let maxRooms = 20;
+        let width = 45;//100
+        let height = 45;//100
+        let maxRooms = 5;//20
 
         const layers = build_Rudnev_Level(width, height, maxRooms, this);
         this.player.isAlive = true;
@@ -399,22 +558,36 @@ let Rudnev_lab5_scene = new Phaser.Class(
 
     update: function () {
         if (this.gameObjects) {
+            let amountHostages = 0;
             this.gameObjects.forEach( function(element) {
                 if(element.isAlive)
                 {
                     element.update();
                     interaction(element);
+                    if(element instanceof Hostage)
+                        amountHostages += 1
                 }
                 else if(element instanceof Player)
                 {
-                    if (rudnev_scene._runningScene !== null) {
-                        rudnev_scene.scene.pause(rudnev_scene._runningScene);
-                        rudnev_scene.scene.stop(rudnev_scene._runningScene);
-                        rudnev_scene._runningScene = null;
-                    }
-                    location.reload()
+                    close_scene()
+                }
+                else if(element instanceof Hostage)
+                {
+                    element.destroy();
                 }
             });
+
+            if(amountHostages < 4)
+            {
+                alert("One of the hostages died.");
+                close_scene()
+            }
+
+            if(check_win())
+            {
+                alert("Well done. You are perfect!");
+                close_scene()
+            }
         }
     },
     tilesToPixels(tileX, tileY) {
