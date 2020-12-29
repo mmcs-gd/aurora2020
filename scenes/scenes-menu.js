@@ -4,38 +4,9 @@ import menuBackgroundJson from '../assets/menu_background.json'
 
 import StartingScene from "./starting-scene";
 import RealLevelScene from './real-level-scene';
-import ExplorationAndShadowingScene from "./exploration-and-shadowing-scene";
-import SteeringWanderingScene from "./steering-wandering-scene";
-import SteeringArrivalScene from "./steering-arrival-scene";
-import SteeringPursuitScene from './steering-pursuit-scene';
-import SteeringEvadeAndPursuitScene from './steering-evade-and-pursuit-scene';
-import MinerScene from "./miner-scene";
-import SteeringRudnevScene from './scene-Rudnev';
-import SteeringPursuitWithDistanceScene from './steering-pursuit-with-distance'
-import SteeringFleeScene from './steering-flee-scene';
-import SteeringExploringScene from './steering-exploring-scene';
-import ProcedurallyGeneratedScene from "./procedurally-generated-scene";
-import SteeringUnionGroupScene from './steering-union-group-scene';
-import EffectsScene from './effects-scene'
-import SlimeRushScene from "./slime-rush";
-
 const scenes = [
     ['StartingScene', StartingScene],
-    //['SteeringFleeScene', SteeringFleeScene],
-    //['SteeringExploringScene', SteeringExploringScene],
     ['RealLevelScene', RealLevelScene],
-   // ['SteeringRudnevScene', SteeringRudnevScene],
-   // [ 'EffectsScene', EffectsScene],
-   // ['SlimeRushScene', SlimeRushScene],
-  //  ['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
-  //  ['SteeringPursuitScene', SteeringPursuitScene],
-  //  ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
-  //  ['SteeringWanderingScene', SteeringWanderingScene],
-  //  ['SteeringArrivalScene', SteeringArrivalScene],
-   // ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
-    //['MinerScene', MinerScene],
-   // ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
-   // ['SteeringUnionGroupScene', SteeringUnionGroupScene]
 ];
 
 let MenuScene = new Phaser.Class({
