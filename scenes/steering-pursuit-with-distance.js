@@ -11,14 +11,17 @@ import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 
-let StartingScene = new Phaser.Class({
+//import Pursuit from "../src/ai/steerings/pursuit"
+import Pursuit_w_dst from "../src/ai/steerings/pursuit_w_distance"
+
+let SteeringPursuitWithDistanceScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
     initialize:
 
         function StartingScene() {
-            Phaser.Scene.call(this, {key: 'StartingScene'});
+            Phaser.Scene.call(this, {key: 'SteeringPursuitWithDistanceScene'});
         },
     characterFrameConfig: {frameWidth: 31, frameHeight: 31},
     slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
@@ -38,7 +41,6 @@ let StartingScene = new Phaser.Class({
         this.load.audio('footsteps', Footsteps);
     },
     create: function () {
-
         this.gameObjects = [];
         const map = this.make.tilemap({key: "map"});
 
@@ -54,6 +56,7 @@ let StartingScene = new Phaser.Class({
         this.tileSize = 32;
         this.finder = new EasyStar.js();
         let grid = [];
+
         for(let y = 0; y < worldLayer.tilemap.height; y++){
             let col = [];
             for(let x = 0; x < worldLayer.tilemap.width; x++) {
@@ -73,23 +76,19 @@ let StartingScene = new Phaser.Class({
         this.physics.world.bounds.height = map.heightInPixels;
         this.characterFactory = new CharacterFactory(this);
 
+
         // Creating characters
-        this.player = this.characterFactory.buildCharacter('aurora', 100, 100, {player: true});
+        this.player = this.characterFactory.buildCharacter('aurora', 100, 120,
+            {player: true});
+        this.player.setVelocityX(50);
         this.gameObjects.push(this.player);
         this.physics.add.collider(this.player, worldLayer);
 
-        this.slimes =  this.physics.add.group();
-        let params = {};
-        for(let i = 0; i < 100; i++) {
-            const x = Phaser.Math.RND.between(50, this.physics.world.bounds.width - 50 );
-            const y = Phaser.Math.RND.between(50, this.physics.world.bounds.height -50 );
-            params.slimeType = Phaser.Math.RND.between(0, 4);
-            const slime = this.characterFactory.buildSlime(x, y, params);
-            this.slimes.add(slime);
-            this.physics.add.collider(slime, worldLayer);
-            this.gameObjects.push(slime);
-        }
-        this.physics.add.collider(this.player, this.slimes);
+        this.evader = this.characterFactory.buildCharacter('green', 300, 150,
+            {Steering: new Pursuit_w_dst(this, this.player)});
+        this.gameObjects.push(this.evader);
+        this.physics.add.collider(this.evader, worldLayer);
+        this.physics.add.collider(this.evader, this.player);
 
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
@@ -116,4 +115,4 @@ let StartingScene = new Phaser.Class({
     }
 });
 
-export default StartingScene
+export default SteeringPursuitWithDistanceScene
