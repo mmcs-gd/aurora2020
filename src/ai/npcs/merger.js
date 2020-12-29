@@ -34,7 +34,7 @@ export default class Merger{
             this.onStartFollowingPlayer));
         
         this.table.addState(new StateTableRow('research',
-            this.playerNear,
+            this.npcNear,
             'merge',
             this.onStartMerge));
         
