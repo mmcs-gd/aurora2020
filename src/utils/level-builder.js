@@ -71,11 +71,12 @@ export default function buildLevel(width, height, maxRooms, maxNpcs, scene){
         }
         console.log(npcAmount)
         scene.npcs = []
-        let notUsedRooms = rooms.map((x, index) => {return index}).filter(x => x != 0);
+        let notUsedRooms = rooms.map((x, index) => index).filter(x => x != 0);
+        console.log(notUsedRooms)
         for (let z = 0; z < npcAmount; z++)
         {
             let roomIndex = notUsedRooms[randomInt(0, notUsedRooms.length - 1)]
-            notUsedRooms.filter(x => x != roomIndex);
+            notUsedRooms = notUsedRooms.filter(x => x != roomIndex);
             let npc = scene.characterFactory.buildCharacter('green', rooms[roomIndex].startCenter.x * 32 + 10, 
                                                              rooms[roomIndex].startCenter.y * 32 + 10); 
             npc.setAI(new Merger(npc, [], scene.player), 'idle');
