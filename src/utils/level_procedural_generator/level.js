@@ -1,88 +1,66 @@
 import Vector2 from 'phaser/src/math/Vector2'
 
 export default class Level{
-    constructor(width, height, roomsCount, minRoomWidth = 5, maxRoomWidth = 9, 
-        minRoomHeight = 5, maxRoomHeight = 9, pathWidth = 3, maxPaths = 2, roomFullness = 1){
-        this.width = width,
-        this.height = height,
-        this.roomsCount = roomsCount,
-        this.minRoomWidth = minRoomWidth,
-        this.maxRoomWidth = maxRoomWidth,
-        this.minRoomHeight = minRoomHeight,
-        this.maxRoomHeight = maxRoomHeight,
+    constructor(width, height, roomsCount, minRoomWidth = 5, maxRoomWidth = 9,
+                minRoomHeight = 5, maxRoomHeight = 9, pathWidth = 3, maxPaths = 2){
+        this.width = width;
+        this.height = height;
+        this.roomsCount = roomsCount;
+        this.minRoomWidth = minRoomWidth;
+        this.maxRoomWidth = maxRoomWidth;
+        this.minRoomHeight = minRoomHeight;
+        this.maxRoomHeight = maxRoomHeight;
         this.maxPaths = maxPaths;
-        this.roomFullness = roomFullness;
     }
 
     generateLevel(){
-        this.levelMatrix = this.generateEmptyLevel();
+        this.levelMatrix = [];
+        for(let y = 0; y < this.height; y++){
+            let col = [];
+            for (let x = 0; x < this.width; x++)
+                col.push(0);
+            this.levelMatrix.push(col);
+        }
         const startCenters = [];
         this.quadTreeDropPoints(startCenters, this.roomsCount, 0, this.width-1, 0, this.height-1);
         let rooms = this.makeRoomsDescriptors(startCenters);
         this.placeRooms(rooms);
         rooms = rooms.filter(r => r.square > 1);
         this.paveTheWays(rooms);
-        //this.fillRooms(rooms);
-        
         this.rooms = rooms;
         return rooms;
     }
-    
-    fillRooms(rooms)
-    {
-        for(let i = 0; i < rooms.length; i++){
-            const room = rooms[i];
-            for(let y = room.top + 1; y <= room.down - 1; y++)
-            {
-                for(let x = room.left + 1; x <= room.right - 1; x++)
-                {
-                    if (Math.random() <= this.roomFullness && !this.anyPropsAround(x,y) && (x != room.startCenter.x || y != room.startCenter.y))
-                    {
-                        this.levelMatrix[y,x] = 2;
-                    }
-                }
-            }
-        }
-    }
-    
-    anyPropsAround(x, y, depth = 1)
-    {
-        for (let y1 = y - depth; y1 <= y + depth; y1++)
-            for (let x1 = x - depth; x1 <= x + depth; x1++)
-                if (this.levelMatrix[y1,x1] == 2)
-                    return true;
-        return false;
-    }
-    
+
     placeRooms(rooms){
         for(let i = 0; i < rooms.length; i++){
             const room = rooms[i];
             let width = Phaser.Math.RND.integerInRange(this.minRoomWidth, this.maxRoomWidth);
             let height = Phaser.Math.RND.integerInRange(this.minRoomHeight, this.maxRoomHeight);
+
             width += width%2 === 0? 1 : 0;
             height += height%2 === 0? 1 : 0;
 
-            // checks if room overlapped the borders of map - then move room center
-            let dx = room.startCenter - Math.floor(width/2); 
+
+            let dx = room.startCenter - Math.floor(width/2);
             if(dx < 0)
                 room.startCenter.subtract(new Vector2(dx, 0));
             else dx = room.startCenter + Math.floor(width/2)
-                if(dx > 0)
-                    room.startCenter.subtract(new Vector2(dx, 0));
+            if(dx > 0)
+                room.startCenter.subtract(new Vector2(dx, 0));
 
-            let dy = room.startCenter - Math.floor(height/2); 
+            let dy = room.startCenter - Math.floor(height/2);
             if(dy < 0)
                 room.startCenter.subtract(new Vector2(0, dy));
             else dy = room.startCenter + Math.floor(height/2)
-                if(dy > 0)
-                    room.startCenter.subtract(new Vector2(0, dy))
+            if(dy > 0)
+                room.startCenter.subtract(new Vector2(0, dy))
 
             room.left = room.startCenter.x - Math.floor(width/2);
             room.right = room.startCenter.x + Math.floor(width/2);
             room.top = room.startCenter.y - Math.floor(height/2);
             room.down = room.startCenter.y + Math.floor(height/2);
-            
-            // checking if the terrain for room is clear
+
+
             let sum = 0;
             if(room.top > 0 && room.left > 0 && room.down < this.height && room.right < this.width)
                 for(let y = room.top; y <= room.down; y++)
@@ -103,7 +81,7 @@ export default class Level{
             for(let j = i+1; j < rooms.length; j++){
                 rooms[i].neighbours.push({
                     idx: j,
-                    id:rooms[j].id, 
+                    id:rooms[j].id,
                     dist : rooms[i].startCenter.distance(rooms[j].startCenter)})
             }
             rooms[i].neighbours = rooms[i].neighbours.sort(this.distComparer);
@@ -123,9 +101,9 @@ export default class Level{
     }
 
     paveWay(center1, center2){
-        let y, y1, x, x1, 
-        dx = center1.x >= center2.x ? 1 : -1, 
-        dy = center1.y >= center2.y ? 1 : -1;
+        let y, y1, x, x1,
+            dx = center1.x >= center2.x ? 1 : -1,
+            dy = center1.y >= center2.y ? 1 : -1;
         y1= center1.y;
         y = center2.y;
         x1 = center1.x;
@@ -176,19 +154,17 @@ export default class Level{
         return descriptors;
     }
 
-    /* distributes total number of points just about equally
-    between four quarters of the area*/
     getQuadrantsNums(totalNum, left, right, top, down, xCenter, yCenter){
         const quadrantsMax = [
-            (xCenter-left+1) * (yCenter-top+1), 
+            (xCenter-left+1) * (yCenter-top+1),
             (right-xCenter) * (yCenter-top+1),
             (xCenter-left+1) * (down-yCenter),
             (right-xCenter) * (down-yCenter)
         ];
-        
+
         if(totalNum > (right-left+1) * (down-top+1) )
-        return quadrantsMax;
-        
+            return quadrantsMax;
+
         const quarter = Math.floor(totalNum / 4);
         const quadrants = [];
         for(let i = 0; i < 4; i++)
@@ -204,7 +180,7 @@ export default class Level{
         return quadrants;
     }
 
-    // generates distribution of points on area
+
     quadTreeDropPoints(points, number, left, right, top, down){
         if(number === 0) return;
         if (number === 1){
@@ -227,17 +203,5 @@ export default class Level{
             this.quadTreeDropPoints(points, quadrants[2], left, xCenter, yCenter+1, down);
             this.quadTreeDropPoints(points, quadrants[3], xCenter+1, right, yCenter+1, down);
         }
-    }
-
-    // initial filling of level matrix
-    generateEmptyLevel(){ 
-        const emptyLevel = [];
-        for(let y = 0; y < this.height; y++){
-            let col = [];
-            for (let x = 0; x < this.width; x++)
-                col.push(0);
-            emptyLevel.push(col);
-        }
-        return emptyLevel;
     }
 }
