@@ -3,29 +3,60 @@ export default function getMatrixRooms(width, height) {
     for (let y = 0; y < height; y++) {
         matrix[y] = new Array();
         for (let x = 0; x < width; x++) {
-            let rand = _getRandom(0,1);
-            matrix[y][x] = rand;
+            matrix[y][x] = 0;
         }
     }
+    let rooms = getRooms(matrix, width, height);
+
     return matrix;
 }
-class Room { 
-    constructor(x, y, width, height) {
+
+function getRooms(matrix, width, height) {
+    let rooms = [];
+    for (let currentY = 0; currentY < height; currentY++) 
+    {
+        for (let currentX = 0; currentX < width; currentX++) 
+        {
+            let room = new Room(currentX, currentY, _getRandom(3, 6), _getRandom(3,6));
+            let subMatrixOfRoom  = room.generateRoom();
+            for (let y = 0; y < room.height; y++) 
+            {
+                for (let x = 0; x < room.width; x++) 
+                { 
+                    if (currentY + y < height && currentX + x < width) 
+                        matrix[currentY + y][currentX + x] = subMatrixOfRoom[y][x];
+                }
+            }
+            rooms.push(room);
+            let shiftX = rooms[rooms.length - 1].x + rooms[rooms.length - 1].width + _getRandom(4,5);
+            if (shiftX < width) currentX = shiftX;
+        }
+        let shiftY = rooms[rooms.length - 1].y + rooms[rooms.length - 1].height + _getRandom(2,5);
+        if (shiftY < height) currentY = shiftY;
+    }
+    return rooms;
+}
+
+function getRoads(matrix, rooms, width, height) {
+    let roads = []; 
+}
+
+class Room {
+    constructor(x, y, width, height){ 
         this.x = x; 
-        this.y = y; 
+        this.y = y;
         this.width = width;
         this.height = height;
     }
-}
-
-class Road {
-    constructor(xBegin, yBegin, xEnd, yEnd, width, height) {
-        this.xBegin = xBegin; 
-        this.yBegin = yBegin; 
-        this.xEnd   = xEnd;
-        this.yEnd   = yEnd; 
-        this.width  = width;
-        this.heigh  = height;
+    generateRoom() {
+        let room = new Array();
+        for (let y = 0; y < this.height; y++) {
+            room[y] = new Array();
+            for (let x = 0; x < this.width; x++) {
+                room[y][x] = 1;
+            }
+        }
+        return room;
     }
 }
 /*
