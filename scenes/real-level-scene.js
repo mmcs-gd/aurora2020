@@ -38,7 +38,7 @@ let RealLevelScene = new Phaser.Class({
         this.gameObjects = [];
         this.characterFactory = new CharacterFactory(this);
         this.level++;
-        let width = 100; let height = 100; let maxRooms = 100; let maxNpcs = 4;
+        let width = 100; let height = 100; let maxRooms = 100; let maxNpcs = 100;
         const layers = buildLevel(width, height, maxRooms, maxNpcs, this);
         this.groundLayer = layers["Ground"];
         this.stuffLayer = layers["Stuff"];
