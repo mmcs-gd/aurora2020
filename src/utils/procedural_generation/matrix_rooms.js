@@ -7,7 +7,7 @@ export default function getMatrixRooms(width, height) {
         }
     }
     let rooms = getRooms(matrix, width, height);
-
+    getRoads(matrix, rooms, width, height);
     return matrix;
 }
 
@@ -17,7 +17,7 @@ function getRooms(matrix, width, height) {
     {
         for (let currentX = 0; currentX < width; currentX++) 
         {
-            let room = new Room(currentX, currentY, _getRandom(3, 6), _getRandom(3,6));
+            let room = new Room(currentX, currentY, _getRandom(3, 5), _getRandom(3,5));
             let subMatrixOfRoom  = room.generateRoom();
             for (let y = 0; y < room.height; y++) 
             {
@@ -28,18 +28,61 @@ function getRooms(matrix, width, height) {
                 }
             }
             rooms.push(room);
-            let shiftX = rooms[rooms.length - 1].x + rooms[rooms.length - 1].width + _getRandom(4,5);
-            if (shiftX < width) currentX = shiftX;
+            let shiftX = rooms[rooms.length - 1].x + rooms[rooms.length - 1].width + _getRandom(5,10);
+            if (shiftX <= width) currentX = shiftX;
         }
         let shiftY = rooms[rooms.length - 1].y + rooms[rooms.length - 1].height + _getRandom(2,5);
-        if (shiftY < height) currentY = shiftY;
+        if (shiftY <= height) currentY = shiftY;
     }
     return rooms;
 }
 
 function getRoads(matrix, rooms, width, height) {
     let roads = []; 
+    for(let room of rooms) {
+
+        let centerLeftSideX = room.x; 
+        let centerLeftSideY = Math.round(room.y + room.height / 2);
+
+        let centerTopSideX = Math.round(room.x + room.width / 2);
+        let centerTopSideY = room.y;
+
+        let centerRightSideX = room.x + room.width; 
+        let centerRightSideY = Math.round(room.y + room.height / 2);
+
+        let centerBottomSideX = Math.round(room.x + room.width / 2);
+        let centerBottomSideY = room.y + room.height; 
+
+        if (centerLeftSideX > 0) {
+            let x = Math.round(centerLeftSideX);
+            while(x >= 0) {
+                if (x < width && matrix[centerLeftSideY] != undefined)  
+                    matrix[centerLeftSideY][x] = 1;
+                x--;
+            }
+        }
+
+        if (centerTopSideY > 0) {
+            let y = Math.round(centerTopSideY);
+            while(y >= 0) {
+                if (y < height && matrix[y] != undefined)
+                    matrix[y][centerTopSideX] = 1;
+                y--;
+            }
+            
+        }
+
+        if (centerRightSideX < width) {
+
+        }
+
+        if (centerBottomSideY < height) {
+
+        }
+
+    }
 }
+
 
 class Room {
     constructor(x, y, width, height){ 
