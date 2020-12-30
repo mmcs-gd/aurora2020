@@ -1,26 +1,45 @@
 import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 import menuBackgroundJson from '../assets/menu_background.json'
 
-import StartingScene from "./starting-scene";
-import explorationAndShadowingScene from "./explorationAndShadowing-scene";
 
+import StartingScene from "./starting-scene";
+import RealLevelScene from './real-level-scene';
+import ExplorationAndShadowingScene from "./exploration-and-shadowing-scene";
 import SteeringWanderingScene from "./steering-wandering-scene";
 import SteeringArrivalScene from "./steering-arrival-scene";
-import SteeringSeekScene from "./steering-seek-scene"
-import SteeringEvadeScene from './steering-evade-scene';
 import SteeringPursuitScene from './steering-pursuit-scene';
 import SteeringEvadeAndPursuitScene from './steering-evade-and-pursuit-scene';
+import MinerScene from "./miner-scene";
+import SteeringRudnevScene from './scene-Rudnev';
+import SteeringPursuitWithDistanceScene from './steering-pursuit-with-distance'
+import SteeringFleeScene from './steering-flee-scene';
+import SteeringExploringScene from './steering-exploring-scene';
+import ProcedurallyGeneratedScene from "./procedurally-generated-scene";
+import SteeringUnionGroupScene from './steering-union-group-scene';
+import EffectsScene from './effects-scene'
+import SlimeRushScene from "./slime-rush";
+import ScenePatseevUshakov from "./scene-patseev-ushakov";
+import scene_chukhin_evseenko from  "./scene_chukhin_evseenko";
 
 const scenes = [
     ['StartingScene', StartingScene],
-    ['SteeringEvadeScene', SteeringEvadeScene],
-    ['SteeringPursuitScene', SteeringPursuitScene],
-    ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
-    ['SteeringSeekScene', SteeringSeekScene],
-    ['SteeringWanderingScene', SteeringWanderingScene],
-		['SteeringArrivalScene', SteeringArrivalScene],
-    ['explorationAndShadowingScene', explorationAndShadowingScene]
-
+    ['SteeringFleeScene', SteeringFleeScene],
+    ['SteeringExploringScene', SteeringExploringScene],
+    ['RealLevelScene', RealLevelScene],
+    ['SteeringRudnevScene', SteeringRudnevScene],
+    [ 'EffectsScene', EffectsScene],
+    ['SlimeRushScene', SlimeRushScene],
+  //  ['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
+  //  ['SteeringPursuitScene', SteeringPursuitScene],
+  //  ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
+  //  ['SteeringWanderingScene', SteeringWanderingScene],
+  //  ['SteeringArrivalScene', SteeringArrivalScene],
+    ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
+    ['MinerScene', MinerScene],
+    ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
+    ['SteeringUnionGroupScene', SteeringUnionGroupScene],
+    ['ScenePatseevUshakov', ScenePatseevUshakov],
+    ['scene_chukhin_evseenko', scene_chukhin_evseenko]
 ];
 
 let MenuScene = new Phaser.Class({
@@ -34,6 +53,7 @@ let MenuScene = new Phaser.Class({
     },
 
     preload: function () {
+        console.log(scenes)
         scenes.forEach(s => {
             this.scene.add(s[0], s[1], false);
         });
