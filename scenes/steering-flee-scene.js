@@ -11,34 +11,35 @@ import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 
-import Pursuit from "../src/ai/steerings/pursuit"
 
-let SteeringPursuitScene = new Phaser.Class({
+import Flee from "../src/ai/steerings/flee"
+
+let SteeringFleeScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
     initialize:
 
         function StartingScene() {
-            Phaser.Scene.call(this, {key: 'SteeringPursuitScene'});
+            Phaser.Scene.call(this, {key: 'SteeringFleeScene'});
         },
         characterFrameConfig: {frameWidth: 31, frameHeight: 31},
         slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
-        preload: function () {
-    
-            //loading map tiles and json with positions
-            this.load.image("tiles", tilemapPng);
-            this.load.tilemapTiledJSON("map", dungeonRoomJson);
-    
-            //loading spitesheets
-            this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
-            this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
-            this.load.spritesheet('green', greenSpriteSheet, this.characterFrameConfig);
-            this.load.spritesheet('yellow', yellowSpriteSheet, this.characterFrameConfig);
-            this.load.spritesheet('punk', punkSpriteSheet, this.characterFrameConfig);
-            this.load.spritesheet('slime', slimeSpriteSheet, this.slimeFrameConfig);
-            this.load.audio('footsteps', Footsteps);
-        },
+
+    preload: function () {
+        //loading map tiles and json with positions
+        this.load.image("tiles", tilemapPng);
+        this.load.tilemapTiledJSON("map", dungeonRoomJson);
+
+        //loading spitesheets
+        this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
+        this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
+        this.load.spritesheet('green', greenSpriteSheet, this.characterFrameConfig);
+        this.load.spritesheet('yellow', yellowSpriteSheet, this.characterFrameConfig);
+        this.load.spritesheet('punk', punkSpriteSheet, this.characterFrameConfig);
+        this.load.spritesheet('slime', slimeSpriteSheet, this.slimeFrameConfig);
+        this.load.audio('footsteps', Footsteps);
+    },
     create: function () {
         this.gameObjects = [];
         const map = this.make.tilemap({key: "map"});
@@ -47,7 +48,6 @@ let SteeringPursuitScene = new Phaser.Class({
         // Phaser's cache (i.e. the name you used in preload)
         const tileset = map.addTilesetImage("Dungeon_Tileset", "tiles");
 
-
         // Parameters: layer name (or index) from Tiled, tileset, x, y
         const belowLayer = map.createStaticLayer("Floor", tileset, 0, 0);
         const worldLayer = map.createStaticLayer("Walls", tileset, 0, 0);
@@ -55,7 +55,6 @@ let SteeringPursuitScene = new Phaser.Class({
         this.tileSize = 32;
         this.finder = new EasyStar.js();
         let grid = [];
-
         for(let y = 0; y < worldLayer.tilemap.height; y++){
             let col = [];
             for(let x = 0; x < worldLayer.tilemap.width; x++) {
@@ -75,21 +74,16 @@ let SteeringPursuitScene = new Phaser.Class({
         this.physics.world.bounds.height = map.heightInPixels;
         this.characterFactory = new CharacterFactory(this);
 
-
-        // Creating characters
-        this.player = this.characterFactory.buildCharacter('aurora', 100, 120, {player: true});
-        this.player.setVelocityX(50);
+        
+        this.player = this.characterFactory.buildCharacter('aurora', 100, 100, {player: true});
         this.gameObjects.push(this.player);
         this.physics.add.collider(this.player, worldLayer);
 
-        this.evader = this.characterFactory
-            .buildCharacter('green', 300, 150,
-                {Steering: new Pursuit(this, this.player)});
-        this.gameObjects.push(this.evader);
-        this.physics.add.collider(this.evader, worldLayer);
-        this.physics.add.collider(this.evader, this.player);
-
-
+        // Creating characters
+        this.fleer = this.characterFactory.buildCharacter('green', 200, 100, {Steering: new Flee(this, this.player)});
+        this.gameObjects.push(this.fleer);
+        this.physics.add.collider(this.fleer, worldLayer);
+        this.physics.add.collider(this.fleer, this.player);
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
             this.physics.world.createDebugGraphic();
@@ -115,4 +109,4 @@ let SteeringPursuitScene = new Phaser.Class({
     }
 });
 
-export default SteeringPursuitScene
+export default SteeringFleeScene

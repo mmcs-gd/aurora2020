@@ -79,12 +79,14 @@ let SteeringEvadeAndPursuitScene = new Phaser.Class({
         
         // Creating characters
 
-        this.evader = this.characterFactory.buildCharacter('green', 300, 150, {Steering: 1});
-        this.player = this.characterFactory.buildCharacter('aurora', 100, 120, {Steering: 1});
+        this.evader = this.characterFactory.buildCharacter('green',
+            300, 150, {Steering: 1});
+        this.player = this.characterFactory.buildCharacter('aurora',
+            100, 120, {Steering: 1});
         
         
-        this.evader.Steering = new Evade(this, this.player);
-        this.player.Steering = new Pursuit(this, this.evader);
+        this.evader.steering = new Evade(this, this.player);
+        this.player.steering = new Pursuit(this, this.evader);
 
         
         
