@@ -18,7 +18,6 @@ import ProcedurallyGeneratedScene from "./procedurally-generated-scene";
 import SteeringUnionGroupScene from './steering-union-group-scene';
 import EffectsScene from './effects-scene'
 import SlimeRushScene from "./slime-rush";
-import ScenePatseevUshakov from "./scene-patseev-ushakov";
 import scene_chukhin_evseenko from  "./scene_chukhin_evseenko";
 
 const scenes = [
@@ -38,7 +37,6 @@ const scenes = [
     ['MinerScene', MinerScene],
     ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
     ['SteeringUnionGroupScene', SteeringUnionGroupScene],
-    ['ScenePatseevUshakov', ScenePatseevUshakov],
     ['scene_chukhin_evseenko', scene_chukhin_evseenko]
 ];
 
