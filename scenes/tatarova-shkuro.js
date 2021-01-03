@@ -1,3 +1,4 @@
+import EasyStar from "easystarjs";
 import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 import crystalTilemapPng from '../assets/tileset/Crystal_tileset.png'
 import auroraSpriteSheet from '../assets/sprites/characters/aurora.png'
@@ -59,24 +60,36 @@ let TatarovaShkuro = new Phaser.Class({
         this.characterFactory = new CharacterFactory(this);
         this.gameObjects = [];
         this.tileSize = 32;
-
+        this.finder = new EasyStar.js();
         const width = 100;
         const height = 100;
 				
-				let map = [];
-				let markedMap = [];
-				//do {
-					map = (new GeneratorLevel(width, height, config)).createMap();
-					markedMap = (new MapLayout(map, width, height)).getMapLayout();
-				//} while (fillability(markedMap) < 0.3);
-			
-				//info(map);
+        let map = [];
+        let markedMap = [];
+        //do {
+            map = (new GeneratorLevel(width, height, config)).createMap();
+            markedMap = (new MapLayout(map, width, height)).getMapLayout();
+        //} while (fillability(markedMap) < 0.3);
+    
+        //info(map);
 				
         const layers = (new TileMapper(markedMap, this, width, height, this.tileSize)).generateLevel();
-        this.gameObjects.push(this.player);
         this.groundLayer = layers.Ground;
         this.otherLayer = layers.Other;
+
         
+        let grid = [];
+        for(let y = 0; y < this.groundLayer.tilemap.height; y++){
+            let col = [];
+            for(let x = 0; x < this.groundLayer.tilemap.width; x++) {
+                const tile = this.groundLayer.tilemap.getTileAt(x, y);
+                col.push(tile ? tile.index : 0);
+            }
+            grid.push(col);
+        }
+
+        this.finder.setGrid(grid);
+        this.finder.setAcceptableTiles([0]);
 				
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox

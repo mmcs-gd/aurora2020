@@ -9,6 +9,8 @@ import AnimationLoader from "../utils/animation-loader";
 import Mine from "./mine";
 import SmartSlime from './minerScene/smartSlime';
 import NPC from "../characters/npc";
+import SlimeWithStates from './slime_with_states';
+import SlimeStates from '../ai/behaviour/slime_states';
 
 export default class CharacterFactory {
 
@@ -112,6 +114,11 @@ export default class CharacterFactory {
         let slime;
         if (params.useSteering) {
             slime = new SmartSlime(this.scene, x, y, this.slimeSpriteSheet, 9*slimeType);
+        } else if (params.useStates) {
+            slime = new SlimeWithStates(this.scene, x, y, this.slimeSpriteSheet, 9*slimeType, params.stateTable, SlimeStates.Searching);
+            params.addSlimesConditions(slime);
+            params.createStateTable(slime);
+            params.initSteerings(slime);
         } else {
             slime = new Slime(this.scene, x, y, this.slimeSpriteSheet, 9 * slimeType);
         }
