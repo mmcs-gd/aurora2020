@@ -51,7 +51,6 @@ export default class FillLevel {
             return false;
         }
 
-        debugger
         for (const m of mobs) {
             if (this.calcDistance({x,y}, m) < 2) {
                 return false;
@@ -69,7 +68,7 @@ export default class FillLevel {
             playerY = Phaser.Math.RND.between(0, this.map[0].length);
         }
 
-        this.scene.player = this.scene.characterFactory.buildCharacter('aurora', playerX * this.tilemapper.tilesize, playerY * this.tilemapper.tilesize, { player: true });
+        this.scene.player = this.scene.characterFactory.buildCharacter('aurora', playerX * this.tilemapper.tilesize, playerY * this.tilemapper.tilesize, { player: true, withGun: true });
         this.scene.gameObjects.push(this.scene.player);
         this.scene.physics.add.collider(this.scene.player, this.groundLayer);
         this.scene.physics.add.collider(this.scene.player, this.otherLayer);
@@ -107,7 +106,18 @@ export default class FillLevel {
 
             slimes.add(slime);
         }
-        this.scene.physics.add.collider(this.scene.player, slimes);        
+        this.scene.physics.add.collider(this.scene.player, slimes);       
+        
+        
+        if (this.scene.bullets) {
+            this.scene.physics.add.collider(this.scene.bullets, slimes, (bullet, slime) => {
+                if (bullet.active) {
+                    slime.damage();
+                    bullet.setActive(false);
+                    bullet.setVisible(false);
+                }
+            }) 
+        }
     }
 
     addSlimesConditions() {
@@ -153,6 +163,12 @@ export default class FillLevel {
         const that = this;
         return function (slime) {
             slime.stateTable = new StateTable(that.scene);
+
+            slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, () => slime.isDead, SlimeStates.Dead));
+            slime.stateTable.addState(new StateTableRow(SlimeStates.Jumping, () => slime.isDead, SlimeStates.Dead));
+            slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, () => slime.isDead, SlimeStates.Dead));
+            slime.stateTable.addState(new StateTableRow(SlimeStates.Attacking, () => slime.isDead, SlimeStates.Dead));
+
             slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, () => slime.isAttacked, SlimeStates.Running));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Jumping, () => slime.isAttacked, SlimeStates.Running));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Attacking, () => slime.isAttacked, SlimeStates.Running));
@@ -167,9 +183,6 @@ export default class FillLevel {
 
             slime.stateTable.addState(new StateTableRow(SlimeStates.Attacking, () => !slime.isEnemyClose(), SlimeStates.Pursuing));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, () => !slime.isEnemyAround(), SlimeStates.Searching));
-            
-
-            
         }
     }
 

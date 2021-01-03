@@ -8,13 +8,18 @@ import yellowSpriteSheet from '../assets/sprites/characters/yellow.png'
 import greenSpriteSheet from '../assets/sprites/characters/green.png'
 import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
+import EffectsFactory from "../src/utils/effects-factory";
+
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 
 import GeneratorLevel from '../src/utils/generators/level-generator';
 import MapLayout from '../src/utils/generators/map-layout';
 import TileMapper from '../src/utils/generators/tile-mapper';
 
-import { fillability, info } from '../src/utils/generators/metrics';
+import gunPng from '../assets/sprites/gun.png'
+import bulletPng from '../assets/sprites/bullet.png'
+import cursorCur from '../assets/sprites/cursor.cur'
+
 
 const config = {
 	cellularAutomata: {
@@ -46,7 +51,9 @@ let TatarovaShkuro = new Phaser.Class({
         //loading map tiles and json with positions
         this.load.image("tiles", tilemapPng);
         this.load.image("crystals", crystalTilemapPng);
-
+        this.load.image("gun", gunPng);
+        this.load.image("bullet", bulletPng);
+  
         //loading spitesheets
         this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
@@ -57,7 +64,10 @@ let TatarovaShkuro = new Phaser.Class({
         this.load.audio('footsteps', Footsteps);
     },
     create: function () {
+        this.input.setDefaultCursor(`url(${cursorCur}), pointer`);
+
         this.characterFactory = new CharacterFactory(this);
+        this.effectsFactory = new EffectsFactory(this);
         this.gameObjects = [];
         this.tileSize = 32;
         this.finder = new EasyStar.js();
@@ -91,15 +101,15 @@ let TatarovaShkuro = new Phaser.Class({
         this.finder.setGrid(grid);
         this.finder.setAcceptableTiles([0]);
 				
-        this.input.keyboard.once("keydown_D", event => {
-            // Turn on physics debugging to show player's hitbox
-            this.physics.world.createDebugGraphic();
+        // this.input.keyboard.once("keydown_D", event => {
+        //     // Turn on physics debugging to show player's hitbox
+        //     this.physics.world.createDebugGraphic();
 
-            const graphics = this.add
-                .graphics()
-                .setAlpha(0.75)
-                .setDepth(20);
-        });
+        //     const graphics = this.add
+        //         .graphics()
+        //         .setAlpha(0.75)
+        //         .setDepth(20);
+        // });
     },
     update: function () {
         if (this.gameObjects)

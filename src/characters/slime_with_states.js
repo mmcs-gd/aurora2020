@@ -27,9 +27,11 @@ export default class SlimeWithStates extends Slime {
     }
 
     update() {
-        const nextState = this.stateTable.getNextState(this.state);
-        this.state = nextState;
-        this.updateVelocity();
-        this.updateAnimation();
+        if (!this.isDead) {
+            const nextState = this.stateTable.getNextState(this.state);
+            this.state = nextState;
+            this.updateVelocity();
+            this.updateAnimation();    
+        }
     }
 }

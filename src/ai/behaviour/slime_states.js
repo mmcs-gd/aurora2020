@@ -4,6 +4,7 @@ const SlimeStates = {
     Attacking: 'attacking', // атака
     Pursuing: 'pursuing',   // преследование
     Running: 'running',     // тактическое отступление 
+    Dead: 'dead'
 }
 
 

@@ -12,10 +12,10 @@ import NPC from "../characters/npc";
 import SlimeWithStates from './slime_with_states';
 import SlimeStates from '../ai/behaviour/slime_states';
 
+import { Bullets, PlayerWithGun } from './player_with_gun';
+import UserControlled from '../ai/behaviour/user_controlled';
+
 export default class CharacterFactory {
-
-
-
     constructor(scene) {
         this.scene = scene;
 
@@ -76,14 +76,56 @@ export default class CharacterFactory {
         return character;
     }
 
+    addBulletsBehaviour(character) {
+        this.scene.bullets = new Bullets(this.scene);
+        if (this.scene.groundLayer) {
+            this.scene.physics.add.collider(this.scene.bullets, this.scene.groundLayer, (bullet) => {
+                bullet.setVisible(false);
+                bullet.setActive(false);
+            });
+        }
+        if (this.scene.otherLayer) {
+            this.scene.physics.add.collider(this.scene.bullets, this.scene.otherLayer, (bullet) => {
+                bullet.setVisible(false);
+                bullet.setActive(false);
+            });
+        }
+
+        this.scene.input.on('pointerdown', (pointer) => {
+            const {x, y} = character.bulletStartingPoint
+
+            const vx = pointer.x - x
+            const vy = pointer.y - y
+
+            const BULLET_SPEED = 400
+            const mult = BULLET_SPEED / Math.sqrt(vx*vx + vy*vy)            
+            this.scene.bullets.fireBullet(x, y, vx * mult, vy * mult);
+        });
+    }
+
     buildPlayerCharacter(spriteSheetName, x, y, params = {}) {
-        let character = new Player(this.scene, x, y, spriteSheetName, 2, params);
-        character.maxSpeed = 100;
+        const maxSpeed = 100;
+        let character;
+        if (params.withGun) {
+            character = new PlayerWithGun(this.scene, x, y, spriteSheetName, 'gun');
+            const wasdCursorKeys = this.scene.input.keyboard.addKeys({
+                up:Phaser.Input.Keyboard.KeyCodes.W,
+                down:Phaser.Input.Keyboard.KeyCodes.S,
+                left:Phaser.Input.Keyboard.KeyCodes.A,
+                right:Phaser.Input.Keyboard.KeyCodes.D
+            });
+            character.addBehaviour(new UserControlled(150, wasdCursorKeys));
+            this.addBulletsBehaviour(character);
+        }
+        else {
+            character = new Player(this.scene, x, y, spriteSheetName, 2, params);
+            character.setCollideWorldBounds(true);
+            character.cursors = this.scene.input.keyboard.createCursorKeys();
+        }
+        character.maxSpeed = maxSpeed;
         // character.maxSpeed = 1000;
         
-        character.setCollideWorldBounds(true);
-        character.cursors = this.scene.input.keyboard.createCursorKeys();
-        character.animationSets = this.animationLibrary.get('aurora');
+        character.animationSets = this.animationLibrary.get(spriteSheetName);
         //todo: not here
         character.footstepsMusic = this.scene.sound.add('footsteps', {
             mute: false,
