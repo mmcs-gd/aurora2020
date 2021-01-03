@@ -29,15 +29,15 @@ export default class FillLevel {
     }
 
     checkFreeSpace(x, y) {
-        return this.tileAt(x, y) === config.FLOOR
+        return this.tileAt(x, y) === config.FLOOR           // tile itself 
             && (this.tileAt(x - 1, y) === null
-                || this.tileAt(x - 1, y) === config.FLOOR)
+                || this.tileAt(x - 1, y) === config.FLOOR)  // left tile
             && (this.tileAt(x + 1, y) === null
-                || this.tileAt(x + 1, y) === config.FLOOR)
-            && (this.tileAt(x, y - 1) === null
-                || this.tileAt(x, y - 1) === config.FLOOR)
-            && (this.tileAt(x, y + 1) === null
-                || this.tileAt(x, y + 1) === config.FLOOR);
+                || this.tileAt(x + 1, y) === config.FLOOR)  // right tile
+            && ((this.tileAt(x, y - 1) === null
+                || this.tileAt(x, y - 1) === config.FLOOR)  // upper tile
+            || (this.tileAt(x, y + 1) === null
+                || this.tileAt(x, y + 1) === config.FLOOR)); // lower tile
     }
 
     checkFreeSpaceForMobs(x, y, mobs) {
@@ -51,11 +51,12 @@ export default class FillLevel {
             return false;
         }
 
-        // for (const m of mobs) {
-        //     if (this.calcDistance({x,y}, m) < 2) {
-        //         return false;
-        //     }
-        // }
+        debugger
+        for (const m of mobs) {
+            if (this.calcDistance({x,y}, m) < 2) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -84,32 +85,29 @@ export default class FillLevel {
             addSlimesConditions: this.addSlimesConditions()
         };
 
-        const slimesAmount = 1;
+        const slimesAmount = 100;
         for (let i = 0; i < slimesAmount; i++) {
             let x = Phaser.Math.RND.between(0, this.map.length);
             let y = Phaser.Math.RND.between(0, this.map[0].length);
 
-            // while (!this.checkFreeSpaceForMobs(x, y, slimes)) {
-            //     x = Phaser.Math.RND.between(0, this.map.length);
-            //     y = Phaser.Math.RND.between(0, this.map[0].length);
-            // }
-            x = this.scene.player.x + 10;
-            y = this.scene.player.y + 10;
-
-            if (x < 0 || y < 0) {
-                console.log({ x, y })
-
+            while (!this.checkFreeSpaceForMobs(x, y, slimes.children.entries)) {
+                x = Phaser.Math.RND.between(0, this.map.length);
+                y = Phaser.Math.RND.between(0, this.map[0].length);
             }
+
+            x *= this.tilemapper.tilesize;
+            y *= this.tilemapper.tilesize;
+
             params.slimeType = Phaser.Math.RND.between(0, 4);
             const slime = this.scene.characterFactory.buildSlime(x, y, params);
             this.scene.gameObjects.push(slime);
 
             this.scene.physics.add.collider(slime, this.groundLayer);
             this.scene.physics.add.collider(slime, this.otherLayer);
+
             slimes.add(slime);
         }
-        console.log(slimes)
-        this.scene.physics.add.collider(this.scene.player, slimes);
+        this.scene.physics.add.collider(this.scene.player, slimes);        
     }
 
     addSlimesConditions() {
@@ -124,7 +122,7 @@ export default class FillLevel {
 
                 for (const enemy of enemies) {
                     const d = Math.sqrt((slime.x - enemy.x)*(slime.x - enemy.x) + (slime.y - enemy.y)*(slime.y - enemy.y));
-                    if (d < 35) {
+                    if (d < 40) {
                         slime.steerings[SlimeStates.Attacking].objects = [enemy];
                         return true;
                     }
