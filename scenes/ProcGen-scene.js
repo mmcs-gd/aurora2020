@@ -9,7 +9,7 @@ import greenSpriteSheet from '../assets/sprites/characters/green.png'
 import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
-
+import Aggressive from "../src/ai/aggressive";
 
 import TILE_MAPPING from '../src/utils/Tile.js'
 
@@ -50,7 +50,6 @@ let ProcScene = new Phaser.Class({
 
         const layers = buildLevel(width, height, maxRooms, this);
         this.gameObjects.push(this.player);
-        this.gameObjects.push(this.evader);
         this.groundLayer = layers["Ground"];
         this.OtherSubjLayer = layers["OtherSubj"];
         this.floorLayer = layers["Floor"];
@@ -108,7 +107,6 @@ let ProcScene = new Phaser.Class({
 
             const layers = buildLevel(width, height, maxRooms, this);
             this.gameObjects.push(this.player);
-            this.gameObjects.push(this.evader);
             this.groundLayer = layers["Ground"];
             this.OtherSubjLayer = layers["OtherSubj"];
             this.floorLayer = layers["Floor"];
@@ -121,7 +119,12 @@ let ProcScene = new Phaser.Class({
     },
     tilesToPixels(tileX, tileY) {
         return [tileX*this.tileSize, tileY*this.tileSize];
-    }
+    },
+    onNpcPlayerCollide() 
+    {
+        alert('Погиб!');
+        this.scene.pause(this._runningScene)
+    }	
 });
 
 export default ProcScene

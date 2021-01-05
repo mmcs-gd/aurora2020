@@ -11,18 +11,18 @@ export default class Chase extends Steering {
         const dist = Math.sqrt(
             (this.owner.x - target.x) * (this.owner.x - target.x) +
             (this.owner.y - target.y) * (this.owner.y - target.y));
-
-        return dist < this.distance;
+        return Math.trunc(dist) <= this.distance;
     }
 
     calculateImpulse() {
+        
         const target = this.objects[0];
 
         if (this.targetIsNear(target)) {
             const targetPos = new Vector2(target.x, target.y);
 
             // reached target
-            if (Math.abs(targetPos.x - this.owner.x) < 35 && Math.abs(targetPos.y - this.owner.y) < 35) {
+            if (Math.abs(targetPos.x - this.owner.x) < 31 && Math.abs(targetPos.y - this.owner.y) < 31) {
                 return new Vector2(0, 0);
             }
 

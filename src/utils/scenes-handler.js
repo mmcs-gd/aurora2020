@@ -2,6 +2,7 @@ import Scene from "./scenes-generator.js"
 
 import Evade from '../ai/steerings/evade'
 import TILE_MAPPING from './Tile.js'
+import Aggressive from '../ai/aggressive' 
 
   export default function buildLevel(width, height, maxRooms, scene){
     let level = new Scene(width, height, maxRooms);
@@ -134,17 +135,19 @@ import TILE_MAPPING from './Tile.js'
         npcY = randomRoom.startCenter.y * 32 + 10;
 
 
-        scene.evader = scene.characterFactory.buildCharacter('green', npcX, npcY, 
-        {Steering: new Evade(scene, scene.player)});
+        scene.evader = scene.characterFactory.buildCharacter('green', npcX, npcY);
+        scene.evader.setAI(new Aggressive(scene.evader, [scene.player]), 'idle');
         scene.gameObjects.push(scene.evader);
         scene.physics.add.collider(scene.evader, groundLayer);
         scene.physics.add.collider(scene.evader, OtherSubjLayer);
-        scene.physics.add.collider(scene.evader, scene.player);
+        scene.physics.add.collider(scene.evader, scene.player, scene.onNpcPlayerCollide.bind(scene));
 
-        // this.npc = this.characterFactory.buildCharacter('punk',
-        //     200,
-        //     100);
-        // this.npc.setAI(new Aggressive(this.npc, [this.player]), 'idle');
+        // scene.npc = scene.characterFactory.buildCharacter('punk',npcX + 12, npcY + 12);
+        // scene.npc.setAI(new Aggressive(scene.npc, [scene.player]), 'idle');
+        // scene.gameObjects.push(scene.npc);
+        // scene.physics.add.collider(scene.npc, groundLayer);
+        // scene.physics.add.collider(scene.npc, OtherSubjLayer);
+        // scene.physics.add.collider(scene.npc, scene.player, scene.onNpcPlayerCollide.bind(scene));
 
         //Можно накидать всё что в голову придёт, но в tileset мало интересного
         ////
