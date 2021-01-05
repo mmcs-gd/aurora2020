@@ -50,6 +50,7 @@ let ProcScene = new Phaser.Class({
 
         const layers = buildLevel(width, height, maxRooms, this);
         this.gameObjects.push(this.player);
+        this.gameObjects.push(this.evader);
         this.groundLayer = layers["Ground"];
         this.OtherSubjLayer = layers["OtherSubj"];
         this.floorLayer = layers["Floor"];
@@ -86,13 +87,10 @@ let ProcScene = new Phaser.Class({
             {
                 //console.log(this)
                 // мы победили, но не приддумал пока ничего улчше этого
-                if (this.scene !== null) {
-                    // this.scene.pause(this.scene);
-                    // this.scene.stop(this.scene);
-
-                    //this._runningScene = null;
-                    Phaser.Scene.call(this, {key: 'MenuScene'});
-                    //this._scroll = 0;
+                if (this._runningScene !== null) {
+                    this.scene.pause(this._runningScene);
+                    this.scene.stop(this._runningScene);
+                    this._runningScene = null;
                 }
             }
         }
@@ -104,8 +102,13 @@ let ProcScene = new Phaser.Class({
             let width = GLOB_WIDTH; 
             let height = GLOB_HEIGHT; 
             let maxRooms = GLOB_MAXROOM;
+            /// отчистить массив стирингов 
+            // this.evader.destroy();
+            // this.player.destroy();
+
             const layers = buildLevel(width, height, maxRooms, this);
             this.gameObjects.push(this.player);
+            this.gameObjects.push(this.evader);
             this.groundLayer = layers["Ground"];
             this.OtherSubjLayer = layers["OtherSubj"];
             this.floorLayer = layers["Floor"];

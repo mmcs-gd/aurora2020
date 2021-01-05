@@ -15,6 +15,8 @@ import SteeringPursuitWithDistanceScene from './steering-pursuit-with-distance'
 import SteeringFleeScene from './steering-flee-scene';
 import SteeringExploringScene from './steering-exploring-scene';
 import ProcScene from './ProcGen-scene'
+import SlimeRushScene from "./slime-rush";
+import Aggressive from "../src/ai/aggressive";
 
 const scenes = [
     ['StartingScene', StartingScene],
@@ -27,7 +29,8 @@ const scenes = [
     ['SteeringWanderingScene', SteeringWanderingScene],
     ['SteeringArrivalScene', SteeringArrivalScene],
     ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
-    ['MinerScene', MinerScene],
+    //['MinerScene', MinerScene],
+    ['SlimeRushScene', SlimeRushScene],
     ['ProcScene', ProcScene]
 
 ];

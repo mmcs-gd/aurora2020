@@ -141,6 +141,11 @@ import TILE_MAPPING from './Tile.js'
         scene.physics.add.collider(scene.evader, OtherSubjLayer);
         scene.physics.add.collider(scene.evader, scene.player);
 
+        // this.npc = this.characterFactory.buildCharacter('punk',
+        //     200,
+        //     100);
+        // this.npc.setAI(new Aggressive(this.npc, [this.player]), 'idle');
+
         //Можно накидать всё что в голову придёт, но в tileset мало интересного
         ////
 
