@@ -3,6 +3,165 @@ import Scene from "./scenes-generator.js"
 import Evade from '../ai/steerings/evade'
 import TILE_MAPPING from './Tile.js'
 import Aggressive from '../ai/aggressive' 
+import UserControlled from '../ai/behaviour/user_controlled'
+import Vector2 from 'phaser/src/math/Vector2'
+
+
+class PlayerWithGun extends Phaser.GameObjects.Container {
+  constructor(scene, x, y, characterSpriteName, gunSpriteName) {
+      super(scene, x, y)
+      this.setSize(31, 31);
+      scene.physics.world.enable(this);
+      this.body.setCollideWorldBounds(true);
+      scene.add.existing(this);
+
+      this.character = scene.characterFactory.buildCharacter('aurora', 0, 0, {player: true});
+      this.gun = new Phaser.GameObjects.Sprite(scene, 2, 8, gunSpriteName);
+
+      this.add(this.character)
+      this.add(this.gun)
+
+      this.setViewDirectionAngle(0)
+
+      this.behaviuors = [];
+      this.steerings = [];
+      this.hp = 100;
+      this.radius = 100;
+      this.groupId = 0;
+
+      scene.input.on('pointermove', pointer => this._onPointerMove(pointer));
+  }
+
+  _onPointerMove(pointer) {
+      this.setViewDirectionAngle(
+          Phaser.Math.Angle.Between(
+              this.x + this.gun.x,
+              this.y + this.gun.y,
+              pointer.x,
+              pointer.y
+          )
+      )
+  }
+
+  addBehaviour(behaviour) {
+      behaviour.character = this;
+      this.behaviuors.push(behaviour);
+  }
+
+  update() {
+      this.behaviuors.forEach(x => x.update());
+      this.updateAnimation();
+  };
+
+  get bulletStartingPoint() {
+      const angle = this.viewDirectionAngle
+      const approxGunWidth = this.gun.width - 2
+      const x = this.gun.x + (approxGunWidth * Math.cos(angle));
+      const y = this.gun.y + (approxGunWidth * Math.sin(angle));
+      return new Vector2(this.x + x, this.y + y)
+  }
+
+  setViewDirectionAngle(newAngle) {
+      this.viewDirectionAngle = newAngle
+
+      if(newAngle > 1.56 || newAngle < -1.56) {
+          this.gun.setFlip(false, true)
+          this.gun.setOrigin(0.4, 0.6)
+          this.gun.x = -6
+      } else {
+          this.gun.setFlip(false, false)
+          this.gun.setOrigin(0.4, 0.4)
+          this.gun.x = 6
+      }
+      this.gun.setRotation(newAngle)
+  }
+
+  updateAnimation() {
+      try {
+          const animations = this.animationSets.get('WalkWithGun');
+          const animsController = this.character.anims;
+          const angle = this.viewDirectionAngle
+
+          if (angle < 0.78 && angle > -0.78) {
+              this.gun.y = 8
+              this.bringToTop(this.gun)
+              animsController.play(animations[1], true);
+          } else if (angle < 2.35 && angle > 0.78) {
+              this.gun.y = 8
+              this.bringToTop(this.gun)
+              animsController.play(animations[3], true);
+          } else if (angle < -2.35 || angle > 2.35) {
+              this.gun.y = 8
+              this.bringToTop(this.gun)
+              animsController.play(animations[0], true);
+          } else if (angle > -2.35 && angle < -0.78) {
+              this.gun.y = -4
+              this.bringToTop(this.character)
+              animsController.play(animations[2], true);
+          } else {
+              const currentAnimation = animsController.currentAnim;
+              if (currentAnimation) {
+                  const frame = currentAnimation.getLastFrame();
+                  this.character.setTexture(frame.textureKey, frame.textureFrame);
+              }
+          }
+      } catch (e) {
+          //console.error('[PlayerWithGun] updateAnimation failed')
+      }
+  }
+}
+
+class Bullet extends Phaser.Physics.Arcade.Sprite
+{
+  constructor (scene, x, y)
+  {
+      super(scene, x, y, 'bullet');
+  }
+
+  fire (x, y, vx, vy)
+  {
+      this.body.reset(x, y);
+      this.body.mass = 3;
+
+      this.setActive(true);
+      this.setVisible(true);
+
+      this.setVelocityX(vx);
+      this.setVelocityY(vy);
+  }
+
+  preUpdate (time, delta)
+  {
+      super.preUpdate(time, delta);
+  }
+}
+
+class Bullets extends Phaser.Physics.Arcade.Group
+{
+  constructor (scene)
+  {
+      super(scene.physics.world, scene);
+
+      this.createMultiple({
+          frameQuantity: 20,
+          key: 'bullet',
+          active: false,
+          visible: false,
+          classType: Bullet
+      });
+  }
+
+  fireBullet(x, y, vx, vy)
+  {
+      let bullet = this.getFirstDead(false);
+
+      if (bullet)
+      {
+          bullet.fire(x, y, vx, vy);
+      }
+  }
+}
+
 
   export default function buildLevel(width, height, maxRooms, scene){
     let level = new Scene(width, height, maxRooms);
@@ -117,9 +276,48 @@ import Aggressive from '../ai/aggressive'
             palyerSpawnX = rooms[0].startCenter.x * 32 + 10;
             palyerSpawnY = rooms[0].startCenter.y * 32 + 10;
         }
-        scene.player = scene.characterFactory.buildCharacter("aurora", palyerSpawnX, palyerSpawnY, {player: true});
+
+        scene.player = new PlayerWithGun(scene, palyerSpawnX, palyerSpawnY, 'aurora', 'gun')
+        scene.player.animationSets = scene.characterFactory.animationLibrary.get('aurora');
+
+        const wasdCursorKeys = scene.input.keyboard.addKeys({
+          up:Phaser.Input.Keyboard.KeyCodes.W,
+          down:Phaser.Input.Keyboard.KeyCodes.S,
+          left:Phaser.Input.Keyboard.KeyCodes.A,
+          right:Phaser.Input.Keyboard.KeyCodes.D
+      });
+
+        scene.player.addBehaviour(new UserControlled(150, wasdCursorKeys));
+
+        //scene.player = scene.characterFactory.buildCharacter("aurora", palyerSpawnX, palyerSpawnY, {player: true});
+       // scene.gameObjects.push(scene.player);
         scene.physics.add.collider(scene.player, groundLayer);
         scene.physics.add.collider(scene.player, OtherSubjLayer);
+
+
+        // Bullets handling
+        scene.bullets = new Bullets(scene);
+        scene.physics.add.collider(scene.bullets, groundLayer, (bullet) => {
+            bullet.setVisible(false);
+            bullet.setActive(false);
+        });
+
+        scene.physics.add.collider(scene.bullets, OtherSubjLayer, (bullet) => {
+          bullet.setVisible(false);
+          bullet.setActive(false);
+      });
+
+        scene.input.on('pointerdown', (pointer) => {
+            const {x, y} = scene.player.bulletStartingPoint
+
+            const vx = pointer.x - x
+            const vy = pointer.y - y
+
+            const BULLET_SPEED = 400
+            const mult = BULLET_SPEED / Math.sqrt(vx*vx + vy*vy)
+
+            scene.bullets.fireBullet(x, y, vx * mult, vy * mult);
+        });
 
 
         //// Добавим что-нибудь
@@ -192,5 +390,17 @@ import Aggressive from '../ai/aggressive'
         groundLayer.setCollisionBetween(1, 500);
         OtherSubjLayer.setDepth(10);
 
+
+        //console.log(scene.gameObjects)
+        // Slime damage
+        scene.physics.add.collider(scene.bullets, scene.gameObjects, (npc, bullet) => {
+          if (bullet.active) 
+          { 
+              //console.log(bullet, npc)
+              npc.damage()
+              bullet.setActive(false)
+              bullet.setVisible(false)
+          }
+      });
       return {"Ground" : groundLayer, "OtherSubj" : OtherSubjLayer, "Floor" : floorLayer, "Goal": goal, "Win": win}
 };

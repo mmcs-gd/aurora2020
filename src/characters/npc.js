@@ -1,10 +1,11 @@
 export default class Npc extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, name, frame, steering) {
+    constructor(scene, x, y, name, frame, steering, hp = 100) {
         super(scene, x, y, name, frame);
         scene.physics.world.enable(this);
         scene.add.existing(this);
         this.steering = steering;
         this.cnt = 0;
+        this.hp = hp;
     }
 
     setAI(ai, initialState)
@@ -56,6 +57,23 @@ export default class Npc extends Phaser.Physics.Arcade.Sprite {
     }
     cntLess(steps) {
         return this.cnt < steps;
+    }
+    damage()
+    {
+        if (this.hp > 0) {
+            this.hp = this.hp - 53
+        } else {
+            this.nextLocation = null
+            this.body.destroy()
+            this.body.stop()
+            //this.destroy();
+            this.x = -10;
+            this.y = -10;
+            //console.log(this)
+            //this.body.setActive(false);
+            //this.body.setDrag(-10, -10);
+            //console.log(this)
+        }
     }
 }
 

@@ -119,7 +119,7 @@ class PlayerWithGun extends Phaser.GameObjects.Container {
                 }
             }
         } catch (e) {
-            console.error('[PlayerWithGun] updateAnimation failed')
+            //console.error('[PlayerWithGun] updateAnimation failed')
         }
     }
 }

@@ -5,10 +5,11 @@ const delay = 500;
 
 
 export default class Slime extends Phaser.Physics.Arcade.Sprite{
-    constructor(scene, x, y, name, frame) {
+    constructor(scene, x, y, name, frame, hp = 100) {
         super(scene, x, y, name, frame);
         scene.physics.world.enable(this);
         scene.add.existing(this);
+        this.hp = hp
     }
     update() {
         if (this.hasArrived())
@@ -90,10 +91,18 @@ export default class Slime extends Phaser.Physics.Arcade.Sprite{
     damage()
     {
         if (this.hp > 0) {
-            this.hp = this.hp - 41
+            this.hp = this.hp - 53
         } else {
             this.nextLocation = null
             this.body.destroy()
+            this.body.stop()
+            //this.destroy();
+            this.x = -10;
+            this.y = -10;
+            //console.log(this)
+            //this.body.setActive(false);
+            //this.body.setDrag(-10, -10);
+            //console.log(this)
         }
     }
 }

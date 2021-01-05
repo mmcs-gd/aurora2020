@@ -13,6 +13,18 @@ import Aggressive from "../src/ai/aggressive";
 
 import TILE_MAPPING from '../src/utils/Tile.js'
 
+import EasyStar from "easystarjs";
+
+import gunPng from '../assets/sprites/gun.png'
+import bulletPng from '../assets/sprites/bullet.png'
+import cursorCur from '../assets/sprites/cursor.cur'
+
+import dungeonRoomJson from '../assets/dungeon_room.json'
+import EffectsFactory from "../src/utils/effects-factory";
+
+import UserControlled from '../src/ai/behaviour/user_controlled'
+
+import Vector2 from 'phaser/src/math/Vector2'
 
 let GLOB_WIDTH = 25;
 let GLOB_HEIGHT = 25;
@@ -37,9 +49,16 @@ let ProcScene = new Phaser.Class({
         this.load.spritesheet('punk', punkSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('slime', slimeSpriteSheet, this.slimeFrameConfig);
         this.load.audio('footsteps', Footsteps);
+        this.effectsFactory = new EffectsFactory(this);
+
+        this.load.image("gun", gunPng);
+        this.load.image("bullet", bulletPng);
     },
     
     create: function () {
+        this.input.setDefaultCursor(`url(${cursorCur}), pointer`);
+
+        this.effectsFactory.loadAnimations();
         this.characterFactory = new CharacterFactory(this);
         this.gameObjects = []; // Впринципе можн было это не делать, 
                                 // но для того, что бы можно было кидать объекты, не только в handler
@@ -59,7 +78,7 @@ let ProcScene = new Phaser.Class({
          // Аналогично предыдущему, можно убрать, 
         // ничего не измениться, но если мы хотим кидать npc или плюшки, пигодиться
         
-        this.input.keyboard.once("keydown_D", event => {
+        this.input.keyboard.once("keydown_F", event => {
             // Turn on physics debugging to show player's hitbox
             this.physics.world.createDebugGraphic();
 

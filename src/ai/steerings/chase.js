@@ -11,6 +11,7 @@ export default class Chase extends Steering {
         const dist = Math.sqrt(
             (this.owner.x - target.x) * (this.owner.x - target.x) +
             (this.owner.y - target.y) * (this.owner.y - target.y));
+            //console.log(Math.trunc(dist), this.distance)
         return Math.trunc(dist) <= this.distance;
     }
 
@@ -32,6 +33,7 @@ export default class Chase extends Steering {
             const curVelocity = new Vector2(this.owner.body.x - this.owner.body.prev.x, this.owner.body.y - this.owner.body.prev.y);
             return desiredVelocity.subtract(curVelocity);
         }
-        return null;
+        return new Vector2(0, 0);
+        //return null;
     }
 }
