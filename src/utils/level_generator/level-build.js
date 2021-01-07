@@ -1,4 +1,5 @@
 import Aggressive from "../../ai/aggressive";
+
 import BinarySpacePartitioning from "./binary-space-partitioning";
 import LevelMetric from "./level-metric";
 
@@ -22,24 +23,25 @@ const LEVEL_TO_TILE = {
 const LEVEL_SETTINGS = {
     // The dungeon's grid size
     width: 30,
-    height: 35,
+    height: 30,
+    corridor_width: 2,
     rooms: {
       // Random range for the width of a room (grid units)
       width: {
-        min: 5,
-        max: 10
+        min: 3,
+        max: 5
       },
       // Random range for the height of a room (grid units)
       height: {
-        min: 8,
-        max: 20
+        min: 3,
+        max: 5
       },
       // Cap the area of a room - e.g. this will prevent large rooms like 10 x 20
-      maxArea: 150,
+      //maxArea: 20,
       // Max rooms to place
-      maxRooms: 20,
+      maxRooms: 10,
       // Min rooms to place
-      minRooms: 10
+      minRooms: 5
     }
 }
 
@@ -58,17 +60,17 @@ export default function buildLevel(width, height, maxRooms, scene) {
     // создаём уровни сцены
     const outsideLayer = scene.map.createBlankLayer("Outside", tileSet);
     const groundLayer = scene.map.createBlankLayer("Ground", tileSet);
-    //const wallsLayer = scene.map.createBlankLayer("Walls", tileSet);
+    //const wallsLayer = scene.map.createBlankLayer("Walls", tileSet); // по маске не хватает инфы. по комнатам и коридорам заполняется
 
     const levelGenerator = new BinarySpacePartitioning(LEVEL_SETTINGS);
     const { rooms, corridors, mask } = levelGenerator.generateMask();
-    const levelMetric = new LevelMetric(width, height, rooms, corridors);
+    const levelMetric = new LevelMetric(width, height, rooms, corridors, mask);
 
     console.log(rooms);
     console.log(mask);
     // метрики уровня
-    console.log(levelMetric.fillPercent());
-    //console.log(levelMetric.connectivity());
+    console.log(`${levelMetric.fillPercent() * 100} % заполнения`);
+    console.log('связность: ' + levelMetric.connectivity());
 
     // по маске уровня заполняем уровни
     //outsideLayer.fill(TILES.BLANK, 0,0, width. height);
@@ -104,8 +106,8 @@ export default function buildLevel(width, height, maxRooms, scene) {
     // рисуем стены коридоров
     
     // добавляем персонажа Аврору в самую большую комнату сцены
-    const room = rooms[0];
-    scene.player = scene.characterFactory.buildCharacter('aurora', room.x*32+100, room.y*32+100, {player: true});
+    const room = rooms[0]; //rooms.length-1
+    scene.player = scene.characterFactory.buildCharacter('aurora', room.x*32+32, room.y*32+32, {player: true});
     //scene.player.setVelocityX(100);
     scene.gameObjects.push(scene.player);
     //scene.physics.add.collider(scene.player, groundLayer);
@@ -139,11 +141,14 @@ export default function buildLevel(width, height, maxRooms, scene) {
     scene.physics.add.collider(mine, scene.player, onNpcPlayerCollide.bind(scene));*/
 
     // настройки камеры
+    // https://photonstorm.github.io/phaser3-docs/Phaser.Cameras.Scene2D.Camera.html
 	const camera = scene.cameras.main;
-    camera.setZoom(1.0);
+    //camera.setZoom(1.0);
     camera.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels);
     camera.startFollow(scene.player);
     camera.roundPixels = true;
+    camera.setScroll(room.x*32+32, room.y*32+32);
+    //camera.setPosition(0, 0);
 
     // настройки столкновений с границей пустого уровня
     // https://photonstorm.github.io/phaser3-docs/Phaser.Tilemaps.Tilemap.html#setCollision__anchor
