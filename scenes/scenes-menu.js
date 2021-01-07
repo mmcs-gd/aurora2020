@@ -37,7 +37,7 @@ const scenes = [
     ['MinerScene', MinerScene],
     ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
     ['SteeringUnionGroupScene', SteeringUnionGroupScene],
-    ['BinarySpacePartitioning', SceneBinarySpacePartitioning],
+    ['SceneBinarySpacePartitioning', SceneBinarySpacePartitioning],
 ];
 
 let MenuScene = new Phaser.Class({
