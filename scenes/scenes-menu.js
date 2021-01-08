@@ -18,7 +18,7 @@ import ProcedurallyGeneratedScene from "./procedurally-generated-scene";
 import SteeringUnionGroupScene from './steering-union-group-scene';
 import EffectsScene from './effects-scene'
 import SlimeRushScene from "./slime-rush";
-import SceneBinarySpacePartitioning from "./scene-binary-space-partitioning";
+import SceneQuadSpacePartitioning from "./scene-quad-space-partitioning";
 
 const scenes = [
     ['StartingScene', StartingScene],
@@ -37,7 +37,7 @@ const scenes = [
     ['MinerScene', MinerScene],
     ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
     ['SteeringUnionGroupScene', SteeringUnionGroupScene],
-    ['SceneBinarySpacePartitioning', SceneBinarySpacePartitioning],
+    ['SceneQuadSpacePartitioning', SceneQuadSpacePartitioning],
 ];
 
 let MenuScene = new Phaser.Class({

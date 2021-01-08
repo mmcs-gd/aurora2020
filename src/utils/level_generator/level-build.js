@@ -1,6 +1,6 @@
 import Aggressive from "../../ai/aggressive";
 
-import QuadSpacePartitioning from "./binary-space-partitioning";
+import QuadSpacePartitioning from "./quad-space-partitioning";
 import LevelMetric from "./level-metric";
 
 
@@ -34,19 +34,19 @@ const LEVEL_TO_TILE = {
 
 const LEVEL_SETTINGS = {
     // The dungeon's grid size
-    width: 30,
-    height: 30,
+    //width: 30,
+    //height: 30,
     corridor_width: 2,
     rooms: {
       // Random range for the width of a room (grid units)
       width: {
-        min: 3,
-        max: 5
+        min: 5,
+        max: 8
       },
       // Random range for the height of a room (grid units)
       height: {
-        min: 3,
-        max: 5
+        min: 5,
+        max: 8
       },
       // Cap the area of a room - e.g. this will prevent large rooms like 10 x 20
       //maxArea: 20,
@@ -57,7 +57,7 @@ const LEVEL_SETTINGS = {
     }
 }
 
-export default function buildLevel(width, height, maxRooms, scene) {
+export default function buildLevel(width, height, scene) {
     const tileSize = 32;
     
 	scene.map = scene.make.tilemap({
@@ -74,7 +74,7 @@ export default function buildLevel(width, height, maxRooms, scene) {
     const groundLayer = scene.map.createBlankLayer("Ground", tileSet);
     const wallsLayer = scene.map.createBlankLayer("Walls", tileSet);
 
-    const levelGenerator = new QuadSpacePartitioning(LEVEL_SETTINGS);
+    const levelGenerator = new QuadSpacePartitioning(width, height, LEVEL_SETTINGS);
     const { rooms, corridors, mask } = levelGenerator.generateMask();
     const levelMetric = new LevelMetric(width, height, rooms, corridors, mask);
 
@@ -103,8 +103,9 @@ export default function buildLevel(width, height, maxRooms, scene) {
     // добавляем персонажа Аврору
     const room = rooms[0];
     scene.player = scene.characterFactory.buildCharacter('aurora', room.x*32+32, room.y*32+32, {player: true});
-    scene.gameObjects.push(scene.player);
     scene.physics.add.collider(scene.player, outsideLayer);
+    scene.physics.add.collider(scene.player, groundLayer);
+    scene.gameObjects.push(scene.player);
 
     // добавляем NPC в сцену. при касании игрок погибает
 	/*scene.NPC = scene.characterFactory.buildCharacter('blue', 200, 200);
@@ -140,21 +141,21 @@ export default function buildLevel(width, height, maxRooms, scene) {
     camera.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels);
     camera.startFollow(scene.player);
     camera.roundPixels = true;
-    camera.setScroll(room.x*32+32, room.y*32+32);
+    //camera.setScroll(room.x*32+32, room.y*32+32);
     //camera.setPosition(0, 0);
 
     // настройки столкновений с границей пустого уровня
     // https://photonstorm.github.io/phaser3-docs/Phaser.Tilemaps.Tilemap.html#setCollision__anchor
     scene.physics.world.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels, true, true, true, true);
+    groundLayer.setCollisionBetween(1, 500);
     outsideLayer.setDepth(10);
-    //outsideLayer.setCollision(TILES.BLANK);
     outsideLayer.setCollisionBetween(0, 320); // с любым tile уровня
     // сделать уровень стен и с ними обрабатывать столкновения Авроры
 
     return {"Ground" : groundLayer, "Outside" : outsideLayer}
 }
 
-function onNpcPlayerCollide() {
+/*function onNpcPlayerCollide() {
     alert('Погиб!');
     this.pause(this._runningScene);
-}
+}*/

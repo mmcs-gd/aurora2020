@@ -11,12 +11,12 @@ import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 import buildLevel from '../src/utils/level_generator/level-build';
 
 
-let SceneBinarySpacePartitioning = new Phaser.Class({
+let SceneQuadSpacePartitioning = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
     initialize: function StartingScene () {
-        Phaser.Scene.call(this, {key: 'SceneBinarySpacePartitioning'});
+        Phaser.Scene.call(this, {key: 'SceneQuadSpacePartitioning'});
     },
 
     characterFrameConfig: {frameWidth: 31, frameHeight: 31},
@@ -41,7 +41,7 @@ let SceneBinarySpacePartitioning = new Phaser.Class({
         this.characterFactory = new CharacterFactory(this);
 
         // генерация уровня
-        let layers = buildLevel(30, 30, 2, this);
+        let layers = buildLevel(50, 50, this);
         this.groundLayer = layers["Ground"];
         this.outsideLayer = layers["Outside"];
 
@@ -76,4 +76,4 @@ let SceneBinarySpacePartitioning = new Phaser.Class({
     }
 });
 
-export default SceneBinarySpacePartitioning
+export default SceneQuadSpacePartitioning

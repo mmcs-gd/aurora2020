@@ -18,12 +18,6 @@ export default class LevelMetrics {
             }
         }
         return ones / (this.width * this.height);
-
-        // комнаты и корридоры не пересекаются ?
-        const levelArea = this.width * this.height;
-        const corridorsArea = this.corridors.reduce((s, corridor) => s + corridor.w * corridor.h, 0);
-        const roomsArea = this.rooms.reduce((s, room) => s + room.w * room.h, 0);
-        return (corridorsArea + roomsArea) / levelArea;
     }
 
     // проверить связность комнат

@@ -1,13 +1,13 @@
 export default class QuadSpacePartitioning {
 
-	constructor(params) {
+	constructor(width, height, params) {
         // проверить корректность параметров уровня
         if (!params) {
             throw TypeError('params is null or undefined')
         }
 
-		this.height = params.height;
-        this.width = params.width;
+        this.width = width;
+		this.height = height;
         this.roomWidth = params.rooms.width;   // min, max
         this.roomHeight = params.rooms.height; // min, max
         //this.roomMaxArea = params.rooms.maxArea;
