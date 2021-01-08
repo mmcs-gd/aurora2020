@@ -46,7 +46,7 @@ export default class QuadSpacePartitioning {
         // 5. находим стены
         // берём комнаты и корридоры и смотрим чтобы с внешней стороны был 0, тогда этот элемент матрицы будет стеной
         // другой способ: обход четырёхсвязной области для внешнего контура, а затем тоже самое для возможных внутренних пустот
-        const makeWall = ({ x,y,w,h }) => {
+        /*const makeWall = ({ x,y,w,h }) => {
             for (let i = x; i < x+w; i++) { // верхняя стена
                 if (0 < y && matrix[i][y-1] === 0) matrix[i][y-1] = 4;
             }
@@ -69,7 +69,7 @@ export default class QuadSpacePartitioning {
         corridors.forEach( ({ rect_dx, rect_dy }) => {
             if (rect_dx) makeWall(rect_dx);
             if (rect_dy) makeWall(rect_dy);
-        });
+        });*/
 
         return { rooms: rooms, corridors:corridors, mask:matrix };
     }
@@ -129,12 +129,60 @@ export default class QuadSpacePartitioning {
         // 2. если нет связности, то перезапуск или строим миним. остовное дерево и добавляем его в дуги
         // Алгоритм Краскала
         // https://neerc.ifmo.ru/wiki/index.php?title=Алгоритм_Краскала
+        // https://evileg.com/ru/post/523/
 
-        // отсортировать дуги по весам
-        // в линейный список и отсортировать по весам
-        const sortGraphEdges = undefined;
+        // в линейный массив и отсортировать дуги по весам
+        const roomEdges2 = []; // дуги остовного дерева
+        const sortGraphEdges = [];
+        for (let i = 0; i < graphEdges.length; i++){
+            for (let j = i+1; j < graphEdges[i].length; j++){
+                sortGraphEdges.push({ dist: graphEdges[i][j], r1: rooms[i], r2: rooms[j] });
+            }
+        }
+        console.log('graphEdges');
+        console.log(graphEdges);
+        console.log('sortGraphEdges');
+        console.log(sortGraphEdges);
+        sortGraphEdges.sort( (r1, r2) => r2.dist - r1.dist);
+        console.log('sortGraphEdges');
+        console.log(sortGraphEdges);
+
         // структура данных для компонент связности. Map ?  малые издержки за ...
+        // изначально все узлы в своих компонентах
+        // берём дугу с минимальным весом и если его концы из разных компонент, то добавляем эту дугу в ответ. сами компоненты сливаем в одну
+        const components = new Map(); // ключ-комната, значение-компонента этой комнаты
+        let components_count = rooms.length; // кол-во компонент
+        rooms.forEach( (r,i) => components.set(r, i));
 
+        // граф связный
+        while (1 < components_count) {
+            const edge = sortGraphEdges.pop();
+            //console.log(edge);
+            const { dist,r1,r2 } = edge;
+            const component1 = components.get(r1);
+            const component2 = components.get(r2);
+
+            if (component1 !== component2) {
+                roomEdges2.push(edge);
+
+                // объединяем в одну компоненту
+                rooms.forEach(r => { if (components.get(r) === component2) components.set(r, component1); });
+                --components_count;
+            }
+        }
+        console.log("roomEdges2");
+        console.log(roomEdges2);
+        // объединяем множества дуг с этапов 1 и 2
+        const roomEdgesUnion = [];
+        roomEdgesUnion.push(...roomEdges);
+        for (let i = 0; i < roomEdges2.length; i++){
+            const r = roomEdges2[i];
+            if (!roomEdgesUnion.find( ({r1,r2}) => r1===r.r1 && r2===r.r2 || r1===r.r2 && r2===r.r1)) {
+                roomEdgesUnion.push(r);
+            }
+        }
+        console.log("roomEdgesUnion");
+        console.log(roomEdgesUnion);
         // 3. если путь от одной комнаты до другой сильно больше их расположения на карте, то добавить дугу между ними
         // находим все пути от одной вершины до всех остальных
         // после добавления дуги нужно считать по новой
@@ -142,12 +190,12 @@ export default class QuadSpacePartitioning {
         // https://ru.wikipedia.org/wiki/Алгоритм_Флойда_—_Уоршелла
         // Алгоритм Флойда-Уоршелла O(n^3)
 
-        const d = Array(rooms.length).fill().map(_ => Array(rooms.length).fill(Number.MAX_SAFE_INTEGER));
+        /*const d = Array(rooms.length).fill().map(_ => Array(rooms.length).fill(Number.MAX_SAFE_INTEGER));
 
         for (let i = 0; i < roomEdges.length; i++){
             const {r1, r2, dist, i1, i2} = roomEdges[i];
             d[i1][i2] = d[i2][i1] = dist;
-            console.log(`${r1} ${r2} ${i1} ${i2} ${dist}`);
+            //console.log(`${r1} ${r2} ${i1} ${i2} ${dist}`);
         }
         
         const FloydWarshall = (d) => {
@@ -161,7 +209,7 @@ export default class QuadSpacePartitioning {
                         }
             return d;
         }
-        FloydWarshall(d);
+        FloydWarshall(d);*/
 
         // провести путь между 2 комнатами. во входных параметрах комнаты не пересекаются
         // если возможно делаем одной линией, иначе двумя
@@ -213,7 +261,7 @@ export default class QuadSpacePartitioning {
             return new Corridor(rect_dx, rect_dy, r1, r2);
         }
 
-        return roomEdges.map(e => connect(e.r1, e.r2));
+        return roomEdgesUnion.map(e => connect(e.r1, e.r2));
     }
 }
 
