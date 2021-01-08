@@ -1,23 +1,35 @@
 import Aggressive from "../../ai/aggressive";
 
-import BinarySpacePartitioning from "./binary-space-partitioning";
+import QuadSpacePartitioning from "./binary-space-partitioning";
 import LevelMetric from "./level-metric";
 
 
 const TILES = {
     BLANK: 17,
     FLOOR: [
-        { index: [88, 89, 92, 93, 104, 105, 108, 109, 105+32, 104+16*9], weight: 1 },
+        { index: [88, 89, 92, 93, 104, 105, 108, 109, 105+16*2, 104+16*9], weight: 1 },
     ],
-    LEFT_WALL: 97,
-    RIGHT_WALL: 101,
-    //TOP_WALL: ,
-    //BOTTOM_WALL: 
+    /*WALL_LEFT: 16,
+    WALL_RIGHT: 12,
+    WALL_TOP: 25,
+    WALL_BOTTOM: 1,
+    CORNER_TOP_LEFT: 0,
+    CORNER_TOP_RIGHT: 0,
+    CORNER_BOTTOM_LEFT: 0,
+    CORNER_BOTTOM_RIGHT: 0,*/
 }
 
 const LEVEL_TO_TILE = {
     0: TILES.BLANK,
     1: TILES.FLOOR,
+    /*2: TILES.WALL_LEFT,
+    3: TILES.WALL_RIGHT,
+    4: TILES.WALL_TOP,
+    5: TILES.WALL_BOTTOM,
+    6: TILES.CORNER_TOP_LEFT,
+    7: TILES.CORNER_TOP_RIGHT,
+    8: TILES.CORNER_BOTTOM_LEFT,
+    9: TILES.CORNER_BOTTOM_RIGHT,*/
 }
 
 const LEVEL_SETTINGS = {
@@ -41,7 +53,7 @@ const LEVEL_SETTINGS = {
       // Max rooms to place
       maxRooms: 10,
       // Min rooms to place
-      minRooms: 5
+      minRooms: 5,
     }
 }
 
@@ -57,60 +69,41 @@ export default function buildLevel(width, height, maxRooms, scene) {
 
     const tileSet = scene.map.addTilesetImage("tiles", null, tileSize, tileSize);
     
-    // создаём уровни сцены
+    // уровни сцены
     const outsideLayer = scene.map.createBlankLayer("Outside", tileSet);
     const groundLayer = scene.map.createBlankLayer("Ground", tileSet);
-    //const wallsLayer = scene.map.createBlankLayer("Walls", tileSet); // по маске не хватает инфы. по комнатам и коридорам заполняется
+    const wallsLayer = scene.map.createBlankLayer("Walls", tileSet);
 
-    const levelGenerator = new BinarySpacePartitioning(LEVEL_SETTINGS);
+    const levelGenerator = new QuadSpacePartitioning(LEVEL_SETTINGS);
     const { rooms, corridors, mask } = levelGenerator.generateMask();
     const levelMetric = new LevelMetric(width, height, rooms, corridors, mask);
 
     console.log(rooms);
+    console.log(corridors);
     console.log(mask);
     // метрики уровня
     console.log(`${levelMetric.fillPercent() * 100} % заполнения`);
     console.log('связность: ' + levelMetric.connectivity());
 
-    // по маске уровня заполняем уровни
+    // 
     //outsideLayer.fill(TILES.BLANK, 0,0, width. height);
-    //groundLayer.fill(95, 5,5, width. height);
-    //groundLayer.putTileAt(95, 3, 3);
     //groundLayer.weightedRandomize(0, 0, 10, 10, LEVEL_TO_TILE[1]);
 	for (let x = 0; x < width; x++) {
 		for (let y = 0; y < height; y++) {
-			if (mask[x][y] == 0) {
+			if (mask[x][y] === 0) {
 				outsideLayer.putTileAt(LEVEL_TO_TILE[0], x, y);
+            } else if (mask[x][y] === 1) {
+                groundLayer.weightedRandomize(x, y, 1, 1, LEVEL_TO_TILE[1]);
             } else {
-                //groundLayer.putTileAt(95, x, y);
-                groundLayer.weightedRandomize(x, y, 1, 1, LEVEL_TO_TILE[1]); // TILES.FLOOR
-			}
+                outsideLayer.putTileAt(LEVEL_TO_TILE[0], x, y);
+            }
 		}
     }
-
-    // рисуем стены комнат
-    /*for (let i = 0; i < rooms.length; i++) {
-        const { x,y,w,h } = rooms[i];
-
-        for (let k = 0; k < w; k++) {
-            //groundLayer.putTileAt(x+k, y, TILES.TOP_WALL);
-            //groundLayer.putTileAt(x+k, y+h, TILES.BOTTOM_WALL);
-        }
-
-        for (let k = 0; k < h; k++) {
-            groundLayer.putTileAt(x, y+k, TILES.LEFT_WALL);
-            groundLayer.putTileAt(x+w, y+k, TILES.RIGHT_WALL);
-        }
-    }*/
-
-    // рисуем стены коридоров
     
-    // добавляем персонажа Аврору в самую большую комнату сцены
-    const room = rooms[0]; //rooms.length-1
+    // добавляем персонажа Аврору
+    const room = rooms[0];
     scene.player = scene.characterFactory.buildCharacter('aurora', room.x*32+32, room.y*32+32, {player: true});
-    //scene.player.setVelocityX(100);
     scene.gameObjects.push(scene.player);
-    //scene.physics.add.collider(scene.player, groundLayer);
     scene.physics.add.collider(scene.player, outsideLayer);
 
     // добавляем NPC в сцену. при касании игрок погибает
@@ -120,7 +113,7 @@ export default function buildLevel(width, height, maxRooms, scene) {
     scene.physics.add.collider(scene.NPC, outsideLayer);
     scene.physics.add.collider(scene.NPC, scene.player, onNpcPlayerCollide.bind(scene));*/
 
-    // добавляем желешки
+    // в комнате с какой-то вероятностью может появиться желешка
     /*scene.slimes =  scene.physics.add.group();
     //let params = {};
     for(let i = 0; i < 1; i++) {
@@ -136,7 +129,7 @@ export default function buildLevel(width, height, maxRooms, scene) {
     scene.physics.add.collider(scene.player, scene.slimes, onNpcPlayerCollide.bind(scene));*/
 
     // добавляем мины. при касании игрок погибает
-    /*const mine = scene.characterFactory.buildCharacter('mine', 400, 400);
+    /*const mine = scene.characterFactory.buildCharacter('mine', room.x*32+65, room.y*32);
     scene.gameObjects.push(mine);
     scene.physics.add.collider(mine, scene.player, onNpcPlayerCollide.bind(scene));*/
 
@@ -154,8 +147,8 @@ export default function buildLevel(width, height, maxRooms, scene) {
     // https://photonstorm.github.io/phaser3-docs/Phaser.Tilemaps.Tilemap.html#setCollision__anchor
     scene.physics.world.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels, true, true, true, true);
     outsideLayer.setDepth(10);
-    outsideLayer.setCollision(TILES.BLANK);
-
+    //outsideLayer.setCollision(TILES.BLANK);
+    outsideLayer.setCollisionBetween(0, 320); // с любым tile уровня
     // сделать уровень стен и с ними обрабатывать столкновения Авроры
 
     return {"Ground" : groundLayer, "Outside" : outsideLayer}
@@ -163,5 +156,5 @@ export default function buildLevel(width, height, maxRooms, scene) {
 
 function onNpcPlayerCollide() {
     alert('Погиб!');
-    this.pause(this._runningScene)
+    this.pause(this._runningScene);
 }
