@@ -79,16 +79,24 @@ export default class QuadSpacePartitioning {
         // 1. подобласть не может быть меньше минимального размера комнаты
         // 2. в каждом узле дерева комната
         // 3. делить подобласть дальше или нет решается случайным образом (с учётом нужного кол-ва комнат)
-        const root = new QuadTree({x: 0, y: 0, w: this.width, h: this.height});
+        const root = new QuadTree({x: 0, y: 0, w: this.width, h: this.height}, this.roomWidth, this.roomHeight);
 
         // делим подобласти пока делятся
-        root._subdivide();
+        /*root._subdivide();
         root.children[0]._subdivide();
         root.children[1]._subdivide();
         root.children[2]._subdivide();
-        root.children[3]._subdivide();
+        root.children[3]._subdivide();*/
 
-        // подобласти для комнат
+        const nodeList = [root]
+        while (0 < nodeList.length) {
+            const node = nodeList.shift();
+            if (node._subdivide()){
+                nodeList.push(...node.children);
+            }
+        }
+
+        // случайные подобласти для комнат
         const subSpaces = root.subSpaces();
         console.log("subSpaces");
         console.log(subSpaces);
@@ -97,7 +105,7 @@ export default class QuadSpacePartitioning {
 
         const randomSpaces = Array(subSpaces.length).fill().map( (_,i) => i);
         Phaser.Math.RND.shuffle(randomSpaces);
-        console.log("randomSpaces");
+        console.log("randomSpaces indexes");
         console.log(randomSpaces);
 
         return Array(this.roomCount).fill().map( (_,i) => subSpaces[randomSpaces[i]] );
@@ -142,8 +150,8 @@ export default class QuadSpacePartitioning {
             roomEdges.push({ r1: rooms[i], r2: rooms[indexRoom], dist: minDist, i1: i, i2: indexRoom });
         }
 
-        console.log("roomEdges");
-        console.log(roomEdges);
+        //console.log("roomEdges");
+        //console.log(roomEdges);
         // 2. если нет связности, то перезапуск или строим миним. остовное дерево и добавляем его в дуги
         // Алгоритм Краскала
         // https://neerc.ifmo.ru/wiki/index.php?title=Алгоритм_Краскала
@@ -157,28 +165,28 @@ export default class QuadSpacePartitioning {
                 sortGraphEdges.push({ dist: graphEdges[i][j], r1: rooms[i], r2: rooms[j] });
             }
         }
-        console.log('graphEdges');
-        console.log(graphEdges);
-        console.log('sortGraphEdges');
-        console.log(sortGraphEdges);
-        sortGraphEdges.forEach(e => console.log(e));
+        //console.log('graphEdges');
+        //console.log(graphEdges);
+        //console.log('sortGraphEdges');
+        //console.log(sortGraphEdges);
+        //sortGraphEdges.forEach(e => console.log(e));
         sortGraphEdges.sort( (r1, r2) => r2.dist - r1.dist);
-        console.log('sortGraphEdges');
-        console.log(sortGraphEdges);
-        sortGraphEdges.forEach(e => console.log(e));
+        //console.log('sortGraphEdges');
+        //console.log(sortGraphEdges);
+        //sortGraphEdges.forEach(e => console.log(e));
 
         // изначально все узлы в своих компонентах
         // берём дугу с минимальным весом и если его концы из разных компонент, то добавляем эту дугу в ответ. сами компоненты сливаем в одну
         const components = new Map(); // ключ-комната, значение-компонента этой комнаты
         let components_count = rooms.length; // кол-во компонент
         rooms.forEach( (r,i) => components.set(r, i));
-        console.log("components");
-        console.log(components);
+        //console.log("components");
+        //console.log(components);
 
         // граф связный
         while (1 < components_count) {
             const edge = sortGraphEdges.pop();
-            console.log(edge);
+            //console.log(edge);
             const { dist,r1,r2 } = edge;
             const component1 = components.get(r1);
             const component2 = components.get(r2);
@@ -191,8 +199,8 @@ export default class QuadSpacePartitioning {
                 --components_count;
             }
         }
-        console.log("roomEdges2");
-        console.log(roomEdges2);
+        //console.log("roomEdges2");
+        //console.log(roomEdges2);
         // объединяем множества дуг с этапов 1 и 2
         const roomEdgesUnion = [];
         roomEdgesUnion.push(...roomEdges);
@@ -202,8 +210,8 @@ export default class QuadSpacePartitioning {
                 roomEdgesUnion.push(r);
             }
         }
-        console.log("roomEdgesUnion");
-        console.log(roomEdgesUnion);
+        //console.log("roomEdgesUnion");
+        //console.log(roomEdgesUnion);
         // 3. если путь от одной комнаты до другой сильно больше их расположения на карте, то добавить дугу между ними
         // находим все пути от одной вершины до всех остальных
         // после добавления дуги нужно считать по новой
@@ -288,7 +296,7 @@ export default class QuadSpacePartitioning {
 
 
 class QuadTree {
-    constructor(boundary) {
+    constructor(boundary, roomWidth, roomHeight) {
         if (!boundary) {
             throw TypeError('boundary is null or undefined')
         }
@@ -296,6 +304,9 @@ class QuadTree {
         this.boundary = boundary;
         this.hasChildren = false;
         this.children = [];
+
+        this.roomWidth = roomWidth;
+        this.roomHeight = roomHeight;
 
         //  N=north, S=south, E=east, W=west
         //  NW -> NE -> SW -> SE
@@ -341,11 +352,15 @@ class QuadTree {
             { x:x, y: p.y, w: w_first, h: h_last },
             { x: p.x, y: p.y, w: w_last, h: h_last }
         ];
+
+        if (quadCoords.some( ({ x,y,w,h }) => w <= this.roomWidth.max || h <= this.roomHeight.max ))
+            return false;
         
         //console.log("quadCoords");
         //console.log(quadCoords);
         this.hasChildren = true;
-        this.children = quadCoords.map(rect => new QuadTree(rect));
+        this.children = quadCoords.map(rect => new QuadTree(rect, this.roomWidth, this.roomHeight));
+        return true;
     }
 }
 
