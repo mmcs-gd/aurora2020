@@ -51,9 +51,9 @@ const LEVEL_SETTINGS = {
       // Cap the area of a room - e.g. this will prevent large rooms like 10 x 20
       //maxArea: 20,
       // Max rooms to place
-      maxRooms: 10,
+      maxRooms: 13,
       // Min rooms to place
-      minRooms: 5,
+      minRooms: 9,
     }
 }
 

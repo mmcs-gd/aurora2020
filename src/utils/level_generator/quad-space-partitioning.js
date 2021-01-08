@@ -38,8 +38,8 @@ export default class QuadSpacePartitioning {
                     matrix[i][j] = 1;
         }
         rooms.forEach(r => rectToMask(r));
-        corridors.forEach( ({ rect_dx, rect_dy }) => { 
-            if (rect_dx) rectToMask(rect_dx); 
+        corridors.forEach( ({ rect_dx, rect_dy }) => {
+            if (rect_dx) rectToMask(rect_dx);
             if (rect_dy) rectToMask(rect_dy);
         });
 
@@ -80,13 +80,27 @@ export default class QuadSpacePartitioning {
         // 2. в каждом узле дерева комната
         // 3. делить подобласть дальше или нет решается случайным образом (с учётом нужного кол-ва комнат)
         const root = new QuadTree({x: 0, y: 0, w: this.width, h: this.height});
+
+        // делим подобласти пока делятся
         root._subdivide();
         root.children[0]._subdivide();
         root.children[1]._subdivide();
         root.children[2]._subdivide();
         root.children[3]._subdivide();
 
-        return root.subSpaces();
+        // подобласти для комнат
+        const subSpaces = root.subSpaces();
+        console.log("subSpaces");
+        console.log(subSpaces);
+        console.log("roomCount");
+        console.log(this.roomCount);
+
+        const randomSpaces = Array(subSpaces.length).fill().map( (_,i) => i);
+        Phaser.Math.RND.shuffle(randomSpaces);
+        console.log("randomSpaces");
+        console.log(randomSpaces);
+
+        return Array(this.roomCount).fill().map( (_,i) => subSpaces[randomSpaces[i]] );
     }
 
     // в указанной области случайным образом создаёт комнату
