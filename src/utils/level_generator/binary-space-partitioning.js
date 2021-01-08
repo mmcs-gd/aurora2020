@@ -1,4 +1,4 @@
-export default class BinarySpacePartitioning {
+export default class QuadSpacePartitioning {
 
 	constructor(params) {
         // проверить корректность параметров уровня
@@ -105,22 +105,63 @@ export default class BinarySpacePartitioning {
     //#connectRooms()
     connectRooms(rooms, corridor_width) {
         // 02.12.2020 10:44 - на лекции алгоритм соединения (00:34:00)
+        const roomEdges = [];
 
-        // похоже на алгоритм Краскала для нахождения остовного дерева, только нет весов и дуга "существует"
-        // если родительский узел дерева у соотв. компонент связности один и тот же
+        // 1. соединяем с ближайшей комнатой (расстояния между центрами комнат)
+        const calcDist = (r1, r2) => Math.abs(r1.x-r2.x) + Math.abs(r1.y-r2.y);
+        const graphEdges = Array(rooms.length).fill().map(_ => Array(rooms.length).fill(0)); // для остовного дерева
+        
+        for (let i = 0; i < rooms.length-1; i++){
+            let minDist = Number.MAX_SAFE_INTEGER;
+            let indexRoom;
 
-        // соединяем комнаты следующим образом:
-        // 1. каждый узел дерева - компонента связности
-        // 2. объединяем компоненты связности:
-        //    2.1. начиная с нижнего уровня дерева объединяем компоненты связности которые лежат в одной подобласти
-        //         объединяются ближайшие узлы из двух объединяемых компонент
-        //    2.2. поднимаемся на 1 уровень дерева выше и повторяем 2.1 пока не доберёмся к корню
-        //    2.3. объединяем полученные компоненты связности в одну компоненту
-        const components = new Set(rooms.map(r => [r]));
-        const edges = [];
-        for (let i=0; i < rooms.length-1; i++){
-            edges.push({ r1: rooms[i], r2: rooms[i+1] });
+            for (let j = i+1; j < rooms.length; j++){
+                const dist = calcDist(rooms[i], rooms[j]);
+                if (dist < minDist){
+                    indexRoom = j;
+                    minDist = dist;
+                }
+                graphEdges[i][j] = graphEdges[j][i] = dist;
+            }
+            roomEdges.push({ r1: rooms[i], r2: rooms[indexRoom], dist: minDist, i1: i, i2: indexRoom });
         }
+
+        // 2. если нет связности, то перезапуск или строим миним. остовное дерево и добавляем его в дуги
+        // Алгоритм Краскала
+        // https://neerc.ifmo.ru/wiki/index.php?title=Алгоритм_Краскала
+
+        // отсортировать дуги по весам
+        // в линейный список и отсортировать по весам
+        const sortGraphEdges = undefined;
+        // структура данных для компонент связности. Map ?  малые издержки за ...
+
+        // 3. если путь от одной комнаты до другой сильно больше их расположения на карте, то добавить дугу между ними
+        // находим все пути от одной вершины до всех остальных
+        // после добавления дуги нужно считать по новой
+        // https://habr.com/ru/post/119158/
+        // https://ru.wikipedia.org/wiki/Алгоритм_Флойда_—_Уоршелла
+        // Алгоритм Флойда-Уоршелла O(n^3)
+
+        const d = Array(rooms.length).fill().map(_ => Array(rooms.length).fill(Number.MAX_SAFE_INTEGER));
+
+        for (let i = 0; i < roomEdges.length; i++){
+            const {r1, r2, dist, i1, i2} = roomEdges[i];
+            d[i1][i2] = d[i2][i1] = dist;
+            console.log(`${r1} ${r2} ${i1} ${i2} ${dist}`);
+        }
+        
+        const FloydWarshall = (d) => {
+            const n = d.length;
+
+            for (let i = 1; i < n + 1; i++)
+                for (let j = 0; j < n - 1; j++)
+                    for (let k = 0; k < n - 1; k++)
+                        if (d[j][k] > d[j][i - 1] + d[i - 1][k]) {
+                            d[j][k] = d[j][i - 1] + d[i - 1][k];
+                        }
+            return d;
+        }
+        FloydWarshall(d);
 
         // провести путь между 2 комнатами. во входных параметрах комнаты не пересекаются
         // если возможно делаем одной линией, иначе двумя
@@ -172,7 +213,7 @@ export default class BinarySpacePartitioning {
             return new Corridor(rect_dx, rect_dy, r1, r2);
         }
 
-        return edges.map(e => connect(e.r1, e.r2));
+        return roomEdges.map(e => connect(e.r1, e.r2));
     }
 }
 
