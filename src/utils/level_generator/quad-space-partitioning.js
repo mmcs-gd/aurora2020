@@ -81,7 +81,10 @@ export default class QuadSpacePartitioning {
         // 3. делить подобласть дальше или нет решается случайным образом (с учётом нужного кол-ва комнат)
         const root = new QuadTree({x: 0, y: 0, w: this.width, h: this.height});
         root._subdivide();
-        //root.children[0]._subdivide();
+        root.children[0]._subdivide();
+        root.children[1]._subdivide();
+        root.children[2]._subdivide();
+        root.children[3]._subdivide();
 
         return root.subSpaces();
     }
@@ -305,23 +308,30 @@ class QuadTree {
         return found;
     }
 
-    // TODO
     _subdivide() {
-        // случайная точка для деления на подобласти
-        //const p = { x: this.boundary.x + this.boundary.w / 2, y: this.boundary.y + this.boundary.h / 2};
-        //const w = this.boundary.w / 2;
-        //const h = this.boundary.h / 2;
-        
         const {x, y, w, h} = this.boundary;
-        const w_half = Math.floor(w/2);
-        const h_half = Math.floor(h/2);
 
-        const quadCoords = [ {x:x, y:y}, {x: x+w_half, y:y}, { x:x, y: y+h_half }, { x: x+w_half, y: y+h_half} ];
+        // случайная точка (в допустимых пределах) для деления на подобласти
+        const dx = Phaser.Math.RND.between(-w/10, w/10);
+        const dy = Phaser.Math.RND.between(-h/10, h/10);
+        const p = { x: x + w/2 + dx, y: y + h/2 + dy};
+        p.x = Math.floor(p.x);
+        p.y = Math.floor(p.y);
+
+        const [w_first, w_last] = [p.x - x, x + w - p.x];
+        const [h_first, h_last] = [p.y - y, y + h - p.y];
+
+        const quadCoords = [
+            { x:x, y:y, w: w_first, h: h_first },
+            {x: p.x, y:y, w: w_last, h: h_first },
+            { x:x, y: p.y, w: w_first, h: h_last },
+            { x: p.x, y: p.y, w: w_last, h: h_last }
+        ];
         
+        //console.log("quadCoords");
+        //console.log(quadCoords);
         this.hasChildren = true;
-        this.children = quadCoords
-        .map(({x, y}) => { return { x:x, y:y, w:w_half, h:h_half }; } )
-        .map(rect => new QuadTree(rect));
+        this.children = quadCoords.map(rect => new QuadTree(rect));
     }
 }
 
