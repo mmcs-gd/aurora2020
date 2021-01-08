@@ -16,6 +16,8 @@ export default class BinarySpacePartitioning {
     }
     
     // возвращает маску уровня (матрицу, содержащую информацию о ячейках)
+    // 0-black, 1-ground, 2-wall_left, 3-wall_right, 4-wall_top, 5-wall_bottom
+    // 6-corner_top_left, 7-corner_top_right, 8-corner_bottom_left, 9-corner_bottom_right
     generateMask() {
         // 1. делим пространство на подобласти
         const subSpaces = this.divideSpace();
@@ -35,7 +37,6 @@ export default class BinarySpacePartitioning {
                 for (let j = y; j < y + h; j++)
                     matrix[i][j] = 1;
         }
-
         rooms.forEach(r => rectToMask(r));
         corridors.forEach( ({ rect_dx, rect_dy }) => { 
             if (rect_dx) rectToMask(rect_dx); 
@@ -43,6 +44,32 @@ export default class BinarySpacePartitioning {
         });
 
         // 5. находим стены
+        // берём комнаты и корридоры и смотрим чтобы с внешней стороны был 0, тогда этот элемент матрицы будет стеной
+        // другой способ: обход четырёхсвязной области для внешнего контура, а затем тоже самое для возможных внутренних пустот
+        const makeWall = ({ x,y,w,h }) => {
+            for (let i = x; i < x+w; i++) { // верхняя стена
+                if (0 < y && matrix[i][y-1] === 0) matrix[i][y-1] = 4;
+            }
+            for (let i = x; i < x+w; i++) { // нижняя стена
+                if (y+h < this.height-1 && matrix[i][y+h] === 0) matrix[i][y+h] = 5;
+            }
+            for (let i = y; i < y+h; i++) { // левая стена
+                if (0 < x && matrix[x-1][i] === 0) matrix[x-1][i] = 2;
+            }
+            for (let i = y; i < y+h; i++) { // правая стена
+                if (x+w < this.width-1 && matrix[x+w][i] === 0) matrix[x+w][i] = 3;
+            }
+
+            if (0 < x && 0 < y && matrix[x-1][y-1] === 0) matrix[x-1][y-1] = 6; // верхний левый угол
+            if (x+w < this.width-1 && 0 < y && matrix[x+w][y-1] === 0) matrix[x+w][y-1] = 7; // верхний правый угол
+            if (0 < x && y+h < this.height-1 && matrix[x-1][y+h] === 0) matrix[x-1][y+h] = 8; // нижний левый угол
+            if (x+w < this.width-1 && y+h < this.height-1 && matrix[x+w][y+h] === 0) matrix[x+w][y+h] = 9; // нижний правый угол
+        }
+        rooms.forEach(r => makeWall(r));
+        corridors.forEach( ({ rect_dx, rect_dy }) => {
+            if (rect_dx) makeWall(rect_dx);
+            if (rect_dy) makeWall(rect_dy);
+        });
 
         return { rooms: rooms, corridors:corridors, mask:matrix };
     }
@@ -79,6 +106,9 @@ export default class BinarySpacePartitioning {
     connectRooms(rooms, corridor_width) {
         // 02.12.2020 10:44 - на лекции алгоритм соединения (00:34:00)
 
+        // похоже на алгоритм Краскала для нахождения остовного дерева, только нет весов и дуга "существует"
+        // если родительский узел дерева у соотв. компонент связности один и тот же
+
         // соединяем комнаты следующим образом:
         // 1. каждый узел дерева - компонента связности
         // 2. объединяем компоненты связности:
@@ -86,6 +116,7 @@ export default class BinarySpacePartitioning {
         //         объединяются ближайшие узлы из двух объединяемых компонент
         //    2.2. поднимаемся на 1 уровень дерева выше и повторяем 2.1 пока не доберёмся к корню
         //    2.3. объединяем полученные компоненты связности в одну компоненту
+        const components = new Set(rooms.map(r => [r]));
         const edges = [];
         for (let i=0; i < rooms.length-1; i++){
             edges.push({ r1: rooms[i], r2: rooms[i+1] });
