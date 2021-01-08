@@ -104,7 +104,6 @@ export default class QuadSpacePartitioning {
 
     //#connectRooms()
     connectRooms(rooms, corridor_width) {
-        // 02.12.2020 10:44 - на лекции алгоритм соединения (00:34:00)
         const roomEdges = [];
 
         // 1. соединяем с ближайшей комнатой (расстояния между центрами комнат)
@@ -126,6 +125,8 @@ export default class QuadSpacePartitioning {
             roomEdges.push({ r1: rooms[i], r2: rooms[indexRoom], dist: minDist, i1: i, i2: indexRoom });
         }
 
+        console.log("roomEdges");
+        console.log(roomEdges);
         // 2. если нет связности, то перезапуск или строим миним. остовное дерево и добавляем его в дуги
         // Алгоритм Краскала
         // https://neerc.ifmo.ru/wiki/index.php?title=Алгоритм_Краскала
@@ -134,7 +135,7 @@ export default class QuadSpacePartitioning {
         // в линейный массив и отсортировать дуги по весам
         const roomEdges2 = []; // дуги остовного дерева
         const sortGraphEdges = [];
-        for (let i = 0; i < graphEdges.length; i++){
+        for (let i = 0; i < graphEdges.length-1; i++){
             for (let j = i+1; j < graphEdges[i].length; j++){
                 sortGraphEdges.push({ dist: graphEdges[i][j], r1: rooms[i], r2: rooms[j] });
             }
@@ -143,21 +144,24 @@ export default class QuadSpacePartitioning {
         console.log(graphEdges);
         console.log('sortGraphEdges');
         console.log(sortGraphEdges);
+        sortGraphEdges.forEach(e => console.log(e));
         sortGraphEdges.sort( (r1, r2) => r2.dist - r1.dist);
         console.log('sortGraphEdges');
         console.log(sortGraphEdges);
+        sortGraphEdges.forEach(e => console.log(e));
 
-        // структура данных для компонент связности. Map ?  малые издержки за ...
         // изначально все узлы в своих компонентах
         // берём дугу с минимальным весом и если его концы из разных компонент, то добавляем эту дугу в ответ. сами компоненты сливаем в одну
         const components = new Map(); // ключ-комната, значение-компонента этой комнаты
         let components_count = rooms.length; // кол-во компонент
         rooms.forEach( (r,i) => components.set(r, i));
+        console.log("components");
+        console.log(components);
 
         // граф связный
         while (1 < components_count) {
             const edge = sortGraphEdges.pop();
-            //console.log(edge);
+            console.log(edge);
             const { dist,r1,r2 } = edge;
             const component1 = components.get(r1);
             const component2 = components.get(r2);
