@@ -8,7 +8,7 @@ import Vector2 from 'phaser/src/math/Vector2'
 
 
 class PlayerWithGun extends Phaser.GameObjects.Container {
-  constructor(scene, x, y, characterSpriteName, gunSpriteName) {
+  constructor(scene, x, y, characterSpriteName, gunSpriteName, countBullet = 10) {
       super(scene, x, y)
       this.setSize(31, 31);
       scene.physics.world.enable(this);
@@ -30,6 +30,8 @@ class PlayerWithGun extends Phaser.GameObjects.Container {
       this.groupId = 0;
 
       scene.input.on('pointermove', pointer => this._onPointerMove(pointer));
+
+      this.countBullet = countBullet;
   }
 
   _onPointerMove(pointer) {
@@ -162,6 +164,66 @@ class Bullets extends Phaser.Physics.Arcade.Group
   }
 }
 
+class Hint extends Phaser.Scene {
+    constructor(x = 0, y = 0, text = '', time = 2000) {
+        super();
+        this.pos = {x, y};
+        this.text = text;
+        this.ttl = time;
+
+        this._index = Phaser.Math.RND.integer();
+    }
+
+    get index() {
+        return this._index;
+    }
+
+    preload() {
+        this._startTime = this.time.now;
+    }
+
+    create() {
+        const pos = this.pos;
+        this._drawingText = this.add.text(
+            pos.x, pos.y,
+            this.text,
+            {
+                fill: '#fff',
+                backgroundColor: '#333',
+                padding: {
+                    x : 8,
+                    y : 8
+                },
+                alpha : 0
+            }
+        );
+
+        this.tweens.add({
+            targets: this._drawingText,
+            alpha: {from : 0, to : 1},
+            y: '+=4',
+            ease: 'Linear',
+            duration: 200,
+            repeat: 0
+        });
+
+        this.tweens.add({
+            targets: this._drawingText,
+            alpha: {from : 1, to : 0},
+            ease: 'Linear',
+            y: '+=4',
+            delay: this.ttl - 400,
+            duration: 200,
+            repeat: 0
+        });
+    }
+
+    update(time) {
+        if (time > this._startTime + this.ttl) {
+            this.scene.remove(this);
+        }
+    }
+}
 
   export default function buildLevel(width, height, maxRooms, scene){
     let level = new Scene(width, height, maxRooms);
@@ -196,7 +258,7 @@ class Bullets extends Phaser.Physics.Arcade.Group
 
     
     let flag = true;
-
+    let ammoPlace = {x: -1, y: -1};
     //console.log(level)
     rooms.forEach(room => {
         const {x, y} = room.startCenter;
@@ -251,6 +313,18 @@ class Bullets extends Phaser.Physics.Arcade.Group
               (rand_X < w ? rand_X: rand_X - 1),
               (rand_Y -1  < h ? rand_Y -1: rand_Y -1 - 1));
 
+        }
+
+        if (Math.random() >= 0.6)
+        {
+
+          let rand_X = x + Math.floor(Math.random() * 3) + 1;
+          let rand_Y = y + Math.floor(Math.random() * 3) + 1;
+
+          ammoPlace = {x: rand_X * 32, y: rand_Y * 32};
+          groundLayer.putTileAt(TILE_MAPPING.AMMO,
+            (rand_X < w ? rand_X: rand_X - 1),
+            (rand_Y < h ? rand_Y: rand_Y - 1));
         }
 
         if (Math.random() >= 0.5)
@@ -308,15 +382,31 @@ class Bullets extends Phaser.Physics.Arcade.Group
       });
 
         scene.input.on('pointerdown', (pointer) => {
-            const {x, y} = scene.player.bulletStartingPoint
+            if (scene.player.countBullet > 0)
+            {
+                const {x, y} = scene.player.bulletStartingPoint
 
-            const vx = pointer.x - x
-            const vy = pointer.y - y
+                const vx = pointer.x - x
+                const vy = pointer.y - y
 
-            const BULLET_SPEED = 400
-            const mult = BULLET_SPEED / Math.sqrt(vx*vx + vy*vy)
+                const BULLET_SPEED = 400
+                const mult = BULLET_SPEED / Math.sqrt(vx*vx + vy*vy)
 
-            scene.bullets.fireBullet(x, y, vx * mult, vy * mult);
+                scene.bullets.fireBullet(x, y, vx * mult, vy * mult);
+                
+                scene.player.countBullet--;
+                const hint = new Hint(80, 32, 'Count ammo ' + scene.player.countBullet, 300);
+                try {
+                    scene.scene.add('HintScene_' + hint.index, hint, true);
+                } catch (error) { /* Error: Cannot add a Scene with duplicate key */ }
+            }
+            else
+            {
+                const hint = new Hint(80, 32, 'No ammo', 2000);
+                try {
+                    scene.scene.add('HintScene_' + hint.index, hint, true);
+                } catch (error) { /* Error: Cannot add a Scene with duplicate key */ }
+            }
         });
 
 
@@ -340,12 +430,19 @@ class Bullets extends Phaser.Physics.Arcade.Group
         scene.physics.add.collider(scene.evader, OtherSubjLayer);
         scene.physics.add.collider(scene.evader, scene.player, scene.onNpcPlayerCollide.bind(scene));
 
-        // scene.npc = scene.characterFactory.buildCharacter('punk',npcX + 12, npcY + 12);
-        // scene.npc.setAI(new Aggressive(scene.npc, [scene.player]), 'idle');
-        // scene.gameObjects.push(scene.npc);
-        // scene.physics.add.collider(scene.npc, groundLayer);
-        // scene.physics.add.collider(scene.npc, OtherSubjLayer);
-        // scene.physics.add.collider(scene.npc, scene.player, scene.onNpcPlayerCollide.bind(scene));
+        scene.evader1 = scene.characterFactory.buildCharacter('green', npcX + 12, npcY + 12);
+        scene.evader1.setAI(new Aggressive(scene.evader1, [scene.player]), 'idle');
+        scene.gameObjects.push(scene.evader1);
+        scene.physics.add.collider(scene.evader1, groundLayer);
+        scene.physics.add.collider(scene.evader1, OtherSubjLayer);
+        scene.physics.add.collider(scene.evader1, scene.player, scene.onNpcPlayerCollide.bind(scene));
+
+        scene.evader2 = scene.characterFactory.buildCharacter('green', npcX + 15, npcY + 22);
+        scene.evader2.setAI(new Aggressive(scene.evader2, [scene.player]), 'idle');
+        scene.gameObjects.push(scene.evader2);
+        scene.physics.add.collider(scene.evader2, groundLayer);
+        scene.physics.add.collider(scene.evader2, OtherSubjLayer);
+        scene.physics.add.collider(scene.evader2, scene.player, scene.onNpcPlayerCollide.bind(scene));
 
         //Можно накидать всё что в голову придёт, но в tileset мало интересного
         ////
@@ -402,5 +499,5 @@ class Bullets extends Phaser.Physics.Arcade.Group
               bullet.setVisible(false)
           }
       });
-      return {"Ground" : groundLayer, "OtherSubj" : OtherSubjLayer, "Floor" : floorLayer, "Goal": goal, "Win": win}
+      return {"Ground" : groundLayer, "OtherSubj" : OtherSubjLayer, "Floor" : floorLayer, "Goal": goal, "Win": win, "Ammo": ammoPlace}
 };

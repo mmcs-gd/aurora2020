@@ -23,6 +23,7 @@ const TILE_MAPPING = {
     TRASH: 86,
     CHEST: 260,
     STAIRS: 211,
+    AMMO: 208,
   };
   
   export default TILE_MAPPING;

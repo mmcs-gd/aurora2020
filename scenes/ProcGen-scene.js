@@ -30,6 +30,67 @@ let GLOB_WIDTH = 25;
 let GLOB_HEIGHT = 25;
 let GLOB_MAXROOM = 25;
 
+class Hint extends Phaser.Scene {
+    constructor(x = 0, y = 0, text = '', time = 2000) {
+        super();
+        this.pos = {x, y};
+        this.text = text;
+        this.ttl = time;
+
+        this._index = Phaser.Math.RND.integer();
+    }
+
+    get index() {
+        return this._index;
+    }
+
+    preload() {
+        this._startTime = this.time.now;
+    }
+
+    create() {
+        const pos = this.pos;
+        this._drawingText = this.add.text(
+            pos.x, pos.y,
+            this.text,
+            {
+                fill: '#fff',
+                backgroundColor: '#333',
+                padding: {
+                    x : 8,
+                    y : 8
+                },
+                alpha : 0
+            }
+        );
+
+        this.tweens.add({
+            targets: this._drawingText,
+            alpha: {from : 0, to : 1},
+            y: '+=4',
+            ease: 'Linear',
+            duration: 200,
+            repeat: 0
+        });
+
+        this.tweens.add({
+            targets: this._drawingText,
+            alpha: {from : 1, to : 0},
+            ease: 'Linear',
+            y: '+=4',
+            delay: this.ttl - 400,
+            duration: 200,
+            repeat: 0
+        });
+    }
+
+    update(time) {
+        if (time > this._startTime + this.ttl) {
+            this.scene.remove(this);
+        }
+    }
+}
+
 let ProcScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
@@ -74,6 +135,7 @@ let ProcScene = new Phaser.Class({
         this.floorLayer = layers["Floor"];
         this.goal = layers["Goal"];
         this.win = layers["Win"];
+        this.ammo = layers["Ammo"];
 
          // Аналогично предыдущему, можно убрать, 
         // ничего не измениться, но если мы хотим кидать npc или плюшки, пигодиться
@@ -104,12 +166,36 @@ let ProcScene = new Phaser.Class({
             if (disance(this.player, this.win) < 32)
             {
                 //console.log(this)
-                // мы победили, но не приддумал пока ничего улчше этого
+                // мы победили, но не приддумал пока ничего лучше этого
                 if (this._runningScene !== null) {
                     this.scene.pause(this._runningScene);
                     this.scene.stop(this._runningScene);
                     this._runningScene = null;
                 }
+            }
+        }
+
+        if (this.ammo.x != -1 && this.ammo.y != -1)
+        { 
+            //console.log(this.player, this.ammo)
+            if (disance(this.player, this.ammo) < 50)
+            {
+                let flag = true;
+                console.log(this.player.countBullet )
+                let str= "";
+                if (this.player.countBullet == 25)
+                {
+                    str = "I\'m overwhelmed";
+                }
+                else
+                {
+                    this.player.countBullet += 10;
+                    if (this.player.countBullet > 25) this.player.countBullet = 25
+                    str =  'Count ammo ' + this.player.countBullet;
+                    
+                }           
+                //alert(str)
+                console.log(str)
             }
         }
 
@@ -120,9 +206,16 @@ let ProcScene = new Phaser.Class({
             let width = GLOB_WIDTH; 
             let height = GLOB_HEIGHT; 
             let maxRooms = GLOB_MAXROOM;
-            /// отчистить массив стирингов 
-            // this.evader.destroy();
-            // this.player.destroy();
+
+            /// отчистить массив объектов      
+            if (this.gameObjects) {
+                this.gameObjects.forEach( function(element) {
+                    element.body.destroy();
+                    element.body.stop();
+                    element.x = -10;
+                    element.y = -10;
+                });
+            }
 
             const layers = buildLevel(width, height, maxRooms, this);
             this.gameObjects.push(this.player);
@@ -131,6 +224,7 @@ let ProcScene = new Phaser.Class({
             this.floorLayer = layers["Floor"];
             this.goal = layers["Goal"];
             this.win = layers["Win"];
+            this.ammo = layers["Ammo"];
         }
         //this.player.update(); // так как кинул player в объекты,
                                  //  нет смыла его двадый за frame обновлять
