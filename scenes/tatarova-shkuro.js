@@ -89,8 +89,8 @@ let TatarovaShkuro = new Phaser.Class({
         //info(map);
 				
         const layers = (new TileMapper(markedMap, this, width, height, this.tileSize)).generateLevel();
-        this.groundLayer = layers.Ground;
-        this.otherLayer = layers.Other;
+        // this.groundLayer = layers.Ground;
+        // this.otherLayer = layers.Other;
 
         
         let grid = [];

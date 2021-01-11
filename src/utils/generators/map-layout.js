@@ -22,10 +22,10 @@ export default class MapLayout {
 
     getCell(x, y) {
         if (x < 0 || x >= this.map.length) {
-            return null;
+            return 0;
         }
         if (y < 0 || y >= this.map[x].length) {
-            return null;
+            return 0;
         }
         return this.map[x][y];
     }
