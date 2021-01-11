@@ -95,6 +95,8 @@ export default class CharacterFactory {
         this.scene.input.on('pointerdown', (pointer) => {
             const {x, y} = character.bulletStartingPoint
 
+            character.lastTimeFired = (new Date()).getTime();
+
             const vx = pointer.x - x
             const vy = pointer.y - y
 

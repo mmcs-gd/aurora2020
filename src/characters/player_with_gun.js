@@ -22,7 +22,14 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
         this.radius = 100;
         this.groupId = 0;
 
+        this.lastTimeFired = 0;
+
         scene.input.on('pointermove', pointer => this._onPointerMove(pointer));
+    }
+
+    get isFiring() {
+        const now = (new Date()).getTime();
+        return (now - this.lastTimeFired) < 1000;
     }
 
     _onPointerMove(pointer) {
@@ -51,6 +58,16 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
         this.updateAnimation();
     };
 
+    subtractHP(value) {
+        this.hp -= value;
+        this.scene.events.emit('changeHP');
+    }
+
+    addHP(value) {
+        this.hp += value;
+        this.scene.events.emit('changeHP');
+    }
+
     get bulletStartingPoint() {
         const angle = this.viewDirectionAngle
         const approxGunWidth = this.gun.width - 2
@@ -76,8 +93,13 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
     }
 
     updateAnimation() {
-        debugger
+        // TODO: Fix the gun
+        // Now it's not making a full circle as expected, it gets stuck
+        // Some rare time it magically works, but I have no idea why
         try {
+            // TODO: There is no such animation,
+            // so there are hundreds of errors in the console
+            // need to ask about it
             const animations = this.animationSets.get('WalkWithGun');
             const animsController = this.character.anims;
             const angle = this.viewDirectionAngle

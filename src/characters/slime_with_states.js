@@ -10,15 +10,13 @@ export default class SlimeWithStates extends Slime {
         this.state = initialState;
         this.stateTable = stateTable;
         this.power = 2;
-        this.hp = 1;
+        this.hp = 82;
     }
 
     updateVelocity() {
-        switch (this.state) {
-            case SlimeStates.Jumping:
-                this.wantToJump = true;
-                break;
-            default:
+        if (this.state === SlimeStates.Jumping) {
+            this.wantToJump = true;
+        } else {
                 this.wantToJump = false;
         }
         const dir = this.steerings[this.state].calculateImpulse();

@@ -71,7 +71,28 @@ export default class FillLevel {
         this.scene.player = this.scene.characterFactory.buildCharacter('aurora', playerX * this.tilemapper.tilesize, playerY * this.tilemapper.tilesize, { player: true, withGun: true });
         this.scene.gameObjects.push(this.scene.player);
         this.scene.physics.add.collider(this.scene.player, this.groundLayer);
-        this.scene.physics.add.collider(this.scene.player, this.otherLayer);
+        this.scene.physics.add.collider(this.scene.player, this.otherLayer);        
+        this.setupText();
+    }
+
+    setupText() {
+        // TODO: WHY isn't it working? :C
+        // this is painful
+        // it may appear (very rarely), but if so, you are very lucky to see the text in the game
+        // inspiration and reference: https://phaser.io/examples/v3/view/scenes/ui-scene#
+        this.scoreInfo = this.scene.add.text(0, 0, 'Score: 0', { font: '48px Arial', fill: '#000000' });
+        this.score = 0;
+        this.hpInfo = this.scene.add.text(10, 10, 'HP: 100', { font: '48px Arial', fill: '#ffffff' });
+        this.scene.events.on('addScore', () => {
+            this.score += 10;
+            this.scoreInfo.setText('Score: ' + this.score);
+            console.log("SHOULD set score to ", this.score);
+        }, this.scene);
+
+        this.scene.events.on('changeHP', () => {
+            this.hpInfo.setText('HP: ' + this.scene.player.hp);
+            console.log("SHOULD set HP to ", this.scene.player.hp);
+        }, this.scene);
     }
 
     spaunMobs() {
@@ -108,11 +129,11 @@ export default class FillLevel {
         }
         this.scene.physics.add.collider(this.scene.player, slimes);       
         
-        
         if (this.scene.bullets) {
             this.scene.physics.add.collider(this.scene.bullets, slimes, (bullet, slime) => {
                 if (bullet.active) {
-                    slime.damage();
+                    console.log("bang!")
+                    slime.damage(this.scene);
                     bullet.setActive(false);
                     bullet.setVisible(false);
                 }
@@ -124,11 +145,31 @@ export default class FillLevel {
         const that = this;
         return function(slime) {
             slime.isAttacked = false;
-            slime.isEnemyClose = function() {
+
+            slime.isEnemyFiring = function() {
                 const enemies = [that.scene.player];
                 // add other if needed
 
-                debugger
+                // TODO: Something is broken here, need to fix
+                // need to debug
+                // slimes are disappearing into the unknown and never come back
+                // when the player is shooting
+
+                // for (const enemy of enemies) {
+                //     const d = Math.sqrt((slime.x - enemy.x)*(slime.x - enemy.x) + (slime.y - enemy.y)*(slime.y - enemy.y));
+                //     if (d < 70 && enemy.isFiring) {
+                //         slime.steerings[SlimeStates.Running].objects = [
+                //             {...enemy, dangerZone: 40 }
+                //         ];
+                //         return true;
+                //     }
+                // }
+                return false;
+            }
+
+            slime.isEnemyClose = function() {
+                const enemies = [that.scene.player];
+                // add other if needed
 
                 for (const enemy of enemies) {
                     const d = Math.sqrt((slime.x - enemy.x)*(slime.x - enemy.x) + (slime.y - enemy.y)*(slime.y - enemy.y));
@@ -169,10 +210,10 @@ export default class FillLevel {
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, () => slime.isDead, SlimeStates.Dead));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Attacking, () => slime.isDead, SlimeStates.Dead));
 
-            slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, () => slime.isAttacked, SlimeStates.Running));
-            slime.stateTable.addState(new StateTableRow(SlimeStates.Jumping, () => slime.isAttacked, SlimeStates.Running));
-            slime.stateTable.addState(new StateTableRow(SlimeStates.Attacking, () => slime.isAttacked, SlimeStates.Running));
-            slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, () => slime.isAttacked, SlimeStates.Running));
+            slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, slime.isEnemyFiring, SlimeStates.Running));
+            slime.stateTable.addState(new StateTableRow(SlimeStates.Jumping, slime.isEnemyFiring, SlimeStates.Running));
+            slime.stateTable.addState(new StateTableRow(SlimeStates.Attacking, slime.isEnemyFiring, SlimeStates.Running));
+            slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, slime.isEnemyFiring, SlimeStates.Running));
 
             slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, slime.isEnemyAround, SlimeStates.Pursuing));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Jumping, slime.isEnemyAround, SlimeStates.Pursuing));

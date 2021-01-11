@@ -87,14 +87,19 @@ export default class Slime extends Phaser.Physics.Arcade.Sprite{
             this.nextLocation = this.body.position;
         }
     }
-    damage()
+    damage(scene)
     {
         if (this.hp > 0) {
             this.hp = this.hp - 41
-        } else {
+        }
+        if (this.hp <= 0) {
             this.nextLocation = null
             this.isDead = true;
             this.destroy()
+            if (scene) {
+                scene.events.emit('addScore');
+            }
+
         }
     }
 }
