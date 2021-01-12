@@ -12,6 +12,10 @@ function connectionFields(map){
 	let markedMap = marking(map);
 	// Connection Fields
 	makeConnection(markedMap.fieldMap, markedMap.fields);
+	let orMap = OR(map, markedMap.fieldMap);
+	// Get Max Field
+	markedMap = marking(orMap);
+	getMaxField(markedMap.fieldMap, markedMap.fields);
 	return markedMap.fieldMap;
 }
 
@@ -76,7 +80,7 @@ function marking(map) {
 				//Count fields
 				let field = fields[result[i][j]];
 				if (!field) {
-					fields[result[i][j]] = { left: i, right: i, top: j, bottom: j, pixels: 1 };
+					fields[result[i][j]] = { left: i, right: i, top: j, bottom: j, pixels: 1, label: result[i][j]};
 				} else {
 					++field.pixels;
 					field.left = Math.min(field.left, i);
@@ -88,6 +92,7 @@ function marking(map) {
 			}
 		}
 	}
+	
 	return {fieldMap: result, fields: fields};
 }
 
@@ -201,6 +206,30 @@ function candidatesMin(arr){
 			cell = arr[i];
 	}
 	return cell;
+}
+
+function getMaxField(map, fields){
+	let maxField = fields.sort((a,b) => {
+		return -1 * (a.pixels - b.pixels);
+	})[0].label;
+	
+	for (let i = 0; i < map.length; ++i) {
+		for (let j = 0; j < map[0].length; ++j){
+			if(map[i][j] != maxField)
+				map[i][j] = 0;
+		}
+	}
+}
+
+function OR(arr1, arr2) {
+  let map = [];
+  for (let x = 0; x < arr1.length; ++x) {
+    map[x] = [];
+    for (let y = 0; y < arr1[0].length; ++y) {
+      map[x][y] = arr1[x][y] || arr2[x][y] || map[x][y] ? 1 : 0
+    }
+  }
+  return map;
 }
 
 export { connectionFields }
