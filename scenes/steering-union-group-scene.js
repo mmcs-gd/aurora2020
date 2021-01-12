@@ -8,49 +8,44 @@ import blueSpriteSheet from '../assets/sprites/characters/blue.png'
 import yellowSpriteSheet from '../assets/sprites/characters/yellow.png'
 import greenSpriteSheet from '../assets/sprites/characters/green.png'
 import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
-import mineSpriteSheet from '../assets/sprites/characters/bomb.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
+import Union from "../src/ai/steerings/union"
+import Group from "../src/characters/group";
 
-let MinerScene = new Phaser.Class({
+let SteeringUnionGroupScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
     initialize:
 
         function StartingScene() {
-            Phaser.Scene.call(this, {key: 'MinerScene'});
+            Phaser.Scene.call(this, {key: 'SteeringUnionGroupScene'});
         },
     characterFrameConfig: {frameWidth: 31, frameHeight: 31},
-    slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
-    mineFrameConfig: { frameWidth: 130, frameHeight: 130 },
-    // boomFrameConfig: { frameWidth: 112, frameHeight: 112 },
-    preload: function () {
+        slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
 
+    preload: function () {
         //loading map tiles and json with positions
         this.load.image("tiles", tilemapPng);
         this.load.tilemapTiledJSON("map", dungeonRoomJson);
 
         //loading spitesheets
-        this.load.spritesheet('slime', slimeSpriteSheet, this.slimeFrameConfig);
         this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('green', greenSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('yellow', yellowSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('punk', punkSpriteSheet, this.characterFrameConfig);
-        this.load.spritesheet('mine', mineSpriteSheet, this.mineFrameConfig);
-        // this.load.spritesheet('boom', boomSpriteSheet, this.boomFrameConfig);
+        this.load.spritesheet('slime', slimeSpriteSheet, this.slimeFrameConfig);
         this.load.audio('footsteps', Footsteps);
     },
     create: function () {
-
         this.gameObjects = [];
         const map = this.make.tilemap({key: "map"});
 
         // Parameters are the name you gave the tileset in Tiled and then the key of the tileset image in
         // Phaser's cache (i.e. the name you used in preload)
         const tileset = map.addTilesetImage("Dungeon_Tileset", "tiles");
-
 
         // Parameters: layer name (or index) from Tiled, tileset, x, y
         const belowLayer = map.createStaticLayer("Floor", tileset, 0, 0);
@@ -79,28 +74,22 @@ let MinerScene = new Phaser.Class({
         this.characterFactory = new CharacterFactory(this);
 
         // Creating characters
-        this.player = this.characterFactory.buildCharacter('punk',
-            100, 100, {player: true, abilities:['mines']});
-        this.gameObjects.push(this.player);
-        this.physics.add.collider(this.player, worldLayer);
-
-        this.mines = this.physics.add.group();
-
-        this.slimes =  this.physics.add.group();
-        let params = {};
-        params.useSteering = true;
-        // slimes amount !
-        for(let i = 0; i < 15; i++) {
-            const x = Phaser.Math.RND.between(50, this.physics.world.bounds.width - 50 );
-            const y = Phaser.Math.RND.between(50, this.physics.world.bounds.height -50 );
-            params.slimeType = Phaser.Math.RND.between(0, 4);
-            const slime = this.characterFactory.buildSlime(x, y, params);
-            this.slimes.add(slime);
-            this.physics.add.collider(slime, worldLayer);
-            this.gameObjects.push(slime);
+        const group = new Group([]);
+        for(let i = 0; i < 3; i++)
+        {
+            this.explorer = this.characterFactory.buildCharacter('green', 200 + i * 200, 100, {Steering: new Union(this, group, i)});
+            this.gameObjects.push(this.explorer);
+            group.join(this.explorer);
+            this.physics.add.collider(this.explorer, worldLayer);
         }
-        this.physics.add.collider(this.player, this.slimes);
-
+        for(let i = 0; i < 3; i++)
+        {
+            this.explorer = this.characterFactory.buildCharacter('green', 200 + i * 200, 400, {Steering: new Union(this, group, i + 3)});
+            this.gameObjects.push(this.explorer);
+            group.join(this.explorer);
+            this.physics.add.collider(this.explorer, worldLayer);
+        }
+        
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
             this.physics.world.createDebugGraphic();
@@ -118,10 +107,6 @@ let MinerScene = new Phaser.Class({
                 element.update();
             });
         }
-        const mineEntries = this.mines.children.entries;
-        if (mineEntries.length > 0) {
-            mineEntries.forEach(element => element.update());
-        }
 
     },
     tilesToPixels(tileX, tileY)
@@ -130,4 +115,4 @@ let MinerScene = new Phaser.Class({
     }
 });
 
-export default MinerScene
+export default SteeringUnionGroupScene
