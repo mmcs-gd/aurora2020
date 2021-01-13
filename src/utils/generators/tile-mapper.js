@@ -124,8 +124,10 @@ export default class TileMapper {
         const tileset = this.scene.map.addTilesetImage("crystals", null, this.tilesize, this.tilesize);
         const floorLayer = this.scene.map.createBlankDynamicLayer("Floor", tileset);
         const groundLayer = this.scene.map.createBlankDynamicLayer("Ground", tileset);
-        const otherLayer = this.scene.map.createBlankDynamicLayer("Other", tileset);
-
+        const collideObjectsLayer = this.scene.map.createBlankDynamicLayer("collideObjects", tileset);
+				const upperObjectsLayer = this.scene.map.createBlankDynamicLayer("upperObjects", tileset);
+				
+				
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 const cell = this.map[x][y];
@@ -142,17 +144,18 @@ export default class TileMapper {
         }
 
         this.scene.groundLayer = groundLayer;
-        this.scene.otherLayer = otherLayer;
+        this.scene.collideObjectsLayer = collideObjectsLayer;
+				this.scene.upperObjectsLayer = upperObjectsLayer;
         
-        const levelFiller = new FillLevel(this, groundLayer, otherLayer);
+        const levelFiller = new FillLevel(this, groundLayer, collideObjectsLayer, upperObjectsLayer);
         levelFiller.setPlayer();
-        this.setCamera(groundLayer, otherLayer);
-        levelFiller.spaunMobs();
+        this.setCamera(groundLayer, collideObjectsLayer, upperObjectsLayer);
+        levelFiller.spawnMobs();
         
-        return { Ground: groundLayer, Other: otherLayer };
+        return { Ground: groundLayer, CollideObjects: collideObjectsLayer, UpperObjects: upperObjectsLayer };
     }
 
-    setCamera(groundLayer, otherLayer) {
+    setCamera(groundLayer, otherLayer, upperLayer) {
         const camera = this.scene.cameras.main;
         camera.setZoom(1.0);
         this.scene.physics.world.setBounds(0, 0, this.scene.map.widthInPixels, this.scene.map.heightInPixels, true);
@@ -162,13 +165,14 @@ export default class TileMapper {
 
         groundLayer.setCollisionBetween(1, 500);
         otherLayer.setDepth(10);
+				upperLayer.setDepth(10);
     }
 
-    tileAt(x, y) {
+    /*tileAt(x, y) {
         if (x > 0 && x < this.map.length && y > 0 && y < this.map[0].length) {
             return this.map[x][y];
         }
         return null;
-    }
+    }*/
 
 }

@@ -9,10 +9,11 @@ import Flee from '../../ai/steerings/flee';
 import Chase from '../../ai/steerings/chase';
 
 export default class FillLevel {
-    constructor(tilemapper, groundLayer, otherLayer) {
+    constructor(tilemapper, groundLayer, collideLayer, upperLayer) {
         this.tilemapper = tilemapper;
         this.groundLayer = groundLayer;
-        this.otherLayer = otherLayer;
+        this.collideLayer = collideLayer;
+				this.upperLayer = upperLayer;
         this.scene = tilemapper.scene;
         this.map = tilemapper.map;
     }
@@ -71,7 +72,7 @@ export default class FillLevel {
         this.scene.player = this.scene.characterFactory.buildCharacter('aurora', playerX * this.tilemapper.tilesize, playerY * this.tilemapper.tilesize, { player: true, withGun: true });
         this.scene.gameObjects.push(this.scene.player);
         this.scene.physics.add.collider(this.scene.player, this.groundLayer);
-        this.scene.physics.add.collider(this.scene.player, this.otherLayer);        
+        this.scene.physics.add.collider(this.scene.player, this.collideLayer);        
         this.setupText();
     }
 
@@ -95,7 +96,7 @@ export default class FillLevel {
         }, this.scene);
     }
 
-    spaunMobs() {
+    spawnMobs() {
         const slimes = this.scene.physics.add.group();
 
         const params = {
@@ -123,7 +124,7 @@ export default class FillLevel {
             this.scene.gameObjects.push(slime);
 
             this.scene.physics.add.collider(slime, this.groundLayer);
-            this.scene.physics.add.collider(slime, this.otherLayer);
+            this.scene.physics.add.collider(slime, this.collideLayer);
 
             slimes.add(slime);
         }
