@@ -1,5 +1,6 @@
 import Level from "./level-generator.js";
 import Exploring from "../ai/steerings/exploring";
+import Aggressive from "../ai/aggressive";
 
 const TILE_MAPPING = {
     BLANK: 17,
@@ -16,7 +17,7 @@ export default function buildLevel(width, height, maxRooms, scene){
     const levelMatrix = level.levelMatrix;
     serialize(level);
     level = unserialize(level);
-    console.log(level);
+    //console.log(level);
     // Creating a blank tilemap with dimensions matching the dungeon
     const tilesize = 32;
     scene.map = scene.make.tilemap({
@@ -53,6 +54,18 @@ export default function buildLevel(width, height, maxRooms, scene){
         scene.physics.add.collider(scene.player, stuffLayer);
         scene.physics.add.collider(scene.player, outsideLayer);
         scene.gameObjects.push(scene.player);
+
+        rooms.forEach(room => {
+            scene.npc = scene.characterFactory.buildCharacter('punk',
+                room.startCenter.x * 32 + 50,
+                room.startCenter.y * 32 + 10);
+            scene.npc.setAI(new Aggressive(scene.npc, [scene.player]), 'idle');
+            scene.gameObjects.push(scene.npc);
+            scene.physics.add.collider(scene.npc, groundLayer);
+            scene.physics.add.collider(scene.npc, stuffLayer);
+            scene.physics.add.collider(scene.npc, outsideLayer);
+            scene.physics.add.collider(scene.npc, scene.player, scene.onNpcPlayerCollide.bind(scene));
+        });
     }
 
 

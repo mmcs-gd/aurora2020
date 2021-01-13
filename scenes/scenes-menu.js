@@ -18,6 +18,7 @@ import ProcedurallyGeneratedScene from "./procedurally-generated-scene";
 import SteeringUnionGroupScene from './steering-union-group-scene';
 import EffectsScene from './effects-scene'
 import SlimeRushScene from "./slime-rush";
+import FinalPotapovScene from "./final-Potapov-scene";
 
 const scenes = [
     ['StartingScene', StartingScene],
@@ -35,7 +36,8 @@ const scenes = [
     ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
     ['MinerScene', MinerScene],
     ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
-    ['SteeringUnionGroupScene', SteeringUnionGroupScene]
+    ['SteeringUnionGroupScene', SteeringUnionGroupScene],
+    ['FinalPotapovScene', FinalPotapovScene]
 ];
 
 let MenuScene = new Phaser.Class({
@@ -49,7 +51,7 @@ let MenuScene = new Phaser.Class({
     },
 
     preload: function () {
-        console.log(scenes)
+        //console.log(scenes)
         scenes.forEach(s => {
             this.scene.add(s[0], s[1], false);
         });

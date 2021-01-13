@@ -23,6 +23,7 @@ export default class Slime extends Phaser.Physics.Arcade.Sprite{
             const me = this;
             if (!this.wantToJump)
             {
+                console.log(this.scene.finder);
                 this.scene.finder.findPath(currentPositionX, currentPositionY, neededTileX, neededTileY, function( path ) {
                     if (path === null) {
                         console.warn("Slime says: Path was not found, gonna jump!");
