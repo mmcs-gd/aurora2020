@@ -46,8 +46,59 @@ const TILE_MAPPING = {
             { index: 16, weight: 9 },
             { index: 47, weight: 1 },
             { index: 45, weight: 1 },
-            { index: 46, weight: 1 },
-        ]
+            { index: 46, weight: 1 }
+        ],
+		JEWELRY: {
+			STATUE_TOP: 272,
+			STATUE_BOTTOM: 284,
+				
+			STATUE_DRAGON_TOP_LEFT: 273,
+			STATUE_DRAGON_TOP_RIGHT: 274,
+			STATUE_DRAGON_BOTTOM_LEFT: 285,
+			STATUE_DRAGON_BOTTOM_RIGHT: 286,
+				
+			BIG_BONES_TOP_LEFT: 248,
+			BIG_BONES_TOP_RIGHT: 249,
+			BIG_BONES_BOTTOM_LEFT: 260,
+			BIG_BONES_BOTTOM_RIGHT: 261,
+				
+			BONES: [
+			  { index: 250, weight: 1 },
+			  { index: 262, weight: 9 }
+			],
+		  POTION: 287,
+		  SCROLLS: 275,
+		  CRACK: [
+		    { index: 263, weight: 9},
+				{ index: 251, weight: 2}
+		  ],
+			STONE: 213,
+		  SMALL_STONE: [
+		    { index: 176, weight: 5},
+				{ index: 177, weight: 5},
+				{ index: 178, weight: 5},
+				{ index: 179, weight: 5},
+				{ index: 200, weight: 5},
+				{ index: 201, weight: 5},
+				{ index: 202, weight: 5},
+				{ index: 203, weight: 5}
+		  ]
+		},		
+
+		GOLD: {
+			HEAP: [
+			  { index: 236, weight: 7 },
+				{ index: 237, weight: 3 },
+				{ index: 224, weight: 1 },
+				{ index: 225, weight: 1 }
+			],
+			INGOTS: [
+			  { index: 226, weight: 7 },
+				{ index: 227, weight: 7 },
+				{ index: 238, weight: 1 },
+				{ index: 239, weight: 1 }
+			]
+		}
 };
 
 export default class TileMapper {
