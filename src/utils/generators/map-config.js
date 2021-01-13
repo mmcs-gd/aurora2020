@@ -17,7 +17,7 @@ export const config = {
         INNER_BOTTOM_RIGHT: 13
     },
     FLOOR: 1,
-		JEWELRY: {
+		JEWELRY_COLLISION: {
 			STATUE_TOP: 100,
 			STATUE_BOTTOM: 101,
 				
@@ -30,18 +30,19 @@ export const config = {
 			BIG_BONES_TOP_RIGHT: 107,
 			BIG_BONES_BOTTOM_LEFT: 108,
 			BIG_BONES_BOTTOM_RIGHT: 109,
-				
-			BONES: 110,
-		  POTION: 111,
-		  SCROLLS: 112,
-		  CRACK: 113,
-			STONE: 114,
-		  SMALL_STONE: 115
-		},		
 
-	GOLD: {
-		HEAP: 116,
-		INGOTS: 117
+			STONE: 110,
+		},		
+		JEWELRY_NONCOLLISION: {
+			BONES: 111,
+		  CRACK: 112,
+			SMALL_STONE: 113
+		},
+	  INTERACTIVE_OBJECT: {
+		  POTION: 114,
+		  SCROLLS: 115,
+		  GOLD_HEAP: 116,
+		  GOLD_INGOTS: 117
 	}
 }
 
@@ -70,12 +71,12 @@ export const digitToType = {
 		107: 'BIG_BONES_TOP_RIGHT',
 		108: 'BIG_BONES_BOTTOM_LEFT',
 		109: 'BIG_BONES_BOTTOM_RIGHT',
-		110: 'BONES',
-		111: 'POTION',
-		112: 'SCROLLS',
-		113: 'CRACK',
-		114: 'STONE',
-		115: 'SMALL_STONE',
-		116: 'HEAP',
-		117: 'INGOTS' 
+		110: 'STONE',
+		111: 'BONES',
+		112: 'CRACK',
+		113: 'SMALL_STONE',
+		114: 'POTION',
+		115: 'SCROLLS',
+		116: 'GOLD_HEAP',
+		117: 'GOLD_INGOTS' 
 }

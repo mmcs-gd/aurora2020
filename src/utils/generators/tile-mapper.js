@@ -48,7 +48,7 @@ const TILE_MAPPING = {
             { index: 45, weight: 1 },
             { index: 46, weight: 1 }
         ],
-		JEWELRY: {
+		JEWELRY_COLLISION: {
 			STATUE_TOP: 272,
 			STATUE_BOTTOM: 284,
 				
@@ -61,19 +61,20 @@ const TILE_MAPPING = {
 			BIG_BONES_TOP_RIGHT: 249,
 			BIG_BONES_BOTTOM_LEFT: 260,
 			BIG_BONES_BOTTOM_RIGHT: 261,
-				
+	
+			STONE: 213
+		},		
+		
+		JEWELRY_NONCOLLISION: {
 			BONES: [
 			  { index: 250, weight: 1 },
 			  { index: 262, weight: 9 }
 			],
-		  POTION: 287,
-		  SCROLLS: 275,
 		  CRACK: [
 		    { index: 263, weight: 9},
 				{ index: 251, weight: 2}
 		  ],
-			STONE: 213,
-		  SMALL_STONE: [
+			SMALL_STONE: [
 		    { index: 176, weight: 5},
 				{ index: 177, weight: 5},
 				{ index: 178, weight: 5},
@@ -83,16 +84,18 @@ const TILE_MAPPING = {
 				{ index: 202, weight: 5},
 				{ index: 203, weight: 5}
 		  ]
-		},		
-
-		GOLD: {
-			HEAP: [
+		},
+		
+		INTERACTIVE_OBJECT: {
+			POTION: 287,
+		  SCROLLS: 275,
+			GOLD_HEAP: [
 			  { index: 236, weight: 7 },
 				{ index: 237, weight: 3 },
 				{ index: 224, weight: 1 },
 				{ index: 225, weight: 1 }
 			],
-			INGOTS: [
+			GOLD_INGOTS: [
 			  { index: 226, weight: 7 },
 				{ index: 227, weight: 7 },
 				{ index: 238, weight: 1 },
