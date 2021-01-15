@@ -9,11 +9,10 @@ import Flee from '../../ai/steerings/flee';
 import Chase from '../../ai/steerings/chase';
 
 export default class FillLevel {
-    constructor(tilemapper, groundLayer, collideLayer, upperLayer) {
+    constructor(tilemapper, groundLayer, collideLayer) {
         this.tilemapper = tilemapper;
         this.groundLayer = groundLayer;
         this.collideLayer = collideLayer;
-				this.upperLayer = upperLayer;
         this.scene = tilemapper.scene;
         this.map = tilemapper.map;
     }
