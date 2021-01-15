@@ -55,7 +55,7 @@ export default class Aggressive{
         const context = this;
         const target = context.targets.find(x =>
             x.body.position.distance(context.me.body.position) < context.distance)
-        context.me.maxSpeed = 40;
+        context.me.maxSpeed = 45;
         context.me.steering = new Chase(context.me, [target], 1, context.distance);
         this.timer = 0;
     }

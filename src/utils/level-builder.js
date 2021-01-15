@@ -46,8 +46,8 @@ export default function buildLevel(width, height, maxRooms, scene){
     if (rooms.length != 0)
     {
         scene.player = scene.characterFactory.buildCharacter('aurora', 
-                                                             rooms[0].startCenter.x * 32 + 10, 
-                                                             rooms[0].startCenter.y * 32 + 10, 
+                                                             rooms[0].startCenter.x*32 + 10,
+                                                             rooms[0].startCenter.y*32 + 10,
                                                              {player: true});
         // Watch the player and tilemap layers for collisions, for the duration of the scene:
         scene.physics.add.collider(scene.player, groundLayer);
@@ -55,17 +55,31 @@ export default function buildLevel(width, height, maxRooms, scene){
         scene.physics.add.collider(scene.player, outsideLayer);
         scene.gameObjects.push(scene.player);
 
-        rooms.forEach(room => {
+        // init punk(enemy) in every room
+        for(let i = 1; i < rooms.length; ++i){
+            console.log(rooms[i]);
             scene.npc = scene.characterFactory.buildCharacter('punk',
-                room.startCenter.x * 32 + 50,
-                room.startCenter.y * 32 + 10);
+                (rooms[i].startCenter.x + 2)*32,
+                (rooms[i].startCenter.y + 2)*32);
             scene.npc.setAI(new Aggressive(scene.npc, [scene.player]), 'idle');
             scene.gameObjects.push(scene.npc);
             scene.physics.add.collider(scene.npc, groundLayer);
             scene.physics.add.collider(scene.npc, stuffLayer);
             scene.physics.add.collider(scene.npc, outsideLayer);
             scene.physics.add.collider(scene.npc, scene.player, scene.onNpcPlayerCollide.bind(scene));
-        });
+        }
+
+        // Goal of game is find YELLOW npc
+        const index = Phaser.Math.RND.between(1, rooms.length-1);
+        console.log(index);
+        scene.goal = scene.characterFactory.buildCharacter('yellow',
+            rooms[index].startCenter.x*32,
+            rooms[index].startCenter.y*32);
+        scene.gameObjects.push(scene.goal);
+        scene.physics.add.collider(scene.goal, groundLayer);
+        scene.physics.add.collider(scene.goal, stuffLayer);
+        scene.physics.add.collider(scene.goal, outsideLayer);
+        scene.physics.add.collider(scene.goal, scene.player, scene.winGame.bind(scene));
     }
 
 

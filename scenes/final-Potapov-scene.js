@@ -40,22 +40,12 @@ let FinalPotapovScene = new Phaser.Class({
         this.characterFactory = new CharacterFactory(this);
         this.level++;
         this.hasPlayerReachedStairs = false;
-        let width = 100; let height = 100; let maxRooms = 100;
+        let width = 30; let height = 30; let maxRooms = 100;
         const layers = buildLevel(width, height, maxRooms, this);
         this.groundLayer = layers["Ground"];
         this.stuffLayer = layers["Stuff"];
         this.outsideLayer = layers["Outside"];
-        //this.physics.add.collider(this.npc, this.slimes);
 
-        /*this.npc = this.characterFactory.buildCharacter('punk',
-            200,
-            100);
-        this.npc.setAI(new Aggressive(this.npc, [this.player]), 'idle');
-        this.gameObjects.push(this.npc);
-        this.physics.add.collider(this.npc, worldLayer);
-        this.physics.add.collider(this.npc, this.player, this.onNpcPlayerCollide.bind(this));
-        this.physics.add.collider(this.npc, this.slimes);
-        */
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
             this.physics.world.createDebugGraphic();
@@ -75,26 +65,16 @@ let FinalPotapovScene = new Phaser.Class({
                 element.update();
             });
         }
-        //if (this.hasPlayerReachedStairs) return;
-
-        //this.player.update();
-
-        // Find the player's room using another helper method from the dungeon that converts from
-        // dungeon XY (in grid units) to the corresponding room object
-        //const playerTileX = this.groundLayer.worldToTileX(this.player.x);
-        //const playerTileY = this.groundLayer.worldToTileY(this.player.y);
-        // if (!isNaN(playerTileX))
-        // {
-        //     const playerRoom = this.dungeon.getRoomAt(playerTileX, playerTileY);
-        //     this.tilemapVisibility.setActiveRoom(playerRoom);
-        // }
     },
     tilesToPixels(tileX, tileY) {
         return [tileX*this.tileSize, tileY*this.tileSize];
     },
     onNpcPlayerCollide() {
-        alert('Погиб!');
+        alert('Ты проиграл! Тебя поймали.');
         this.scene.pause(this._runningScene)
+    },
+    winGame(){
+        alert('Победа! Ты нашла/нашёл своего братка.');this.scene.pause(this._runningScene)
     }
 });
 
