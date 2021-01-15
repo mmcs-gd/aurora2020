@@ -29,7 +29,8 @@ export default class FillLevel {
     }
 
     checkFreeSpace(x, y) {
-        return this.tileAt(x, y) === config.FLOOR           // tile itself 
+        return this.tileAt(x, y) === config.FLOOR 
+						&& this.collideLayer.getTileAt(x,y) === null     // tile itself 
             && (this.tileAt(x - 1, y) === null
                 || this.tileAt(x - 1, y) === config.FLOOR)  // left tile
             && (this.tileAt(x + 1, y) === null
