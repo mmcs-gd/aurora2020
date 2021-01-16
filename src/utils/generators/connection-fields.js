@@ -217,6 +217,8 @@ function getMaxField(map, fields){
 		for (let j = 0; j < map[0].length; ++j){
 			if(map[i][j] != maxField)
 				map[i][j] = 0;
+			else 
+				map[i][j] = 1;
 		}
 	}
 }

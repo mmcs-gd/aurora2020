@@ -35,12 +35,9 @@ export default class GeneratorLevel {
 				
 				//6. Connect different fields
 				let markedMap = connectionFields(map);
-				
-				//7. Union with markedMap
-				map = this.OR(map, markedMap);
         
-				//8. Enlarge map by 1
-        map = this.enlarge(map);
+				//7. Enlarge map by 1
+        map = this.enlarge(markedMap);
 
         return map;
     }
@@ -76,69 +73,6 @@ export default class GeneratorLevel {
             for (let j = 1; j < map[0].length - 1; ++j)
                 if (map[i][j])
                     map[i][j] = map[i - 1][j] + map[i + 1][j] + map[i][j - 1] + map[i][j + 1] < 2 ? 0 : 1;
-    }
-
-    debugMap() {
-        let map = [];
-        for (let i = 0; i < this.width; ++i) {
-            map.push([]);
-            for (let j = 0; j < this.height; ++j) {
-                map[i].push(0);
-            }
-        }
-
-        let cw = this.width / 2;
-        let ch = this.height / 2;
-
-        // center line
-        map[cw - 3][ch] = 1;
-        map[cw - 2][ch] = 1;
-        map[cw - 1][ch] = 1;
-        map[cw][ch] = 1;
-        map[cw + 1][ch] = 1;
-        map[cw + 2][ch] = 1;
-        map[cw + 3][ch] = 1;
-        map[cw + 4][ch] = 1;
-
-        // upper line
-        map[cw - 3][ch - 1] = 1;
-        map[cw - 2][ch - 1] = 1;
-        map[cw - 1][ch - 1] = 1;
-        map[cw][ch - 1] = 1;
-        map[cw + 1][ch - 1] = 1;
-        map[cw + 2][ch - 1] = 1;
-        map[cw + 3][ch - 1] = 1;
-        map[cw + 4][ch - 1] = 1;
-
-        // upper x 2 line
-        map[cw - 1][ch - 2] = 1;
-        map[cw][ch - 2] = 1;
-        map[cw + 1][ch - 2] = 1;
-
-        // lower line
-        map[cw - 3][ch + 1] = 1;
-        map[cw - 2][ch + 1] = 1;
-        map[cw - 1][ch + 1] = 1;
-        map[cw][ch + 1] = 1;
-        map[cw + 1][ch + 1] = 1;
-        map[cw + 2][ch + 1] = 1;
-        map[cw + 3][ch + 1] = 1;
-        map[cw + 4][ch + 1] = 1;
-
-        // lower x 2 line
-        map[cw - 1][ch + 2] = 1;
-        map[cw][ch + 2] = 1;
-        map[cw + 1][ch + 2] = 1;
-        map[cw + 2][ch + 2] = 1;
-
-        // lower x 3 line
-        map[cw - 1][ch + 3] = 1;
-        map[cw][ch + 3] = 1;
-        map[cw + 1][ch + 3] = 1;
-        map[cw + 2][ch + 3] = 1;
-
-        return this.enlarge(map);
-
     }
 
     setNeighbors(map, x, y) {
