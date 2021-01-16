@@ -7,6 +7,7 @@ import Wander from '../../ai/steerings/wander';
 import Attack from '../../ai/steerings/attack';
 import Flee from '../../ai/steerings/flee';
 import Chase from '../../ai/steerings/chase';
+import RanawayFromObjects from '../../ai/steerings/ranaway_from_objects';
 
 export default class FillLevel {
     constructor(tilemapper, groundLayer, collideLayer) {
@@ -150,8 +151,6 @@ export default class FillLevel {
     addSlimesConditions() {
         const that = this;
         return function(slime) {
-            slime.isAttacked = false;
-
             slime.isEnemyFiring = function() {
                 const enemies = [that.scene.player];
                 // add other if needed
@@ -201,7 +200,7 @@ export default class FillLevel {
                 return false;
             }
             slime.canWander = function() {
-                return !slime.isAttacked && !slime.isEnemyAround();
+                return !slime.isAttacked && !slime.isEnemyAround() && !slime.isEnemyFiring();
             }
         }
     }
@@ -212,7 +211,6 @@ export default class FillLevel {
             slime.stateTable = new StateTable(that.scene);
 
             slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, () => slime.isDead, SlimeStates.Dead));
-            slime.stateTable.addState(new StateTableRow(SlimeStates.Jumping, () => slime.isDead, SlimeStates.Dead));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, () => slime.isDead, SlimeStates.Dead));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Attacking, () => slime.isDead, SlimeStates.Dead));
 
@@ -239,7 +237,7 @@ export default class FillLevel {
             let steerings = {
                 [SlimeStates.Searching]: new Wander(slime),
                 [SlimeStates.Pursuing]: new Chase(slime, []),
-                [SlimeStates.Running]: new Ranaway(slime, [that.scene.player]),
+                [SlimeStates.Running]: new RanawayFromObjects(slime, [that.scene.player]),
                 [SlimeStates.Attacking]: new Attack(slime, []),
             
             };
