@@ -15,6 +15,8 @@ import SlimeStates from '../ai/behaviour/slime_states';
 import { Bullets, PlayerWithGun } from './player_with_gun';
 import UserControlled from '../ai/behaviour/user_controlled';
 import { Spells, PlayerWithMagic } from './player_with_magic';
+import NpcWithStates from './npc_with_states';
+import NpcStates from '../ai/behaviour/npc_states';
 
 export default class CharacterFactory {
     constructor(scene) {
@@ -72,7 +74,15 @@ export default class CharacterFactory {
 
 
     buildNPCCharacter(spriteSheetName, x, y, params) {
-        let character = new NPC(this.scene, x, y, spriteSheetName, 2, params.Steering);
+        let character;
+        if (params.useStates) {
+            character = new NpcWithStates(this.scene, x, y, spriteSheetName, 'gun', NpcStates.ChasingSlime);
+            params.addConditions(character);
+            params.createStateTable(character);
+            params.initSteerings(character);
+        } else {
+            character = new NPC(this.scene, x, y, spriteSheetName, 2, params.Steering);
+        }
         character.animationSets = this.animationLibrary.get(spriteSheetName);
         return character;
     }
@@ -107,7 +117,7 @@ export default class CharacterFactory {
     }
 
     buildPlayerCharacter(spriteSheetName, x, y, params = {}) {
-        const maxSpeed = 100;
+        const maxSpeed = 1000;
         let character;
         if (params.withGun) {
             character = new PlayerWithGun(this.scene, x, y, spriteSheetName, 'gun');
@@ -135,7 +145,6 @@ export default class CharacterFactory {
             character.cursors = this.scene.input.keyboard.createCursorKeys();
         }
         character.maxSpeed = maxSpeed;
-        // character.maxSpeed = 1000;
         
         character.animationSets = this.animationLibrary.get(spriteSheetName);
         //todo: not here
@@ -169,7 +178,7 @@ export default class CharacterFactory {
         if (params.useSteering) {
             slime = new SmartSlime(this.scene, x, y, this.slimeSpriteSheet, 9*slimeType);
         } else if (params.useStates) {
-            slime = new SlimeWithStates(this.scene, x, y, this.slimeSpriteSheet, 9*slimeType, params.stateTable, SlimeStates.Searching);
+            slime = new SlimeWithStates(this.scene, x, y, this.slimeSpriteSheet, 9*slimeType, SlimeStates.Searching);
             params.addSlimesConditions(slime);
             params.createStateTable(slime);
             params.initSteerings(slime);

@@ -154,8 +154,10 @@ export default class TileMapper {
 		this.scene.upperFloorLayer = upperFloorLayer;
 
 		const levelFiller = new FillLevel(this, groundLayer, collideObjectsLayer);
+		levelFiller.initGroups();
 		levelFiller.setPlayer();
 		this.setCamera(groundLayer, collideObjectsLayer, upperObjectsLayer);
+		levelFiller.spawnNpc();
 		levelFiller.spawnMobs();
 
 		return { Ground: groundLayer, UpperFloor: upperFloorLayer, CollideObjects: collideObjectsLayer, UpperObjects: upperObjectsLayer };
