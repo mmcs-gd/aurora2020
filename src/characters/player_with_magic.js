@@ -45,6 +45,16 @@ export class PlayerWithMagic extends Phaser.GameObjects.Container {
         this.behaviuors.push(behaviour);
     }
 
+    subtractHP(value) {
+        this.hp -= value;
+        this.scene.events.emit('changeHP');
+    }
+
+    addHP(value) {
+        this.hp += value;
+        this.scene.events.emit('changeHP');
+    }
+
     update() {
         this.behaviuors.forEach(x => x.update());
         this.updateAnimation();

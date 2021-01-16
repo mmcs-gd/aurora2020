@@ -100,7 +100,7 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
             // TODO: There is no such animation,
             // so there are hundreds of errors in the console
             // need to ask about it
-            const animations = this.animationSets.get('WalkWithGun');
+            const animations = this.animationSets.get('Walk');
             const animsController = this.character.anims;
             const angle = this.viewDirectionAngle
 
