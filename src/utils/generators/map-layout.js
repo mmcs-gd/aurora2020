@@ -12,7 +12,9 @@ export default class MapLayout {
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 if (this.map[x][y] !== config.BLANK) {
-                    const type = this.getCellType({ x, y });
+                    let type = this.getCellType({ x, y });
+                    type = this.checkBorders(x, y, type);
+                    
                     this.map[x][y] = type;
                 }
             }
@@ -20,12 +22,56 @@ export default class MapLayout {
         return this.map;
     }
 
-    getCell(x, y) {
-        if (x < 0 || x >= this.map.length - 1) {
-            return 0;
+    checkBorders(x, y, type) {
+        if (type === config.FLOOR) {
+            // left side
+            if (x === 0) {
+                if (y === 0) {
+                    // top left corner
+                    type = config.WALL.TOP_LEFT;
+                } else if (y === this.map[x].length - 1) {
+                    // bottom left corner
+                    type = config.WALL.BOTTOM_LEFT;
+                } else {
+                    // plain left wall
+                    type = config.WALL.LEFT;
+                }
+            }
+            // top side 
+            else if (y === 0) {
+                if (x === this.map.length - 1) {
+                    // top right corner
+                    type = config.WALL.TOP_RIGHT;
+                } else {
+                    // plain top wall
+                    type = config.WALL.TOP;
+                }
+            } 
+            // right side
+            else if (x === this.map.length - 1) {
+                if (y === this.map[x].length) {
+                    // bottom right corner
+                    type = config.WALL.BOTTOM_RIGHT;
+                } else {
+                    // plain right wall
+                    type = config.WALL.RIGHT;
+                }
+            } 
+            // bottom side
+            else if (y === this.map[x].length - 1) {
+                // plain bottom wall
+                type = config.WALL.BOTTOM;
+            }
         }
-        if (y < 0 || y >= this.map[x].length - 1) {
-            return 0;
+        return type;
+    }
+
+    getCell(x, y) {
+        if (x < 0 || x >= this.map.length) {
+            return null;
+        }
+        if (y < 0 || y >= this.map[x].length) {
+            return null;
         }
         return this.map[x][y];
     }

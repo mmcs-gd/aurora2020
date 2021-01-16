@@ -54,7 +54,7 @@ export default class FillLevel {
         }
 
         for (const m of mobs) {
-            if (this.calcDistance({x,y}, m) < 2) {
+            if (this.calcDistance({x,y}, m) < 10) {
                 return false;
             }
         }
@@ -107,7 +107,7 @@ export default class FillLevel {
             addSlimesConditions: this.addSlimesConditions()
         };
 
-        const slimesAmount = 100;
+        const slimesAmount = 50;
         for (let i = 0; i < slimesAmount; i++) {
             let x = Phaser.Math.RND.between(0, this.map.length);
             let y = Phaser.Math.RND.between(0, this.map[0].length);
