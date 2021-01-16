@@ -87,12 +87,12 @@ export default class FillLevel {
         this.scene.events.on('addScore', () => {
             this.score += 10;
             this.scoreInfo.setText('Score: ' + this.score);
-            console.log("SHOULD set score to ", this.score);
+            // console.log("SHOULD set score to ", this.score);
         }, this.scene);
 
         this.scene.events.on('changeHP', () => {
             this.hpInfo.setText('HP: ' + this.scene.player.hp);
-            console.log("SHOULD set HP to ", this.scene.player.hp);
+            // console.log("SHOULD set HP to ", this.scene.player.hp);
         }, this.scene);
     }
 
@@ -131,9 +131,14 @@ export default class FillLevel {
         this.scene.physics.add.collider(this.scene.player, slimes);       
         
         if (this.scene.bullets) {
+            this.scene.physics.add.collider(this.scene.bullets, this.collideLayer, (bullet, layer) => {
+                if (bullet.active) {
+                    bullet.setActive(false);
+                    bullet.setVisible(false);
+                }
+            });
             this.scene.physics.add.collider(this.scene.bullets, slimes, (bullet, slime) => {
                 if (bullet.active) {
-                    console.log("bang!")
                     slime.damage(this.scene);
                     bullet.setActive(false);
                     bullet.setVisible(false);
@@ -174,7 +179,7 @@ export default class FillLevel {
 
                 for (const enemy of enemies) {
                     const d = Math.sqrt((slime.x - enemy.x)*(slime.x - enemy.x) + (slime.y - enemy.y)*(slime.y - enemy.y));
-                    if (d < 40) {
+                    if (d < 45) {
                         slime.steerings[SlimeStates.Attacking].objects = [enemy];
                         return true;
                     }
