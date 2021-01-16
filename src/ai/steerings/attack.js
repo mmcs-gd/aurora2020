@@ -5,21 +5,13 @@ export default class Attack extends Steering {
     constructor(owner, target, force = 1) {
         super(owner, [target], force);
         this.lastTimeAttacked = 0;
-        this.attackDelay = 1000;
-    }
-
-    get canAttack() {
-        const now = (new Date()).getTime();
-        return this.lastTimeAttacked === 0 || (now - this.lastTimeAttacked) > this.attackDelay;
     }
 
     calculateImpulse() {
-        if (this.canAttack) {
+        if (this.objects.length > 0) {
             const target = this.objects[0];
-            this.lastTimeAttacked = (new Date()).getTime();
-            target.subtractHP(this.owner.power);
+            this.owner.attack(target);        
         }
-        this.owner.wantToJump = true;    
         return new Vector2(0,0);
     }
 }
