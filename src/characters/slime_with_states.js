@@ -57,6 +57,9 @@ export default class SlimeWithStates extends Slime {
                 this.wantToJump = false;
         }
         const dir = this.steerings[this.state].calculateImpulse();
+        if (!dir) {
+            debugger
+        }
         this.body.setVelocityX(dir.x);
         this.body.setVelocityY(dir.y);
     }

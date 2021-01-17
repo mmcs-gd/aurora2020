@@ -5,23 +5,20 @@ export default class Npc extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         this.steering = steering;
         this.cnt = 0;
-
     }
 
+    setAI(ai, initialState)
+    {
+        this.ai = ai;
+        this.currentState = initialState;
+    }
     update() {
-
-        const body = this.body;
-        this.body.setVelocity(0);
-        if (this.steering != 1)
+        if (this.ai)
         {
-            const dir = this.steering.calculateImpulse();
-        // console.log(dir)
-            this.body.setVelocityX(dir.x)
-            this.body.setVelocityY(dir.y)
-
-            this.updateAnimation();
+          this.currentState = this.ai.update(this.currentState);
         }
-
+        const delay = 500;
+        this.body.setVelocity(0);
         if (this.steering) {
             const dir = this.steering.calculateImpulse(!this.cntLess(delay));
             this.body.setVelocityX(dir.x)

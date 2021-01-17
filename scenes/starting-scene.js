@@ -10,6 +10,7 @@ import greenSpriteSheet from '../assets/sprites/characters/green.png'
 import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
+import Aggressive from "../src/ai/aggressive";
 
 let StartingScene = new Phaser.Class({
 
@@ -80,7 +81,7 @@ let StartingScene = new Phaser.Class({
 
         this.slimes =  this.physics.add.group();
         let params = {};
-        for(let i = 0; i < 100; i++) {
+        for(let i = 0; i < 10; i++) {
             const x = Phaser.Math.RND.between(50, this.physics.world.bounds.width - 50 );
             const y = Phaser.Math.RND.between(50, this.physics.world.bounds.height -50 );
             params.slimeType = Phaser.Math.RND.between(0, 4);
@@ -90,6 +91,15 @@ let StartingScene = new Phaser.Class({
             this.gameObjects.push(slime);
         }
         this.physics.add.collider(this.player, this.slimes);
+
+        this.npc = this.characterFactory.buildCharacter('punk',
+            200,
+            100);
+        this.npc.setAI(new Aggressive(this.npc, [this.player]), 'idle');
+        this.gameObjects.push(this.npc);
+        this.physics.add.collider(this.npc, worldLayer);
+        this.physics.add.collider(this.npc, this.player, this.onNpcPlayerCollide.bind(this));
+        this.physics.add.collider(this.npc, this.slimes);
 
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
@@ -113,6 +123,10 @@ let StartingScene = new Phaser.Class({
     tilesToPixels(tileX, tileY)
     {
         return [tileX*this.tileSize, tileY*this.tileSize];
+    },
+    onNpcPlayerCollide() {
+        alert('Погиб!');
+        this.scene.pause(this._runningScene)
     }
 });
 
