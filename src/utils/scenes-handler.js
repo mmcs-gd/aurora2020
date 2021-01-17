@@ -8,7 +8,7 @@ import Vector2 from 'phaser/src/math/Vector2'
 
 
 class PlayerWithGun extends Phaser.GameObjects.Container {
-  constructor(scene, x, y, characterSpriteName, gunSpriteName, countBullet = 10) {
+  constructor(scene, x, y, characterSpriteName, gunSpriteName, countBullet = 15) {
       super(scene, x, y)
       this.setSize(31, 31);
       scene.physics.world.enable(this);
@@ -437,12 +437,49 @@ class Hint extends Phaser.Scene {
         scene.physics.add.collider(scene.evader1, OtherSubjLayer);
         scene.physics.add.collider(scene.evader1, scene.player, scene.onNpcPlayerCollide.bind(scene));
 
+        // Берем рандомную комнату для добавления персонажа, его ещё найти надо будет
+        randdd = Math.floor(Math.random() * rooms.length) + 1
+        //console.log(rooms.length, randdd)
+        randomRoom = rooms[randdd == rooms.length? randdd - 1 : randdd]
+
+        npcX = randomRoom.startCenter.x * 32 + 10;
+        npcY = randomRoom.startCenter.y * 32 + 10;
+
         scene.evader2 = scene.characterFactory.buildCharacter('green', npcX + 15, npcY + 22);
         scene.evader2.setAI(new Aggressive(scene.evader2, [scene.player]), 'idle');
         scene.gameObjects.push(scene.evader2);
         scene.physics.add.collider(scene.evader2, groundLayer);
         scene.physics.add.collider(scene.evader2, OtherSubjLayer);
         scene.physics.add.collider(scene.evader2, scene.player, scene.onNpcPlayerCollide.bind(scene));
+
+        scene.evader3 = scene.characterFactory.buildCharacter('green', npcX + 12, npcY + 12);
+        scene.evader3.setAI(new Aggressive(scene.evader3, [scene.player]), 'idle');
+        scene.gameObjects.push(scene.evader3);
+        scene.physics.add.collider(scene.evader3, groundLayer);
+        scene.physics.add.collider(scene.evader3, OtherSubjLayer);
+        scene.physics.add.collider(scene.evader3, scene.player, scene.onNpcPlayerCollide.bind(scene));
+
+        // Берем рандомную комнату для добавления персонажа, его ещё найти надо будет
+        randdd = Math.floor(Math.random() * rooms.length) + 1
+        //console.log(rooms.length, randdd)
+        randomRoom = rooms[randdd == rooms.length? randdd - 1 : randdd]
+
+        npcX = randomRoom.startCenter.x * 32 + 10;
+        npcY = randomRoom.startCenter.y * 32 + 10;
+
+        scene.evader4 = scene.characterFactory.buildCharacter('green', npcX + 15, npcY + 22);
+        scene.evader4.setAI(new Aggressive(scene.evader4, [scene.player]), 'idle');
+        scene.gameObjects.push(scene.evader4);
+        scene.physics.add.collider(scene.evader4, groundLayer);
+        scene.physics.add.collider(scene.evader4, OtherSubjLayer);
+        scene.physics.add.collider(scene.evader4, scene.player, scene.onNpcPlayerCollide.bind(scene));
+
+        scene.evader5 = scene.characterFactory.buildCharacter('green', npcX + 12, npcY + 12);
+        scene.evader5.setAI(new Aggressive(scene.evader5, [scene.player]), 'idle');
+        scene.gameObjects.push(scene.evader5);
+        scene.physics.add.collider(scene.evader5, groundLayer);
+        scene.physics.add.collider(scene.evader5, OtherSubjLayer);
+        scene.physics.add.collider(scene.evader5, scene.player, scene.onNpcPlayerCollide.bind(scene));
 
         //Можно накидать всё что в голову придёт, но в tileset мало интересного
         ////

@@ -201,7 +201,7 @@ let ProcScene = new Phaser.Class({
                     
                 }           
                 //alert(str)
-                ыconsole.log(str)
+                console.log(str)
                 // this.hint.text = str;
                 // try {
                 //     this.scene.add('HintScene_' + this.hint.index, this.hint, true);
