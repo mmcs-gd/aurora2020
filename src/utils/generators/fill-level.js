@@ -82,6 +82,7 @@ export default class FillLevel {
 
     setupText() {
         this.scoreInfo = this.scene.add.text(0, 0, 'Score: 0 (your) - 0 (opponent)', { font: '32px Arial', fill: '#ff0000' });
+				this.scoreInfo.setDepth(11);
         this.score = 0;
 				this.scoreNPC = 0;
         this.hpInfo = this.scene.add.text(0, 25, 'HP: 100', { font: '32px Arial', fill: '#ff0000' });
