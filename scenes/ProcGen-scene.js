@@ -30,6 +30,7 @@ let GLOB_WIDTH = 25;
 let GLOB_HEIGHT = 25;
 let GLOB_MAXROOM = 25;
 
+
 class Hint extends Phaser.Scene {
     constructor(x = 0, y = 0, text = '', time = 2000) {
         super();
@@ -91,6 +92,8 @@ class Hint extends Phaser.Scene {
     }
 }
 
+
+
 let ProcScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
@@ -139,6 +142,8 @@ let ProcScene = new Phaser.Class({
 
          // Аналогично предыдущему, можно убрать, 
         // ничего не измениться, но если мы хотим кидать npc или плюшки, пигодиться
+        var hint = new Hint(80, 32, '', 300);
+        this.hint = hint;
         
         this.input.keyboard.once("keydown_F", event => {
             // Turn on physics debugging to show player's hitbox
@@ -168,6 +173,7 @@ let ProcScene = new Phaser.Class({
                 //console.log(this)
                 // мы победили, но не приддумал пока ничего лучше этого
                 if (this._runningScene !== null) {
+                    alert('Победа!');
                     this.scene.pause(this._runningScene);
                     this.scene.stop(this._runningScene);
                     this._runningScene = null;
@@ -195,7 +201,12 @@ let ProcScene = new Phaser.Class({
                     
                 }           
                 //alert(str)
-                console.log(str)
+                ыconsole.log(str)
+                // this.hint.text = str;
+                // try {
+                //     this.scene.add('HintScene_' + this.hint.index, this.hint, true);
+                // } catch (error) { /* Error: Cannot add a Scene with duplicate key */ }
+            
             }
         }
 

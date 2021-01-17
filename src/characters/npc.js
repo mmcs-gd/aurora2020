@@ -5,8 +5,13 @@ export default class Npc extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         this.steering = steering;
         this.cnt = 0;
-        this.hp = hp;
+        //this.hp = hp;
+        this.hp = this.randomInteger(80, 200);
     }
+
+    randomInteger(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
 
     setAI(ai, initialState)
     {
