@@ -19,6 +19,9 @@ export default class SlimeWithStates extends Slime {
 
         this.lastTimeAttacked = 0;
         this.attackDelay = 1000;
+				
+				this.lastTimeChangeDirect = 0;
+				this.changeDirectDelay = 5000; 
     }
 
     get isDead() {
@@ -30,6 +33,15 @@ export default class SlimeWithStates extends Slime {
         return this.lastTimeAttacked === 0 || (now - this.lastTimeAttacked) > this.attackDelay;
     }
     
+		get canChangeDirect(){
+			const now = (new Date()).getTime();
+			if(now - this.lastTimeChangeDirect > this.changeDirectDelay){
+				this.lastTimeChangeDirect = now;
+				return true;
+			}
+			return false;
+		}
+		
     attack(target) {
         if (this.canAttack) {
             this.lastTimeAttacked = (new Date()).getTime();

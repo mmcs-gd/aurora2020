@@ -95,9 +95,6 @@ let TatarovaShkuro = new Phaser.Class({
         //info(map);
 				
         const layers = (new TileMapper(markedMap, this, width, height, this.tileSize)).generateLevel();
-        // this.groundLayer = layers.Ground;
-        // this.otherLayer = layers.Other;
-
         
         let grid = [];
         for(let y = 0; y < this.groundLayer.tilemap.height; y++){
@@ -112,24 +109,25 @@ let TatarovaShkuro = new Phaser.Class({
         this.finder.setGrid(grid);
         this.finder.setAcceptableTiles([0]);
 				
-        // this.input.keyboard.once("keydown_D", event => {
-        //     // Turn on physics debugging to show player's hitbox
-        //     this.physics.world.createDebugGraphic();
+        /*this.input.keyboard.once("keydown_D", event => {
+             // Turn on physics debugging to show player's hitbox
+					this.physics.world.createDebugGraphic();
 
-        //     const graphics = this.add
-        //         .graphics()
-        //         .setAlpha(0.75)
-        //         .setDepth(20);
-        // });
+          const graphics = this.add
+            .graphics()
+            .setAlpha(0.75)
+            .setDepth(20);
+        });*/
     },
     update: function () {
-        if (this.gameObjects)
+				if (this.gameObjects)
         {
             this.gameObjects.forEach( function(element) {
                 element.update();
             });
         }
-
+				const camera = this.cameras.main;
+				this.events.emit('moveCamera', camera.scrollX, camera.scrollY);
     },
     tilesToPixels(tileX, tileY)
     {

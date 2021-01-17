@@ -103,23 +103,31 @@ export default class FillLevel {
     }
 
     setupText() {
-        // TODO: WHY isn't it working? :C
-        // this is painful
-        // it may appear (very rarely), but if so, you are very lucky to see the text in the game
-        // inspiration and reference: https://phaser.io/examples/v3/view/scenes/ui-scene#
-        this.scoreInfo = this.scene.add.text(0, 0, 'Score: 0', { font: '48px Arial', fill: '#000000' });
+        this.scoreInfo = this.scene.add.text(0, 0, 'Score: 0 (your) - 0 (opponent)', { font: '32px Arial', fill: '#ff0000' });
+				this.scoreInfo.setDepth(11);
         this.score = 0;
-        this.hpInfo = this.scene.add.text(10, 10, 'HP: 100', { font: '48px Arial', fill: '#ffffff' });
+				this.scoreNPC = 0;
+        this.hpInfo = this.scene.add.text(0, 25, 'HP: 100', { font: '32px Arial', fill: '#ff0000' });
         this.scene.events.on('addScore', () => {
             this.score += 10;
-            this.scoreInfo.setText('Score: ' + this.score);
-            // console.log("SHOULD set score to ", this.score);
+            this.scoreInfo.setText('Score: ' + this.score + ' (your) - ' + this.scoreNPC + ' (opponent)');
         }, this.scene);
-
+				
+				this.scene.events.on('addScoreNPC', () => {
+					this.scoreNPC += 10;
+  				this.scoreInfo.setText('Score: ' + this.score + ' (your) - ' + this.scoreNPC + ' (opponent)');
+				}, this.scene);
+				
         this.scene.events.on('changeHP', () => {
             this.hpInfo.setText('HP: ' + this.scene.player.hp);
-            // console.log("SHOULD set HP to ", this.scene.player.hp);
         }, this.scene);
+				
+				this.scene.events.on('moveCamera', (x,y) => {
+					this.scoreInfo.setX(x);
+					this.scoreInfo.setY(y);
+					this.hpInfo.setX(x);
+					this.hpInfo.setY(y + 30);
+				}, this.scene);
     }
 
     initGroups() {
@@ -270,6 +278,7 @@ export default class FillLevel {
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, slime.isEnemyClose, SlimeStates.Attacking));
 
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, slime.canWander, SlimeStates.Searching));
+						slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, () => slime.canChangeDirect, SlimeStates.Searching));
 
             slime.stateTable.addState(new StateTableRow(SlimeStates.Attacking, () => !slime.isEnemyClose(), SlimeStates.Pursuing));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, () => !slime.isEnemyAround(), SlimeStates.Searching));
