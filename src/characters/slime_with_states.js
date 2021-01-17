@@ -51,15 +51,12 @@ export default class SlimeWithStates extends Slime {
     }
 
     updateVelocity() {
-        if (this.state === SlimeStates.Jumping) {
-            this.wantToJump = true;
-        } else {
-                this.wantToJump = false;
-        }
+        // if (this.state === SlimeStates.Jumping) {
+        //     this.wantToJump = true;
+        // } else {
+        //         this.wantToJump = false;
+        // }
         const dir = this.steerings[this.state].calculateImpulse();
-        if (!dir) {
-            debugger
-        }
         this.body.setVelocityX(dir.x);
         this.body.setVelocityY(dir.y);
     }

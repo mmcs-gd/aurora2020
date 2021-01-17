@@ -108,6 +108,7 @@ export default class FillLevel {
         this.score = 0;
         this.scoreNPC = 0;
         this.hpInfo = this.scene.add.text(0, 25, 'HP: 100', { font: '32px Arial', fill: '#ff0000' });
+        this.hpInfo.setDepth(11);
         this.scene.events.on('addScore', () => {
             this.scoreInfo.setText('Score: ' + this.scene.player.score + ' (your) - ' + this.scene.npc.score + ' (opponent)');
         }, this.scene);
@@ -244,17 +245,20 @@ export default class FillLevel {
             slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, () => slime.isDead, SlimeStates.Dead));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, () => slime.isDead, SlimeStates.Dead));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Attacking, () => slime.isDead, SlimeStates.Dead));
+            slime.stateTable.addState(new StateTableRow(SlimeStates.Running, () => slime.isDead, SlimeStates.Dead));
+            
 
             slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, slime.isEnemyFiring, SlimeStates.Running));
-            slime.stateTable.addState(new StateTableRow(SlimeStates.Jumping, slime.isEnemyFiring, SlimeStates.Running));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Attacking, slime.isEnemyFiring, SlimeStates.Running));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, slime.isEnemyFiring, SlimeStates.Running));
 
             slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, slime.isEnemyAround, SlimeStates.Pursuing));
-            slime.stateTable.addState(new StateTableRow(SlimeStates.Jumping, slime.isEnemyAround, SlimeStates.Pursuing));
 
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, slime.isEnemyClose, SlimeStates.Attacking));
 
+            slime.stateTable.addState(new StateTableRow(SlimeStates.Running, slime.canWander, SlimeStates.Searching));
+            slime.stateTable.addState(new StateTableRow(SlimeStates.Running, slime.isEnemyClose, SlimeStates.Pursuing));
+            
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, slime.canWander, SlimeStates.Searching));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, () => slime.canChangeDirect, SlimeStates.Searching));
 
