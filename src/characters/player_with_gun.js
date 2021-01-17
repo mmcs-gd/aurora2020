@@ -24,7 +24,7 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
 
         this.lastTimeFired = 0;
 
-        scene.input.on('pointermove', pointer => this._onPointerMove(pointer));
+        scene.input.on('pointermove', pointer => this._onPointerMove(pointer, scene));
     }
 
     get isFiring() {
@@ -32,7 +32,7 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
         return (now - this.lastTimeFired) < 1000;
     }
 
-    _onPointerMove(pointer) {
+    _onPointerMove(pointer, scene) {
         // console.log("set angle")
         // console.log("this", {x: this.x, y: this.y})
         // console.log("gun", { x: this.gun.x, y :this.gun.y});
@@ -42,8 +42,8 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
             Phaser.Math.Angle.Between(
                 this.x + this.gun.x,
                 this.y + this.gun.y,
-                pointer.x,
-                pointer.y
+                pointer.x + scene.cameras.main.scrollX,
+                pointer.y + scene.cameras.main.scrollY
             )
         )
     }

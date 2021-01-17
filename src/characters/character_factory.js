@@ -101,14 +101,14 @@ export default class CharacterFactory {
                 bullet.setActive(false);
             });
         }
-
+        const context = this;
         this.scene.input.on('pointerdown', (pointer) => {
             const {x, y} = character.bulletStartingPoint
 
             character.lastTimeFired = (new Date()).getTime();
 
-            const vx = pointer.x - x
-            const vy = pointer.y - y
+            const vx = pointer.x + context.scene.cameras.main.scrollX - x
+            const vy = pointer.y + context.scene.cameras.main.scrollY - y
 
             const BULLET_SPEED = 400
             const mult = BULLET_SPEED / Math.sqrt(vx*vx + vy*vy)            
