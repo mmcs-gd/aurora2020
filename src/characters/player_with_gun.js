@@ -43,8 +43,8 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
             Phaser.Math.Angle.Between(
                 this.x + this.gun.x,
                 this.y + this.gun.y,
-                pointer.x,
-                pointer.y
+                pointer.x + this.scene.cameras.main.scrollX,
+                pointer.y + this.scene.cameras.main.scrollY
             )
         )
     }
@@ -99,14 +99,8 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
     }
 
     updateAnimation() {
-        // TODO: Fix the gun
-        // Now it's not making a full circle as expected, it gets stuck
-        // Some rare time it magically works, but I have no idea why
         try {
-            // TODO: There is no such animation,
-            // so there are hundreds of errors in the console
-            // need to ask about it
-            const animations = this.animationSets.get('Walk');
+            const animations = this.animationSets.get('WalkWithGun');
             const animsController = this.character.anims;
             const angle = this.viewDirectionAngle
 
@@ -150,6 +144,8 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite
     {
         this.body.reset(x, y);
         this.body.mass = 3;
+
+        this.setDepth(11);
 
         this.setActive(true);
         this.setVisible(true);
