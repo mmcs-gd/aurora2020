@@ -6,6 +6,7 @@ export default class SlimeWithStates extends Slime {
         super(scene, x, y, name, frame);
         scene.physics.world.enable(this);
         scene.add.existing(this);
+        this.setDepth(5);
         this.maxSpeed = 30;
         this.state = initialState;
         

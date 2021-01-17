@@ -2,9 +2,7 @@ import Vector2 from "phaser/src/math/Vector2";
 
 export default class NpcWithStates extends Phaser.GameObjects.Container {
     constructor(scene, x, y, characterSpriteName, gunSpriteName, initialState) {
-        super(scene, x, y);
-        console.log("scene", this.scene)
-            
+        super(scene, x, y);            
         this.setSize(31, 31);
         scene.physics.world.enable(this);
         this.body.setCollideWorldBounds(true);
@@ -17,6 +15,7 @@ export default class NpcWithStates extends Phaser.GameObjects.Container {
         this.add(this.gun)
 
         this.hp = 100;
+        this.score = 0;
         this.radius = 100;
         this.groupId = 1;
 
@@ -143,6 +142,11 @@ export default class NpcWithStates extends Phaser.GameObjects.Container {
         this.hp += value;
         this.scene.events.emit('changeHP');
     }
+    
+    addScore(value) {
+        this.score += value;
+        console.log("npc score", this.score)
+    }
 
     get canAttack() {
         const now = (new Date()).getTime();
@@ -161,7 +165,7 @@ export default class NpcWithStates extends Phaser.GameObjects.Container {
 
             const BULLET_SPEED = 400
             const mult = BULLET_SPEED / Math.sqrt(vx*vx + vy*vy)            
-            this.scene.bullets.fireBullet(x, y, vx * mult, vy * mult);
+            this.scene.bullets.fireBullet(x, y, vx * mult, vy * mult, this);
         }
     }
 }

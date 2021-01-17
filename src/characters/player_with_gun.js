@@ -19,6 +19,7 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
         this.behaviuors = [];
         this.steerings = [];
         this.hp = 100;
+        this.score = 0;
         this.radius = 100;
         this.groupId = 0;
 
@@ -66,6 +67,11 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
     addHP(value) {
         this.hp += value;
         this.scene.events.emit('changeHP');
+    }
+
+    addScore(value) {
+        this.score += value;
+        console.log("player score", this.score)
     }
 
     get bulletStartingPoint() {
@@ -173,12 +179,13 @@ export class Bullets extends Phaser.Physics.Arcade.Group
         });
     }
 
-    fireBullet(x, y, vx, vy)
+    fireBullet(x, y, vx, vy, character)
     {
         let bullet = this.getFirstDead(false);
 
         if (bullet)
         {
+            bullet.character = character;
             bullet.fire(x, y, vx, vy);
         }
     }

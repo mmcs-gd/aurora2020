@@ -112,12 +112,12 @@ export default class CharacterFactory {
 
             const BULLET_SPEED = 400
             const mult = BULLET_SPEED / Math.sqrt(vx*vx + vy*vy)            
-            this.scene.bullets.fireBullet(x, y, vx * mult, vy * mult);
+            this.scene.bullets.fireBullet(x, y, vx * mult, vy * mult, character);
         });
     }
 
     buildPlayerCharacter(spriteSheetName, x, y, params = {}) {
-        const maxSpeed = 1000;
+        const maxSpeed = 100;
         let character;
         if (params.withGun) {
             character = new PlayerWithGun(this.scene, x, y, spriteSheetName, 'gun');

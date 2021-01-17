@@ -159,6 +159,7 @@ export default class TileMapper {
 		this.setCamera(groundLayer, collideObjectsLayer, upperObjectsLayer);
 		levelFiller.spawnNpc();
 		levelFiller.spawnMobs();
+		levelFiller.addObjects();
 
 		return { Ground: groundLayer, UpperFloor: upperFloorLayer, CollideObjects: collideObjectsLayer, UpperObjects: upperObjectsLayer };
 	}

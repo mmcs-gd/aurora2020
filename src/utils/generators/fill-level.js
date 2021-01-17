@@ -11,6 +11,7 @@ import Flee from '../../ai/steerings/flee';
 import Chase from '../../ai/steerings/chase';
 import RanawayFromObjects from '../../ai/steerings/ranaway_from_objects';
 import ChaseClosest from '../../ai/steerings/chaseClosest';
+import { Gold, Potion, Scroll } from '../../characters/interactive_objects';
 
 export default class FillLevel {
     constructor(tilemapper, groundLayer, collideLayer) {
@@ -64,6 +65,27 @@ export default class FillLevel {
         return true;
     }
 
+    checkFreeSpaceForObjects(x, y, objects, tries) {
+        if (x < 0 || y < 0 || x > this.map.length || x > this.map[0].length) {
+            return false;
+        }
+        if (!this.checkFreeSpace(x, y)) {
+            return false;
+        }
+        const characters = [this.scene.player, ...this.scene.npcs.children.entries];
+        for (const c of characters) {
+            if (this.calcDistance({ x, y }, c.body) < 20) {
+                return false;
+            }    
+        }
+        for (const o of objects) {
+            if (tries < 10 && this.calcDistance({ x, y }, o) < 20) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     setPlayer() {
         // randomize player position
         let playerX = 10, playerY = 10;
@@ -105,7 +127,7 @@ export default class FillLevel {
         this.scene.npcs = this.scene.physics.add.group();
         this.scene.potions = this.scene.physics.add.group();
         this.scene.gold = this.scene.physics.add.group();
-
+        this.scene.scrolls = this.scene.physics.add.group();
     }
 
     spawnMobs() {
@@ -118,7 +140,7 @@ export default class FillLevel {
             addSlimesConditions: this.addSlimesConditions()
         };
 
-        const slimesAmount = 50;
+        const slimesAmount = 30;
         for (let i = 0; i < slimesAmount; i++) {
             let x = Phaser.Math.RND.between(0, this.map.length);
             let y = Phaser.Math.RND.between(0, this.map[0].length);
@@ -156,6 +178,9 @@ export default class FillLevel {
             this.scene.physics.add.collider(this.scene.bullets, slimes, (bullet, slime) => {
                 if (bullet.active) {
                     slime.damage(this.scene);
+                    if (slime.isDead) {
+                        bullet.character.addScore(10);
+                    }
                     bullet.setActive(false);
                     bullet.setVisible(false);
                 }
@@ -168,7 +193,7 @@ export default class FillLevel {
         const npcs = this.scene.npcs.children.entries;
         return function (slime) {
             slime.isEnemyFiring = function () {
-                const enemies = [that.scene.player];
+                const enemies = [that.scene.player, ...npcs];
                 // add other if needed
 
                 // TODO: Something is broken here, need to fix
@@ -190,7 +215,7 @@ export default class FillLevel {
 
             slime.isEnemyClose = function () {
                 const enemies = [that.scene.player,
-                    // ...npcs
+                    ...npcs
                 ];
                 // add other if needed
 
@@ -205,7 +230,7 @@ export default class FillLevel {
             };
             slime.isEnemyAround = function () {
                 const enemies = [that.scene.player,
-                    // ...npcs
+                    ...npcs
                 ];
                 // add other if needed
 
@@ -267,7 +292,7 @@ export default class FillLevel {
 
     spawnNpc() {
         const npcs = this.scene.npcs;
-
+        
         const params = {
             useStates: true,
             createStateTable: this.createNpcTable(),
@@ -288,8 +313,8 @@ export default class FillLevel {
             // x *= this.tilemapper.tilesize;
             // y *= this.tilemapper.tilesize;
 
-            let x = this.scene.player.x + 10;
-            let y = this.scene.player.y + 10;
+            let x = this.scene.player.x;
+            let y = this.scene.player.y;
 
 
             const npc = this.scene.characterFactory.buildNPCCharacter('punk', x, y, params);
@@ -313,20 +338,15 @@ export default class FillLevel {
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.canAttackSlime, NpcStates.Attacking));
             npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, () => !npc.canAttackSlime() && npc.slimeIsCloser(), NpcStates.ChasingSlime));
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.slimeIsCloser, NpcStates.ChasingSlime));
+            npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.goldIsCloser, NpcStates.ChasingObject));
             
-            // npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.goldIsCloser, NpcStates.ChasingObject));
-            
-            // npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, !npc.canAttackSlime() && npc.goldIsCloser(), NpcStates.ChasingObject));
+            npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, () => !npc.canAttackSlime() && npc.goldIsCloser(), NpcStates.ChasingObject));
 
-            // npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.needToHeal, NpcStates.ChasingObject));
-            // npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, npc.needToHeal, NpcStates.ChasingObject));
-
-            // npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, npc.achievedObject, NpcStates.UseObject));
-            // npc.stateTable.addState(new StateTableRow(NpcStates.UseObject, npc.needToHeal, NpcStates.ChasingObject));
-            // npc.stateTable.addState(new StateTableRow(NpcStates.UseObject, () => !npc.needToHeal() && npc.slimeIsCloser(), NpcStates.ChasingSlime));
-            // npc.stateTable.addState(new StateTableRow(NpcStates.UseObject, () => !npc.needToHeal() && npc.goldIsCloser(), NpcStates.ChasingObject));
-
-
+            npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.needToHeal, NpcStates.ChasingObject));
+            npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, npc.needToHeal, NpcStates.ChasingObject));
+            npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, () => !npc.needToHeal() && npc.goldIsCloser(), NpcStates.ChasingObject));
+            npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, () => !npc.needToHeal() && npc.slimeIsCloser(), NpcStates.ChasingSlime));
+         
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, () => npc.isDead, NpcStates.Dead));
             npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, () => npc.isDead, NpcStates.Dead));
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, () => npc.isDead, NpcStates.Dead));
@@ -337,11 +357,10 @@ export default class FillLevel {
     initNpcSteerings() {
         const that = this;
         return function (npc) {
-            console.log(that)
             let steerings = {
                 [NpcStates.ChasingSlime]: new ChaseClosest(npc, that.scene.slimes.children.entries, 80),
                 [NpcStates.Attacking]: new Attack(npc, []),
-                [NpcStates.ChasingObject]: new ChaseClosest(npc, []) // there will be a group of potions or gold
+                [NpcStates.ChasingObject]: new ChaseClosest(npc, [])
             };
             npc.steerings = steerings;
         }
@@ -350,45 +369,25 @@ export default class FillLevel {
     addNpcConditions() {
         const that = this;
         return function (npc) {
-            /*
-            
-            slimeIsCloser:
-                find nearest gold
-                find nearest slime
-
-                choose what is closer
-                if slime => return true, set chasing target to slime 
-                set state to chasing slime
-
-            goldIsCloser:
-                find nearest gold
-                find nearest slime
-
-                choose what is closer
-                if gold => return true, set chasing target to gold
-                set state to chasing object
-
-            
-            */
             npc.slimeIsCloser = function () {
                 const slime = ChaseClosest.findNearObject(npc, that.scene.slimes.children.entries);
-                const gold = ChaseClosest.findNearObject(npc, that.scene.gold.children.entries);
+                const objects = [...that.scene.gold.children.entries, ...that.scene.scrolls.children.entries];
+                const object = ChaseClosest.findNearObject(npc, objects);
 
                 if (!slime) {
+                    npc.target = null;
                     return false;
                 }
 
-                if (!gold) {
-                    // it should be set already
-                    // npc.steerings[NpcStates.ChasingSlime].objects = [slime];
+                if (!object) {
                     npc.target = slime;
                     return true;
                 }
 
                 const d1 = ChaseClosest.calculateDistance(npc, slime);
-                const d2 = ChaseClosest.calculateDistance(npc, gold);
+                const d2 = ChaseClosest.calculateDistance(npc, object);
                 if (d1 <= d2) {
-                    // npc.steerings[NpcStates.ChasingSlime].objects = [slime];
+                    npc.target = slime;
                     return true;
                 }
                 return false;
@@ -396,27 +395,26 @@ export default class FillLevel {
 
             npc.goldIsCloser = function () {
                 const slime = ChaseClosest.findNearObject(npc, that.scene.slimes.children.entries);
-                const gold = ChaseClosest.findNearObject(npc, that.scene.gold.children.entries);
+                const objects = [...that.scene.gold.children.entries, ...that.scene.scrolls.children.entries];
+                const object = ChaseClosest.findNearObject(npc, objects);
 
-                if (!gold) {
+                if (!object) {
+                    npc.target = null;
                     return false;
                 }
 
                 if (!slime) {
-                    // i can set the whole array of golds, but do i have to?
-                    // npc.steerings[NpcStates.ChasingObject].objects = [gold];
-                    npc.steerings[NpcStates.ChasingObject].objects = that.scene.gold.children.entries;
-                    npc.target = gold;
+                    npc.steerings[NpcStates.ChasingObject].objects = objects;
+                    npc.target = object;
 
                     return true;
                 }
 
-                const d1 = ChaseClosest.calculateDistance(npc, gold);
+                const d1 = ChaseClosest.calculateDistance(npc, object);
                 const d2 = ChaseClosest.calculateDistance(npc, slime);
                 if (d1 <= d2) {
-                    // npc.steerings[NpcStates.ChasingObject].objects = [gold];
-                    npc.steerings[NpcStates.ChasingObject].objects = that.scene.gold.children.entries;
-                    npc.target = gold;
+                    npc.steerings[NpcStates.ChasingObject].objects = objects;
+                    npc.target = object;
                     return true;
                 }
                 return false;
@@ -424,9 +422,6 @@ export default class FillLevel {
 
             npc.canAttackSlime = function () {
                 const canAttack = npc.target !== null && ChaseClosest.calculateDistance(npc, npc.target) <= 80;
-                // if (npc.target) {
-                //     const d = ChaseClosest.calculateDistance(npc, npc.target)
-                // }
                 if (canAttack) {
                     npc.steerings[NpcStates.Attacking].objects = [npc.target];
                 }
@@ -442,5 +437,108 @@ export default class FillLevel {
                 return needToHeal;
             }
         }
+    }
+
+    getAllObjects() {
+        const gold = this.scene.gold;
+        const potions = this.scene.potions;
+        const scrolls = this.scene.scrolls;
+        return [...gold.children.entries, ...potions.children.entries, ...scrolls.children.entries];
+    }
+
+    addObjects() {
+        const gold = this.scene.gold;
+        const potions = this.scene.potions;
+        const scrolls = this.scene.scrolls;
+        
+        //#region --- GOLD ---
+        const goldAmount = 10;
+        for (let i = 0; i < goldAmount; i++) {
+            let tries = 0;
+            let x = Phaser.Math.RND.between(0, this.map.length);
+            let y = Phaser.Math.RND.between(0, this.map[0].length);
+
+            while (!this.checkFreeSpaceForObjects(x, y, this.getAllObjects(), tries)) {
+                x = Phaser.Math.RND.between(0, this.map.length);
+                y = Phaser.Math.RND.between(0, this.map[0].length);
+                tries += 1;
+            }
+            // if (tries > 10) {
+            //     break;
+            // }
+
+            x *= this.tilemapper.tilesize;
+            y *= this.tilemapper.tilesize;
+
+            const g = new Gold(this.scene, x, y);
+            gold.add(g);
+        }
+        this.scene.physics.add.collider(this.scene.player, gold, (player, g) => {
+            g.interact(player);
+        });
+        this.scene.physics.add.collider(this.scene.npcs, gold, (npc, g) => {
+            g.interact(npc);
+        });
+        
+        //#endregion
+        
+        //#region --- SCROLLS ---
+        const scrollsAmount = 10;
+        for (let i = 0; i < scrollsAmount; i++) {
+            let tries = 0;
+            let x = Phaser.Math.RND.between(0, this.map.length);
+            let y = Phaser.Math.RND.between(0, this.map[0].length);
+
+            while (tries < 10 && !this.checkFreeSpaceForObjects(x, y, this.getAllObjects(), tries)) {
+                x = Phaser.Math.RND.between(0, this.map.length);
+                y = Phaser.Math.RND.between(0, this.map[0].length);
+                tries += 1;
+            }
+            // if (tries > 10) {
+            //     break;
+            // }
+            x *= this.tilemapper.tilesize;
+            y *= this.tilemapper.tilesize;
+
+            const s = new Scroll(this.scene, x, y);
+            scrolls.add(s);
+        }
+        this.scene.physics.add.collider(this.scene.player, scrolls, (player, scroll) => {
+            scroll.interact(player);
+        });
+        this.scene.physics.add.collider(this.scene.npcs, scrolls, (npc, scroll) => {
+            scroll.interact(npc);
+        });
+        //#endregion
+
+        //#region --- POTIONS ---
+        const potionAmount = 30;
+        for (let i = 0; i < potionAmount; i++) {
+            let tries = 0;
+            let x = Phaser.Math.RND.between(0, this.map.length);
+            let y = Phaser.Math.RND.between(0, this.map[0].length);
+
+            while (tries < 20 && !this.checkFreeSpaceForObjects(x, y, this.getAllObjects(), tries)) {
+                x = Phaser.Math.RND.between(0, this.map.length);
+                y = Phaser.Math.RND.between(0, this.map[0].length);
+                tries += 1;
+            }
+
+            // if (tries > 10) {
+            //     break;
+            // }
+            x *= this.tilemapper.tilesize;
+            y *= this.tilemapper.tilesize;
+
+            const p = new Potion(this.scene, x, y);
+            potions.add(p);
+        }
+        this.scene.physics.add.collider(this.scene.player, potions, (player, potion) => {
+            potion.interact(player);
+        });
+        this.scene.physics.add.collider(this.scene.npcs, potions, (npc, potion) => {
+            potion.interact(npc);
+        });
+        //#endregion
     }
 }
