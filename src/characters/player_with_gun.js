@@ -71,7 +71,7 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
 
     addScore(value) {
         this.score += value;
-        console.log("player score", this.score)
+        this.scene.events.emit('addScore');
     }
 
     get bulletStartingPoint() {

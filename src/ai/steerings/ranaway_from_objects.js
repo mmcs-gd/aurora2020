@@ -28,11 +28,11 @@ export default class RanawayFromObjects extends Steering {
 
     calculateImpulse() {
         if (this.objects.length === 0) {
-            return {objects: null, velocity: null};
+            return new Vector2(0, 0);
         }
         const nearestObjects = RanawayFromObjects.findNearObjects(this.owner.body, this.objects);
         if (nearestObjects.length === 0) {
-            return {objects: null, velocity: null};
+            return new Vector2(0, 0);
         }
         let desiredVelocity = new Vector2(0,0);
         for (const m of nearestObjects) {

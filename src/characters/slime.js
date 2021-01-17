@@ -95,10 +95,6 @@ export default class Slime extends Phaser.Physics.Arcade.Sprite{
         if (this.hp <= 0) {
             this.nextLocation = null;
             this.destroy();
-            if (scene) {
-                scene.events.emit('addScore');
-            }
-
         }
     }
 }
