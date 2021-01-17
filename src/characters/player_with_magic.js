@@ -18,6 +18,7 @@ export class PlayerWithMagic extends Phaser.GameObjects.Container {
         this.behaviuors = [];
         this.steerings = [];
         this.hp = 100;
+        this.score = 0;
         this.radius = 100;
         this.groupId = 0;
 
@@ -25,17 +26,12 @@ export class PlayerWithMagic extends Phaser.GameObjects.Container {
     }
 
     _onPointerMove(pointer) {
-        // console.log("set angle")
-        // console.log("this", {x: this.x, y: this.y})
-        // console.log("gun", { x: this.gun.x, y :this.gun.y});
-        // console.log("pointer", { x: pointer.x, y : pointer.y});
-        
         this.setViewDirectionAngle(
             Phaser.Math.Angle.Between(
                 this.x + this.gun.x,
                 this.y + this.gun.y,
-                pointer.x,
-                pointer.y
+                pointer.x + this.scene.cameras.main.scrollX,
+                pointer.y + this.scene.cameras.main.scrollY
             )
         )
     }
@@ -55,6 +51,11 @@ export class PlayerWithMagic extends Phaser.GameObjects.Container {
         this.scene.events.emit('changeHP');
     }
 
+    addScore(value) {
+        this.score += value;
+        this.scene.events.emit('addScore');
+    }
+    
     update() {
         this.behaviuors.forEach(x => x.update());
         this.updateAnimation();
@@ -87,7 +88,7 @@ export class PlayerWithMagic extends Phaser.GameObjects.Container {
     updateAnimation() {
         debugger
         try {
-            const animations = this.animationSets.get('WalkWithGun');
+            const animations = this.animationSets.get('Walk');
             const animsController = this.character.anims;
             const angle = this.viewDirectionAngle
 
@@ -124,7 +125,7 @@ export class Spell extends Phaser.Physics.Arcade.Sprite
 {
     constructor (scene, x, y)
     {
-        super(scene, x, y, 'spell');
+        super(scene, x, y, 'spell2');
     }
 
     fire (x, y, vx, vy)
@@ -160,12 +161,13 @@ export class Spells extends Phaser.Physics.Arcade.Group
         });
     }
 
-    fireBullet(x, y, vx, vy)
+    fireBullet(x, y, vx, vy, character)
     {
         let bullet = this.getFirstDead(false);
 
         if (bullet)
         {
+            bullet.character = character;
             bullet.fire(x, y, vx, vy);
         }
     }

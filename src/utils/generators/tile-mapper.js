@@ -136,11 +136,11 @@ export default class TileMapper {
 				if (cell === config.BLANK) {
 					groundLayer.putTileAt(TILE_MAPPING.BLANK, x, y);
 				} else {
-					floorLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.FLOOR);
 					if (cell !== config.FLOOR) {
 						const type = digitToType[cell];
 						groundLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.WALL[type]);
 					} else {
+						floorLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.FLOOR);
 						//JEWELRY
 						this.putJewelry(x, y, upperFloorLayer, collideObjectsLayer, upperObjectsLayer);
 					}

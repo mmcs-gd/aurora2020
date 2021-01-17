@@ -154,10 +154,6 @@ export default class FillLevel {
             x *= this.tilemapper.tilesize;
             y *= this.tilemapper.tilesize;
 
-            // let x = this.scene.player.x + 10;
-            // let y = this.scene.player.y + 10;
-
-
             params.slimeType = Phaser.Math.RND.between(0, 4);
             const slime = this.scene.characterFactory.buildSlime(x, y, params);
             this.scene.gameObjects.push(slime);
@@ -194,13 +190,7 @@ export default class FillLevel {
         return function (slime) {
             slime.isEnemyFiring = function () {
                 const enemies = [that.scene.player, that.scene.npc];
-                // add other if needed
-
-                // TODO: Something is broken here, need to fix
-                // need to debug
-                // slimes are disappearing into the unknown and never come back
-                // when the player is shooting
-
+     
                 for (const enemy of enemies) {
                     const d = Math.sqrt((slime.x - enemy.x)*(slime.x - enemy.x) + (slime.y - enemy.y)*(slime.y - enemy.y));
                     if (d < 70 && enemy.isFiring) {

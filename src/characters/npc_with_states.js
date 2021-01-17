@@ -101,7 +101,7 @@ export default class NpcWithStates extends Phaser.GameObjects.Container {
 
     updateAnimation() {
         try {
-            const animations = this.animationSets.get('Walk');
+            const animations = this.animationSets.get('WalkWithGun');
             const animsController = this.character.anims;
             const angle = this.viewDirectionAngle
 
