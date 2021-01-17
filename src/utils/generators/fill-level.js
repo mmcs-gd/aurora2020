@@ -108,6 +108,7 @@ export default class FillLevel {
         this.score = 0;
         this.scoreNPC = 0;
         this.hpInfo = this.scene.add.text(0, 25, 'HP: 100', { font: '32px Arial', fill: '#ff0000' });
+        this.hpInfo.setDepth(11);
         this.scene.events.on('addScore', () => {
             this.scoreInfo.setText('Score: ' + this.scene.player.score + ' (your) - ' + this.scene.npc.score + ' (opponent)');
         }, this.scene);
@@ -154,10 +155,6 @@ export default class FillLevel {
             x *= this.tilemapper.tilesize;
             y *= this.tilemapper.tilesize;
 
-            // let x = this.scene.player.x + 10;
-            // let y = this.scene.player.y + 10;
-
-
             params.slimeType = Phaser.Math.RND.between(0, 4);
             const slime = this.scene.characterFactory.buildSlime(x, y, params);
             this.scene.gameObjects.push(slime);
@@ -194,13 +191,7 @@ export default class FillLevel {
         return function (slime) {
             slime.isEnemyFiring = function () {
                 const enemies = [that.scene.player, that.scene.npc];
-                // add other if needed
-
-                // TODO: Something is broken here, need to fix
-                // need to debug
-                // slimes are disappearing into the unknown and never come back
-                // when the player is shooting
-
+     
                 for (const enemy of enemies) {
                     const d = Math.sqrt((slime.x - enemy.x)*(slime.x - enemy.x) + (slime.y - enemy.y)*(slime.y - enemy.y));
                     if (d < 70 && enemy.isFiring) {
@@ -254,17 +245,20 @@ export default class FillLevel {
             slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, () => slime.isDead, SlimeStates.Dead));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, () => slime.isDead, SlimeStates.Dead));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Attacking, () => slime.isDead, SlimeStates.Dead));
+            slime.stateTable.addState(new StateTableRow(SlimeStates.Running, () => slime.isDead, SlimeStates.Dead));
+            
 
             slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, slime.isEnemyFiring, SlimeStates.Running));
-            slime.stateTable.addState(new StateTableRow(SlimeStates.Jumping, slime.isEnemyFiring, SlimeStates.Running));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Attacking, slime.isEnemyFiring, SlimeStates.Running));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, slime.isEnemyFiring, SlimeStates.Running));
 
             slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, slime.isEnemyAround, SlimeStates.Pursuing));
-            slime.stateTable.addState(new StateTableRow(SlimeStates.Jumping, slime.isEnemyAround, SlimeStates.Pursuing));
 
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, slime.isEnemyClose, SlimeStates.Attacking));
 
+            slime.stateTable.addState(new StateTableRow(SlimeStates.Running, slime.canWander, SlimeStates.Searching));
+            slime.stateTable.addState(new StateTableRow(SlimeStates.Running, slime.isEnemyClose, SlimeStates.Pursuing));
+            
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, slime.canWander, SlimeStates.Searching));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, () => slime.canChangeDirect, SlimeStates.Searching));
 

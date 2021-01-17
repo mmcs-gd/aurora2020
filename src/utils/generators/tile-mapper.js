@@ -144,6 +144,7 @@ export default class TileMapper {
 							upperObjectsLayer.weightedRandomize(x,y,1,1,TILE_MAPPING.WALL.INNER_TOP_LEFT);
 						}
 					} else {
+						floorLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.FLOOR);
 						//JEWELRY
 						floorLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.FLOOR);
 						this.putJewelry(x, y, upperFloorLayer, collideObjectsLayer, upperObjectsLayer);
