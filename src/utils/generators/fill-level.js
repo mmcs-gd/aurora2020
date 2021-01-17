@@ -110,7 +110,19 @@ export default class FillLevel {
         this.hpInfo = this.scene.add.text(0, 25, 'HP: 100', { font: '32px Arial', fill: '#ff0000' });
         this.hpInfo.setDepth(11);
         this.scene.events.on('addScore', () => {
-            this.scoreInfo.setText('Score: ' + this.scene.player.score + ' (your) - ' + this.scene.npc.score + ' (opponent)');
+            const playerScore = this.scene.player.score;
+            const npcScore = this.scene.npc.score;
+            
+            this.scoreInfo.setText('Score: ' + playerScore + ' (your) - ' + npcScore + ' (opponent)');
+        
+            if (this.scene.slimes.children.entries.length === 0) {
+                if (playerScore > npcScore) {
+                    alert(`Все желешки истреблены! \nВы самый кровожадный истребитель желе, примите поздравления\n\nВаш счёт: ${playerScore}, счёт противника: ${npcScore}`);
+                } else {
+                    alert(`Все желешки истреблены! \nВашему сопернику досталось больше... Может, в следующий раз?\n\nВаш счёт: ${playerScore}, счёт противника: ${npcScore}`);
+                }
+                this.scene.stopGame();
+            }
         }, this.scene);
 
         this.scene.events.on('changeHP', () => {

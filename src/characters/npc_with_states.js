@@ -96,6 +96,8 @@ export default class NpcWithStates extends Phaser.GameObjects.Container {
             }
             this.updateVelocity();
             this.updateAnimation();
+        } else {
+            this.destroy();
         }
     }
 

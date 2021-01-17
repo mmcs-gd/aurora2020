@@ -33,6 +33,10 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
         return (now - this.lastTimeFired) < 1000;
     }
 
+    get isDead() {
+        return this.hp <= 90;
+    }
+
     _onPointerMove(pointer) {
         // console.log("set angle")
         // console.log("this", {x: this.x, y: this.y})
@@ -62,6 +66,10 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
     subtractHP(value) {
         this.hp -= value;
         this.scene.events.emit('changeHP');
+        if (this.isDead) {
+            alert('Вы погибли!');
+            this.scene.stopGame();
+        }
     }
 
     addHP(value) {

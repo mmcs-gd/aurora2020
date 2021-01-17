@@ -132,6 +132,9 @@ let TatarovaShkuro = new Phaser.Class({
     tilesToPixels(tileX, tileY)
     {
         return [tileX*this.tileSize, tileY*this.tileSize];
+    },
+    stopGame() {
+        this.scene.stop();
     }
 });
 
