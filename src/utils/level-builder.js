@@ -57,7 +57,6 @@ export default function buildLevel(width, height, maxRooms, scene){
 
         // init punk(enemy) in every room
         for(let i = 1; i < rooms.length; ++i){
-            console.log(rooms[i]);
             scene.npc = scene.characterFactory.buildCharacter('punk',
                 (rooms[i].startCenter.x + 2)*32,
                 (rooms[i].startCenter.y + 2)*32);
@@ -66,12 +65,11 @@ export default function buildLevel(width, height, maxRooms, scene){
             scene.physics.add.collider(scene.npc, groundLayer);
             scene.physics.add.collider(scene.npc, stuffLayer);
             scene.physics.add.collider(scene.npc, outsideLayer);
-            scene.physics.add.collider(scene.npc, scene.player, scene.onNpcPlayerCollide.bind(scene));
+            scene.physics.add.collider(scene.npc, scene.player, scene.runLoseScene.bind(scene));
         }
 
         // Goal of game is find YELLOW npc
         const index = Phaser.Math.RND.between(1, rooms.length-1);
-        console.log(index);
         scene.goal = scene.characterFactory.buildCharacter('yellow',
             rooms[index].startCenter.x*32,
             rooms[index].startCenter.y*32);
@@ -79,7 +77,7 @@ export default function buildLevel(width, height, maxRooms, scene){
         scene.physics.add.collider(scene.goal, groundLayer);
         scene.physics.add.collider(scene.goal, stuffLayer);
         scene.physics.add.collider(scene.goal, outsideLayer);
-        scene.physics.add.collider(scene.goal, scene.player, scene.winGame.bind(scene));
+        scene.physics.add.collider(scene.goal, scene.player, scene.runWinScene.bind(scene));
     }
 
 

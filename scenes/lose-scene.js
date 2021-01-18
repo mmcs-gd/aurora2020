@@ -12,12 +12,12 @@ import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 import Aggressive from "../src/ai/aggressive";
 
-let FinalPotapovScene = new Phaser.Class({
+let LoseScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
     initialize: function StartingScene() {
-        Phaser.Scene.call(this, {key: 'FinalPotapovScene'});
+        Phaser.Scene.call(this, {key: 'LoseScene'});
     },
     characterFrameConfig: {frameWidth: 31, frameHeight: 31},
     slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
@@ -36,25 +36,10 @@ let FinalPotapovScene = new Phaser.Class({
     },
 
     create: function () {
-        this.gameObjects = [];
-        this.characterFactory = new CharacterFactory(this);
-        this.level++;
-        this.hasPlayerReachedStairs = false;
-        let width = 30; let height = 30; let maxRooms = 100;
-        const layers = buildLevel(width, height, maxRooms, this);
-        this.groundLayer = layers["Ground"];
-        this.stuffLayer = layers["Stuff"];
-        this.outsideLayer = layers["Outside"];
-
-        this.input.keyboard.once("keydown_D", event => {
-            // Turn on physics debugging to show player's hitbox
-            this.physics.world.createDebugGraphic();
-
-            const graphics = this.add
-                .graphics()
-                .setAlpha(0.75)
-                .setDepth(20);
-        });
+        this.cameras.main.setBackgroundColor('#444444')
+        let text = "Вы проиграли. \n Вас поймали панки :(\nESC для выхода в меню сцен.";
+        let style = { font: "50px Arial", fill: "#441188", align: "center" };
+        let t = this.add.text(this.scale.width/9, this.scale.height/4, text, style);
     },
 
     update: function () {
@@ -67,19 +52,6 @@ let FinalPotapovScene = new Phaser.Class({
     tilesToPixels(tileX, tileY) {
         return [tileX*this.tileSize, tileY*this.tileSize];
     },
-    runWinScene(){
-        this.game.scene.scenes[0].scene.pause(this.game.scene.scenes[0]._runningScene);
-        this.game.scene.scenes[0].scene.stop(this.game.scene.scenes[0]._runningScene);
-        this.game.scene.scenes[0]._runningScene = 'WinScene';
-        this.game.scene.scenes[0].scene.run('WinScene');
-
-    },
-    runLoseScene(){
-        this.game.scene.scenes[0].scene.pause(this.game.scene.scenes[0]._runningScene);
-        this.game.scene.scenes[0].scene.stop(this.game.scene.scenes[0]._runningScene);
-        this.game.scene.scenes[0]._runningScene = 'LoseScene';
-        this.game.scene.scenes[0].scene.run('LoseScene');
-    }
 });
 
-export default FinalPotapovScene;
+export default LoseScene;
