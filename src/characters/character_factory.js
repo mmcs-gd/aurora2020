@@ -104,7 +104,6 @@ export default class CharacterFactory {
     }
 
     buildSlime(x, y, params) {
-
         const slimeType = params.slimeType;
         let slime;
         if (params.useSteering) {
