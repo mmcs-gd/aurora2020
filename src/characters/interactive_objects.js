@@ -1,7 +1,7 @@
 export class Potion extends Phaser.Physics.Arcade.Sprite
 {
     constructor(scene, x, y) {
-        super(scene, x, y, 'potion');
+        super(scene, x+16, y+16, 'potion');
         scene.physics.world.enable(this);
         scene.add.existing(this);
         this.setDepth(1);
@@ -17,11 +17,11 @@ export class Potion extends Phaser.Physics.Arcade.Sprite
 export class Scroll extends Phaser.Physics.Arcade.Sprite
 {
     constructor(scene, x, y) {
-        super(scene, x, y, 'scrolls');
+        super(scene, x+16, y+16, 'scrolls');
         scene.physics.world.enable(this);
         scene.add.existing(this);
         this.setDepth(1);
-        this.value = 3;
+        this.value = 10;
     }
 
     interact(target) {
@@ -33,11 +33,11 @@ export class Scroll extends Phaser.Physics.Arcade.Sprite
 export class Gold extends Phaser.Physics.Arcade.Sprite
 {
     constructor(scene, x, y) {
-        super(scene, x, y, 'gold');
+        super(scene, x+16, y+16, 'gold');
         scene.physics.world.enable(this);
         scene.add.existing(this);
         this.setDepth(1);
-        this.value = 5;
+        this.value = 25;
     }
 
     interact(target) {

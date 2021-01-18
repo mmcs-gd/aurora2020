@@ -146,7 +146,6 @@ export default class TileMapper {
 					} else {
 						floorLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.FLOOR);
 						//JEWELRY
-						floorLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.FLOOR);
 						this.putJewelry(x, y, upperFloorLayer, collideObjectsLayer, upperObjectsLayer);
 					}
 				}
@@ -158,7 +157,7 @@ export default class TileMapper {
 		this.scene.upperObjectsLayer = upperObjectsLayer;
 		this.scene.upperFloorLayer = upperFloorLayer;
 
-		const levelFiller = new FillLevel(this, groundLayer, collideObjectsLayer);
+		const levelFiller = new FillLevel(this, groundLayer, collideObjectsLayer, upperObjectsLayer);
 		levelFiller.initGroups();
 		levelFiller.setPlayer();
 		this.setCamera(groundLayer, collideObjectsLayer, upperObjectsLayer);

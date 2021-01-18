@@ -14,10 +14,11 @@ import ChaseClosest from '../../ai/steerings/chaseClosest';
 import { Gold, Potion, Scroll } from '../../characters/interactive_objects';
 
 export default class FillLevel {
-    constructor(tilemapper, groundLayer, collideLayer) {
+    constructor(tilemapper, groundLayer, collideLayer, upperLayer) {
         this.tilemapper = tilemapper;
         this.groundLayer = groundLayer;
         this.collideLayer = collideLayer;
+				this.upperLayer = upperLayer;
         this.scene = tilemapper.scene;
         this.map = tilemapper.map;
     }
@@ -434,78 +435,70 @@ export default class FillLevel {
         const scrolls = this.scene.scrolls;
         return [...gold.children.entries, ...potions.children.entries, ...scrolls.children.entries];
     }
-
+		
+		countFloors(x,y){
+			let neigbors = [this.tileAt(x-1,y), this.tileAt(x,y-1), this.tileAt(x+1,y), this.tileAt(x,y+1)].filter(o => o === config.FLOOR);
+			return neigbors.length;
+		}
+		
+		countVoids(x,y){
+			let voids = [
+			  this.tileAt(x-1,y),
+				this.tileAt(x-1,y-1),
+				this.tileAt(x, y-1),
+				this.tileAt(x+1,y-1),
+				this.tileAt(x+1,y),
+				this.tileAt(x+1,y+1),
+				this.tileAt(x,y+1),
+				this.tileAt(x-1,y+1)
+			].filter(o => o !== config.FLOOR);
+			return voids.length;
+		}
+		
     addObjects() {
         const gold = this.scene.gold;
         const potions = this.scene.potions;
         const scrolls = this.scene.scrolls;
-
-        //#region --- GOLD ---
-        const goldAmount = 10;
-        for (let i = 0; i < goldAmount; i++) {
-            let tries = 0;
-            let x = Phaser.Math.RND.between(0, this.map.length);
-            let y = Phaser.Math.RND.between(0, this.map[0].length);
-
-            while (!this.checkFreeSpaceForObjects(x, y, this.getAllObjects(), tries)) {
-                x = Phaser.Math.RND.between(0, this.map.length);
-                y = Phaser.Math.RND.between(0, this.map[0].length);
-                tries += 1;
-            }
-            // if (tries > 10) {
-            //     break;
-            // }
-
-            x *= this.tilemapper.tilesize;
-            y *= this.tilemapper.tilesize;
-
-            const g = new Gold(this.scene, x, y);
-            gold.add(g);
-        }
-        this.scene.physics.add.collider(this.scene.player, gold, (player, g) => {
+				let x = 0; let y = 0;
+				for(let i = 0; i < this.map.length; ++i){
+					for(let j = 0; j < this.map[0].length; ++j){
+						x = i * this.tilemapper.tilesize;
+						y = j * this.tilemapper.tilesize;
+						if(this.map[i][j] === config.FLOOR && 
+						(this.countFloors(i,j) === 1)){ 
+						//|| this.countFloors(i,j) === 2 && this.countVoids(i,j) < 6 && this.countVoids(i,j) > 3)){
+							const g = new Gold(this.scene, x, y);
+							gold.add(g);
+						}
+						else if(this.map[i][j] === config.FLOOR && this.collideLayer.getTileAt(i,j-1) !== null
+						&& this.collideLayer.getTileAt(i-1,j-1) !== null && this.upperLayer.getTileAt(i,j-2) !== null
+						&& this.upperLayer.getTileAt(i-1, j-2) !== null){
+							scrolls.add(new Scroll(this.scene, x, y));
+							scrolls.add(new Scroll(this.scene, x - this.tilemapper.tilesize, y));
+						}
+					}
+				}
+				this.scene.physics.add.collider(this.scene.player, gold, (player, g) => {
             g.interact(player);
         });
         this.scene.physics.add.collider(this.scene.npc, gold, (npc, g) => {
             g.interact(npc);
         });
-
-        //#endregion
-
-        //#region --- SCROLLS ---
-        const scrollsAmount = 10;
-        for (let i = 0; i < scrollsAmount; i++) {
-            let tries = 0;
-            let x = Phaser.Math.RND.between(0, this.map.length);
-            let y = Phaser.Math.RND.between(0, this.map[0].length);
-
-            while (tries < 10 && !this.checkFreeSpaceForObjects(x, y, this.getAllObjects(), tries)) {
-                x = Phaser.Math.RND.between(0, this.map.length);
-                y = Phaser.Math.RND.between(0, this.map[0].length);
-                tries += 1;
-            }
-            // if (tries > 10) {
-            //     break;
-            // }
-            x *= this.tilemapper.tilesize;
-            y *= this.tilemapper.tilesize;
-
-            const s = new Scroll(this.scene, x, y);
-            scrolls.add(s);
-        }
-        this.scene.physics.add.collider(this.scene.player, scrolls, (player, scroll) => {
+				this.scene.physics.add.collider(this.scene.player, scrolls, (player, scroll) => {
             scroll.interact(player);
         });
         this.scene.physics.add.collider(this.scene.npc, scrolls, (npc, scroll) => {
             scroll.interact(npc);
         });
-        //#endregion
-
+				
+				
+				//?
         //#region --- POTIONS ---
         const potionAmount = 10;
         for (let i = 0; i < potionAmount; i++) {
             let tries = 0;
-            let x = Phaser.Math.RND.between(0, this.map.length);
-            let y = Phaser.Math.RND.between(0, this.map[0].length);
+            x = Phaser.Math.RND.between(0, this.map.length);
+            y = Phaser.Math.RND.between(0, this.map[0].length);
 
             while (tries < 20 && !this.checkFreeSpaceForObjects(x, y, this.getAllObjects(), tries)) {
                 x = Phaser.Math.RND.between(0, this.map.length);
@@ -513,9 +506,6 @@ export default class FillLevel {
                 tries += 1;
             }
 
-            // if (tries > 10) {
-            //     break;
-            // }
             x *= this.tilemapper.tilesize;
             y *= this.tilemapper.tilesize;
 
