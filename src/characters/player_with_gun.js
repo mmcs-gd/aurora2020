@@ -34,7 +34,7 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
     }
 
     get isDead() {
-        return this.hp <= 90;
+        return this.hp <= 0;
     }
 
     _onPointerMove(pointer) {

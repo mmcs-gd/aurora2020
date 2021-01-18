@@ -45,7 +45,9 @@ export default class SlimeWithStates extends Slime {
     attack(target) {
         if (this.canAttack) {
             this.lastTimeAttacked = (new Date()).getTime();
-            target.subtractHP(this.power);
+            if (target.active) {
+                target.subtractHP(this.power);
+            }
         }
     }
 
