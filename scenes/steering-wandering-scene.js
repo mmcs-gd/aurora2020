@@ -85,7 +85,6 @@ let SteeringWanderingScene = new Phaser.Class({
 			this.slimes.add(slime);
       this.physics.add.collider(slime, worldLayer);
     }
-		
 		const npc = this.characterFactory.buildNPCCharacter('blue', 200, 200, {steering: "wandering"});
     this.gameObjects.push(npc);
     this.physics.add.collider(npc, worldLayer);

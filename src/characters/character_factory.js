@@ -66,9 +66,9 @@ export default class CharacterFactory {
         return character;
     }
 
-    buildNpcCharacter(animation,spriteSheetName, x, y,params){
+    buildNpcCharacter(spriteSheetName, x, y,params){
         let character = new npc(this.scene,x,y,spriteSheetName,2,params.Steering)
-        character.animationSets = this.animationLibrary.get(animation);
+        character.animationSets = this.animationLibrary.get(spriteSheetName);
         return character;
     }
     buildPlayerCharacter(spriteSheetName, x, y) {
@@ -76,7 +76,7 @@ export default class CharacterFactory {
         character.maxSpeed = 100;
         character.setCollideWorldBounds(true);
         character.cursors = this.scene.input.keyboard.createCursorKeys();
-        character.animationSets = this.animationLibrary.get('aurora');
+        character.animationSets = this.animationLibrary.get(spriteSheetName);
         //todo: not here
       character.footstepsMusic = this.scene.sound.add('footsteps', {
           mute: false,
@@ -113,7 +113,7 @@ export default class CharacterFactory {
 		getSteerings(params, owner){
 			switch(params.steering){
 				case "wandering": 
-					return new Wandering(owner, params.target);
+					return new Wandering(owner, params.target,1,10,70,params.boundary);
 				case "arrival":
 					return new Arrival(owner, params.target);
 				default:

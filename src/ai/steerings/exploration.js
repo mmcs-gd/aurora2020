@@ -5,7 +5,7 @@ import Circle from 'phaser/src/geom/circle';
 const windowWidth = document.documentElement.clientWidth;
 
 
- class Exploration extends Steering {
+ export default class Exploration extends Steering {
      constructor(owner, objects, force = 1, isArrival = true,path = new Vector2(0.0)) {
          super(owner, objects, force);
          this.isArrival = isArrival;
@@ -42,7 +42,6 @@ const windowWidth = document.documentElement.clientWidth;
          const desiredVelocity = new Vector2(this.path.x-owner.x,this.path.y-owner.y)
          desiredVelocity.normalize().scale(25);
          return  desiredVelocity;
-
      }
  }
 

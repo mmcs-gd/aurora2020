@@ -10,15 +10,19 @@ import SteeringSeekScene from "./steering-seek-scene"
 import SteeringEvadeScene from './steering-evade-scene';
 import SteeringPursuitScene from './steering-pursuit-scene';
 import SteeringEvadeAndPursuitScene from './steering-evade-and-pursuit-scene';
+import generateLevelScene from "./generateLevelScene";
+import test from "./test";
 
 const scenes = [
-    ['StartingScene', StartingScene],
+    ['GenerateLevelScene', generateLevelScene],
+    ['test', test],
+
     ['SteeringEvadeScene', SteeringEvadeScene],
     ['SteeringPursuitScene', SteeringPursuitScene],
     ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
     ['SteeringSeekScene', SteeringSeekScene],
     ['SteeringWanderingScene', SteeringWanderingScene],
-		['SteeringArrivalScene', SteeringArrivalScene],
+    ['SteeringArrivalScene', SteeringArrivalScene],
     ['explorationAndShadowingScene', explorationAndShadowingScene]
 
 ];

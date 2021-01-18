@@ -3,6 +3,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
         super(scene, x, y, name, frame);
         scene.physics.world.enable(this);
         scene.add.existing(this);
+        this.hp = 3
+        this.kushCount = 0
+    }
+
+    get HP(){
+        return this.hp
+    }
+
+    set HP (newHP){
+        this.hp = newHP
     }
 
     update() {
@@ -28,7 +38,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
         this.updateAnimation();
     };
     updateAnimation() {
-        //console.log(this)
+        
         const animations = this.animationSets.get('Walk');
         const animsController = this.anims;
         const x = this.body.velocity.x;
