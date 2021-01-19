@@ -90,7 +90,7 @@ let TatarovaShkuro = new Phaser.Class({
         map = (new GeneratorLevel(width, height, config)).createMap();
         markedMap = (new MapLayout(map, width, height)).getMapLayout();
 				
-        const layers = (new TileMapper(markedMap, this, width, height, this.tileSize)).generateLevel();
+        (new TileMapper(markedMap, this, width, height, this.tileSize)).generateLevel();
         
         let grid = [];
         for(let y = 0; y < this.groundLayer.tilemap.height; y++){

@@ -10,16 +10,16 @@ class Shadowing extends Steering {
 
     calculateImpulse() {
 
-        const target = this.objects;
+        const target = this.objects[0];
         const owner = this.owner;
         let distance = Math.sqrt(Math.pow(target.x - owner.x, 2) + Math.pow(target.y - owner.y, 2));
         let desiredVelocity = new Vector2(target.x - owner.x, target.y - owner.y)
         desiredVelocity.normalize().scale(50);
-        if (distance >= 200) {
+        if (distance >= 100) {
             return desiredVelocity;
         }
 
-        if (distance <= 150) {
+        if (distance <= 50) {
             const newDesiredVelocity = new Vector2(-desiredVelocity.x, -desiredVelocity.y);
             newDesiredVelocity.normalize().scale(50);
             return newDesiredVelocity;
