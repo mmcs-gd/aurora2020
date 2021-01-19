@@ -1,5 +1,7 @@
-import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
-import menuBackgroundJson from '../assets/menu_background.json'
+//import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
+import tilemapPng from '../assets/tileset/Crystal_tileset.png'
+//import menuBackgroundJson from '../assets/menu_background.json'
+import menuBackgroundJson from '../assets/background.json'
 
 
 import StartingScene from "./starting-scene";
@@ -27,7 +29,7 @@ const scenes = [
   //  ['RealLevelScene', RealLevelScene],
   //  ['SteeringRudnevScene', SteeringRudnevScene],
   //  [ 'EffectsScene', EffectsScene],
-    ['SlimeRushScene', SlimeRushScene],
+  //  ['SlimeRushScene', SlimeRushScene],
   //  ['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
   //  ['SteeringPursuitScene', SteeringPursuitScene],
   //  ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
@@ -37,7 +39,7 @@ const scenes = [
   //  ['MinerScene', MinerScene],
   //  ['SteeringUnionGroupScene', SteeringUnionGroupScene],
   //  ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
-    ['Tatarova-Shkuro', TatarovaShkuro]
+    ['Начать игру', TatarovaShkuro]
 
 ];
 
@@ -63,19 +65,25 @@ let MenuScene = new Phaser.Class({
 
     create: function () {
         const map = this.make.tilemap({key: 'menu_map'});
-        const tileset = map.addTilesetImage('Dungeon_Tileset', 'tiles');
+        const tileset = map.addTilesetImage('Crystal_tileset', 'tiles');
         map.createStaticLayer('Main', tileset, 0, 0);
 
 
-        this.add.text(32 * 7 - 4, 32 * 2 + 4, 'SCENES', {fill: '#FFF', fontSize : 28})
+        this.add.text(32 * 2, 32 * 1, 'Подземелья наводнили желе-мутанты,', {fill: '#FFF', fontSize : 28})
             .setShadow(2,2,'#000', true);
-
+				this.add.text(32 * 2, 32 * 2, 'объявлена награда за их истребление!', {fill: '#FFF', fontSize : 28} )
+				.setShadow(2,2,'#000', true);
+				this.add.text(32 * 2, 32 * 3, 'Сразитесь ли вы с соперником за звание', {fill: '#FFF', fontSize : 28} )
+				.setShadow(2,2,'#000', true);
+				this.add.text(32 * 2, 32 * 4, 'самого успешного охотника за желе?', {fill: '#FFF', fontSize : 28} )
+				.setShadow(2,2,'#000', true);
+				
         // creating list of buttons
         let k = 0;
         this.scenesButtons = scenes.map(s => {
-            return this.add.text(0, k++ * 32, s[0], {fill: '#AAA'})
+            return this.add.text(32 * 8, 32 * 6, s[0], {fill: '#AAA', fontSize : 28})
                 .setInteractive()
-                .setFixedSize(32 * 10, 32)
+                .setFixedSize(32 * 7, 32 * 2 )
                 .setPadding({ top: 8 })
                 .setShadow(1,1,'#000')
                 .on('pointerdown', () => this.actionOnClick(s[0]));
@@ -88,27 +96,13 @@ let MenuScene = new Phaser.Class({
                 this._runningScene = null;
             }
         });
-
-
-        // Scrolling container
-        const mask = this.add.graphics(0, 0).fillRect(32*7, 32*3, 32*10, 32*12);
-        this.add.container(32*7, 32*3,this.scenesButtons)
-            .setMask(new Phaser.Display.Masks.GeometryMask(this, mask));
-
-        this.input.on('wheel', (pointer, currentlyOver, dx, dy, dz, event) => {
-            if (this._scroll <= 0 && dy < 0
-                || this._scroll >= (this.scenesButtons.length - 12) * 32 && dy > 0) return;
-
-            this.scenesButtons.forEach(e => e.y -= Math.floor(dy/5));
-            this._scroll += Math.floor(dy/5);
-        });
     },
 
     update: function () {
         if (this._runningScene == null) {
             this.scenesButtons.forEach(e => {
                 const [x, y] = [this.input.x, this.input.y]
-                if (e.input.hitArea.contains(x-e.x - 32*7,y-e.y - 32*3)) {
+                if (e.input.hitArea.contains(x-e.x - 32,y-e.y - 20)) {
                     e.setFill('#FFF')
                 } else {
                     e.setFill('#AAA')
