@@ -48,7 +48,7 @@ let TatarovaShkuro = new Phaser.Class({
     initialize:
 
         function StartingScene() {
-            Phaser.Scene.call(this, {key: 'Tatarova-Shkuro'});
+            Phaser.Scene.call(this, {key: 'Начать игру'});
         },
     characterFrameConfig: {frameWidth: 31, frameHeight: 31},
     slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
@@ -87,12 +87,10 @@ let TatarovaShkuro = new Phaser.Class({
 				
         let map = [];
         let markedMap = [];
-        //do {
-            map = (new GeneratorLevel(width, height, config)).createMap();
-            markedMap = (new MapLayout(map, width, height)).getMapLayout();
-        //} while (fillability(markedMap) < 0.3);
-    
-        (new TileMapper(markedMap, this, width, height, this.tileSize)).generateLevel();
+        map = (new GeneratorLevel(width, height, config)).createMap();
+        markedMap = (new MapLayout(map, width, height)).getMapLayout();
+				
+        const layers = (new TileMapper(markedMap, this, width, height, this.tileSize)).generateLevel();
         
         let grid = [];
         for(let y = 0; y < this.groundLayer.tilemap.height; y++){
