@@ -5,7 +5,7 @@ export class Potion extends Phaser.Physics.Arcade.Sprite
         scene.physics.world.enable(this);
         scene.add.existing(this);
         this.setDepth(1);
-        this.value = 30;
+        this.value = 40;
     }
 
     interact(target) {

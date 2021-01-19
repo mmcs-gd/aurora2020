@@ -2,7 +2,7 @@ import Vector2 from "phaser/src/math/Vector2";
 import Steering from "./steering";
 
 export default class Chase extends Steering {
-    constructor(owner, objects, force = 1, distance = 100) {
+    constructor(owner, objects, distance = 100, force = 1) {
         super(owner, objects, force);
         this.distance = distance;
     }

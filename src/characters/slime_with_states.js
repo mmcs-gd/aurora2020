@@ -14,8 +14,8 @@ export default class SlimeWithStates extends Slime {
         this.stateTable = [];
         this.steerings = [];
 
-        this.power = 2;
-        this.hp = 82;
+        this.power = 5;
+        this.hp = 123;
 
         this.lastTimeAttacked = 0;
         this.attackDelay = 1000;

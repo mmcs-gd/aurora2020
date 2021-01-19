@@ -142,6 +142,9 @@ export default class NpcWithStates extends Phaser.GameObjects.Container {
 
     addHP(value) {
         this.hp += value;
+        if (this.hp > 100) {
+            this.hp = 100;
+        }
         this.scene.events.emit('changeHP');
     }
     

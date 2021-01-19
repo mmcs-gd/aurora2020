@@ -34,8 +34,8 @@ const config = {
 		chanceToStartAlive: 0.33
 	},
 	randomWalk: {
-		maxTunnels: 7, 
-		maxLength: 20,
+		maxTunnels: 5, 
+		maxLength: 10,
 		minWidth: 2,
 		maxWidth: 3
 	}
