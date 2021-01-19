@@ -7,6 +7,7 @@ export default class Mine extends Phaser.Physics.Arcade.Sprite {
         this.lifeTime = 5000;
         this.dangerZone = 60;
         this.createdAt = scene.time.now;
+        this.exploded = false;
     }
 
     get beeps() {
@@ -20,9 +21,10 @@ export default class Mine extends Phaser.Physics.Arcade.Sprite {
 
     update() {     
         if (this.beeps || this.explodes) {
-            this.updateAnimation();
+            return this.updateAnimation();
         } else {
             this.destroy();
+            return { exploded: false, range: this.dangerZone }
         }
     }
 
@@ -30,8 +32,13 @@ export default class Mine extends Phaser.Physics.Arcade.Sprite {
         const animsController = this.anims;
         if (this.beeps) {
             animsController.play(this.animations[0], true);
+            return { exploded: false, range: this.dangerZone }
+        } else if (this.exploded) {
+            return { exploded: false ,range: this.dangerZone }
         } else if (this.explodes) {
             animsController.play(this.animations[1], true);
+            this.exploded = true;
+            return { exploded: true, range: this.dangerZone }
         }
     }
 }

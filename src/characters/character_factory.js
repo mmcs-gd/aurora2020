@@ -134,7 +134,7 @@ export default class CharacterFactory {
     }
     
     buildMine(x, y, params) {
-        let mine = new Mine(this.scene, x, y, this.mineSpriteSheet, 0);
+        let mine = new Mine(this.scene, x + 16, y + 16, this.mineSpriteSheet, 0);
         mine.animations = this.animationLibrary.get(this.mineSpriteSheet).get("Mine");
     }
 }

@@ -8,7 +8,16 @@ export default class Npc extends Phaser.Physics.Arcade.Sprite {
 
     }
 
+    kill() {
+        this.shouldDie = true;
+        // this.destroy();
+    }
+
     update() {
+        if (this.shouldDie) {
+            this.destroy();
+            return;
+        }
 
         const body = this.body;
         this.body.setVelocity(0);
