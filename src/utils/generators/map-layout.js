@@ -23,46 +23,80 @@ export default class MapLayout {
     }
 
     checkBorders(x, y, type) {
-        if (type === config.FLOOR) {
-            // left side
-            if (x === 0) {
-                if (y === 0) {
-                    // top left corner
-                    type = config.WALL.TOP_LEFT;
-                } else if (y === this.map[x].length - 1) {
-                    // bottom left corner
-                    type = config.WALL.BOTTOM_LEFT;
-                } else {
-                    // plain left wall
-                    type = config.WALL.LEFT;
-                }
+			switch(type) {
+				case config.FLOOR:
+					if (x === 0) {
+					  if (y === 0) {
+						  // top left corner
+              type = config.WALL.TOP_LEFT;
+            } else if (y === this.map[x].length - 1) {
+              // bottom left corner
+              type = config.WALL.BOTTOM_LEFT;
+            }							
+						else{
+              // plain left wall
+              type = config.WALL.LEFT;
             }
+          }
             // top side 
-            else if (y === 0) {
-                if (x === this.map.length - 1) {
-                    // top right corner
-                    type = config.WALL.TOP_RIGHT;
-                } else {
-                    // plain top wall
-                    type = config.WALL.TOP;
-                }
-            } 
-            // right side
-            else if (x === this.map.length - 1) {
-                if (y === this.map[x].length) {
-                    // bottom right corner
-                    type = config.WALL.BOTTOM_RIGHT;
-                } else {
-                    // plain right wall
-                    type = config.WALL.RIGHT;
-                }
-            } 
-            // bottom side
-            else if (y === this.map[x].length - 1) {
-                // plain bottom wall
-                type = config.WALL.BOTTOM;
+          else if (y === 0) {
+            if (x === this.map.length - 1) {
+              // top right corner
+              type = config.WALL.TOP_RIGHT;
+            } else {
+              // plain top wall
+              type = config.WALL.TOP;
             }
-        }
+          } 
+            // right side
+          else if (x === this.map.length - 1) {
+            if (y === this.map[x].length) {
+              // bottom right corner
+              type = config.WALL.BOTTOM_RIGHT;
+            } else {
+              // plain right wall
+              type = config.WALL.RIGHT;
+            }
+          } 
+            // bottom side
+          else if (y === this.map[x].length - 1) {
+            // plain bottom wall
+            type = config.WALL.BOTTOM;
+          }
+				break;
+				
+				case config.WALL.TOP:
+					if(x === 0)
+						type = config.WALL.TOP_LEFT;
+					if(x === this.map.length - 1)
+						type = config.WALL.TOP_RIGHT;
+				break;
+					
+				case config.WALL.BOTTOM:
+				  if(x === 0)
+						type = config.WALL.BOTTOM_LEFT;
+					if(x === this.map.length - 1)
+						type = config.WALL.BOTTOM_RIGHT;
+					break;
+					
+				case config.WALL.LEFT:
+					if(y === 0)
+						type = config.WALL.TOP_LEFT;
+					if(y === this.map[x].length - 1)
+						type = config.WALL.BOTTOM_LEFT;
+					break;
+					
+				case config.WALL.RIGHT:
+					if(y === 0)
+						type = config.WALL.TOP_RIGHT;
+					if(y === this.map[x].length - 1)
+						type = config.WALL.BOTTOM_RIGHT;
+					break;
+					
+					default:
+					break;
+			}
+
         return type;
     }
 
