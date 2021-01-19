@@ -117,6 +117,10 @@ export default class MapLayout {
     isFilled(cell) {
         return cell !== null && cell !== config.BLANK;
     }
+		
+		isFloor(cell) {
+        return cell !== null && cell === config.FLOOR;
+    }
 
     getCellType(cellPos) {
         let neighbors = {};
@@ -271,6 +275,8 @@ export default class MapLayout {
         // return false;
         return this.isBlank(cells.bottomRight) &&
             this.isFilled(cells.bottom) &&
+						this.isFloor(cells.left) &&
+						this.isFloor(cells.top) &&
             this.isFilled(cells.right);
     }
 
@@ -281,6 +287,8 @@ export default class MapLayout {
         // return false;
         return this.isBlank(cells.bottomLeft) &&
             this.isFilled(cells.bottom) &&
+						this.isFloor(cells.top) &&
+						this.isFloor(cells.right);
             this.isFilled(cells.left);
     }
 
@@ -291,6 +299,8 @@ export default class MapLayout {
         // return false;
         return this.isBlank(cells.topRight) &&
             this.isFilled(cells.top) &&
+						this.isFloor(cells.left) &&
+						this.isFloor(cells.bottom) &&
             this.isFilled(cells.right);
     }
 
@@ -301,6 +311,8 @@ export default class MapLayout {
         // return false;
         return this.isBlank(cells.topLeft) &&
             this.isFilled(cells.top) &&
+						this.isFloor(cells.right) &&
+						this.isFloor(cells.bottom) &&
             this.isFilled(cells.left);
     }
     //#endregion
