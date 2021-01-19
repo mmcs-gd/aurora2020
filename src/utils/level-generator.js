@@ -1,8 +1,8 @@
 import Vector2 from 'phaser/src/math/Vector2'
 
 export default class Level{
-    constructor(width, height, roomsCount, minRoomWidth = 5, maxRoomWidth = 9, 
-        minRoomHeight = 5, maxRoomHeight = 9, pathWidth = 3, maxPaths = 2){
+    constructor(width, height, roomsCount, minRoomWidth = 5, maxRoomWidth = 7,
+        minRoomHeight = 5, maxRoomHeight = 7, pathWidth = 3, maxPaths = 2){
         this.width = width,
         this.height = height,
         this.roomsCount = roomsCount,

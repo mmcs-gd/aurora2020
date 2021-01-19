@@ -5,7 +5,6 @@ import Exploring from "./steerings/exploring";
 
 export default class Aggressive{
     constructor(owner, targets) {
-
         this.table = new StateTable({
             me: owner,
             targets: targets,
@@ -40,7 +39,6 @@ export default class Aggressive{
         const context = this;
         return this.targets.some(x =>
             x.body.position.distance(context.me.body.position) <= context.distance);
-
     }
 
     gotEnemy() {
@@ -57,13 +55,13 @@ export default class Aggressive{
         const context = this;
         const target = context.targets.find(x =>
             x.body.position.distance(context.me.body.position) < context.distance)
-        context.me.maxSpeed = 10;
+        context.me.maxSpeed = 45;
         context.me.steering = new Chase(context.me, [target], 1, context.distance);
         this.timer = 0;
     }
 
     onStopAttack() {
-        this.me.steering = null//new Exploring(this.me, 1, 20);
+        this.me.steering = null;//new Exploring(this.me, 1, 20);
         this.timer = 0;
     }
 

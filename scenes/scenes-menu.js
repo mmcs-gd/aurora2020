@@ -18,27 +18,33 @@ import ProcedurallyGeneratedScene from "./procedurally-generated-scene";
 import SteeringUnionGroupScene from './steering-union-group-scene';
 import EffectsScene from './effects-scene'
 import SlimeRushScene from "./slime-rush";
+import FinalPotapovScene from "./final-Potapov-scene";
+import WinScene from "./win-scene";
+import LoseScene from "./lose-scene";
 
 const scenes = [
     ['StartingScene', StartingScene],
-    ['SteeringFleeScene', SteeringFleeScene],
-    ['SteeringExploringScene', SteeringExploringScene],
-    ['RealLevelScene', RealLevelScene],
-    ['SteeringRudnevScene', SteeringRudnevScene],
-    [ 'EffectsScene', EffectsScene],
-    ['SlimeRushScene', SlimeRushScene],
+    //['SteeringFleeScene', SteeringFleeScene],
+    //['SteeringExploringScene', SteeringExploringScene],
+    //['RealLevelScene', RealLevelScene],
+    //['SteeringRudnevScene', SteeringRudnevScene],
+    //[ 'EffectsScene', EffectsScene],
+    //['SlimeRushScene', SlimeRushScene],
   //  ['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
   //  ['SteeringPursuitScene', SteeringPursuitScene],
   //  ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
   //  ['SteeringWanderingScene', SteeringWanderingScene],
   //  ['SteeringArrivalScene', SteeringArrivalScene],
-    ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
-    ['MinerScene', MinerScene],
-    ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
-    ['SteeringUnionGroupScene', SteeringUnionGroupScene]
+    //['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
+    //['MinerScene', MinerScene],
+    //['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
+   // ['SteeringUnionGroupScene', SteeringUnionGroupScene],
+    ['FinalPotapovScene', FinalPotapovScene],
+    ['WinScene', WinScene],
+    ['LoseScene', LoseScene]
 ];
 
-let MenuScene = new Phaser.Class({
+export let MenuScene = new Phaser.Class({
     Extends: Phaser.Scene,
     scenesButtons: [],
     _runningScene: null,
@@ -49,7 +55,7 @@ let MenuScene = new Phaser.Class({
     },
 
     preload: function () {
-        console.log(scenes)
+        //console.log(scenes)
         scenes.forEach(s => {
             this.scene.add(s[0], s[1], false);
         });
@@ -113,6 +119,7 @@ let MenuScene = new Phaser.Class({
                 }
             });
         }
+        //console.log(this._runningScene)
     },
 
     actionOnClick: function (sceneName) {

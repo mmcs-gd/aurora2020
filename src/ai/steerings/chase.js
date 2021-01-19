@@ -8,11 +8,11 @@ export default class Chase extends Steering {
     }
 
     targetIsNear(target) {
-        const dist = Math.sqrt(
-            (this.owner.x - target.x) * (this.owner.x - target.x) +
-            (this.owner.y - target.y) * (this.owner.y - target.y));
-
-        return dist < this.distance;
+        ///const dist = Math.sqrt(
+        //    (this.owner.x - target.x) * (this.owner.x - target.x) +
+        //    (this.owner.y - target.y) * (this.owner.y - target.y));
+        //return dist < this.distance;
+        return target.body.position.distance(this.owner.body.position) <= this.distance;
     }
 
     calculateImpulse() {
@@ -22,7 +22,7 @@ export default class Chase extends Steering {
             const targetPos = new Vector2(target.x, target.y);
 
             // reached target
-            if (Math.abs(targetPos.x - this.owner.x) < 35 && Math.abs(targetPos.y - this.owner.y) < 35) {
+            if (Math.abs(targetPos.x - this.owner.x) < 0 && Math.abs(targetPos.y - this.owner.y) < 0) {
                 return new Vector2(0, 0);
             }
 
