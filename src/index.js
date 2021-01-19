@@ -13,7 +13,7 @@ const config = {
   width: 1200,
   height: 780,
   pixelArt: true,
-  zoom: 1.2,
+  zoom: 1.1,
   scene: generateLevelScene,
   physics: {
     default: "arcade",

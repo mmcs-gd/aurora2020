@@ -9,8 +9,9 @@ import AnimationLoader from "../utils/animation-loader";
 import npc from "./npc";
 import Wandering from "../ai/steerings/wandering";
 import Arrival from "../ai/steerings/arrival";
-
-
+import {Bullets} from '../stuff/bullets';
+import { PlayerWithGun} from './player_with_gun';
+import UserControlled from '../ai/behaviour/user_controlled';
 
 export default class CharacterFactory {
     constructor(scene) {
@@ -71,6 +72,90 @@ export default class CharacterFactory {
         character.animationSets = this.animationLibrary.get(spriteSheetName);
         return character;
     }
+
+
+
+    buildPlayerCharacter(spriteSheetName, x, y, params = {}) {
+        const maxSpeed = 1000;
+        let character;
+        if (params.withGun) {
+            character = new PlayerWithGun(this.scene, x, y, spriteSheetName, 'gun');
+            const wasdCursorKeys = this.scene.input.keyboard.addKeys({
+                up:Phaser.Input.Keyboard.KeyCodes.W,
+                down:Phaser.Input.Keyboard.KeyCodes.S,
+                left:Phaser.Input.Keyboard.KeyCodes.A,
+                right:Phaser.Input.Keyboard.KeyCodes.D
+            });
+            character.addBehaviour(new UserControlled(25, wasdCursorKeys));
+            this.addBulletsBehaviour(character, Bullets);
+        } else if (params.withMagic) {
+            character = new PlayerWithMagic(this.scene, x, y, spriteSheetName);
+            const wasdCursorKeys = this.scene.input.keyboard.addKeys({
+                up:Phaser.Input.Keyboard.KeyCodes.W,
+                down:Phaser.Input.Keyboard.KeyCodes.S,
+                left:Phaser.Input.Keyboard.KeyCodes.A,
+                right:Phaser.Input.Keyboard.KeyCodes.D
+            });
+            character.addBehaviour(new UserControlled(150, wasdCursorKeys));
+            this.addBulletsBehaviour(character, Spells);
+        } else {
+            character = new Player(this.scene, x, y, spriteSheetName, 2, params);
+            character.setCollideWorldBounds(true);
+            character.cursors = this.scene.input.keyboard.createCursorKeys();
+        }
+        character.maxSpeed = maxSpeed;
+
+        character.animationSets = this.animationLibrary.get(spriteSheetName);
+        //todo: not here
+        character.footstepsMusic = this.scene.sound.add('footsteps', {
+            mute: false,
+            volume: 1,
+            rate: 1,
+            detune: 0,
+            seek: 0,
+            loop: true,
+            delay: 0
+        });
+        //todo uncomment at your won risk - these footsteps will get you insane
+        // character.footstepsMusic.play();
+
+
+        return character;
+
+    }
+
+
+
+    addBulletsBehaviour(character, BulletsClass) {
+        this.scene.bullets = new BulletsClass(this.scene);
+        if (this.scene.groundLayer) {
+            this.scene.physics.add.collider(this.scene.bullets, this.scene.groundLayer, (bullet) => {
+                bullet.setVisible(false);
+                bullet.setActive(false);
+            });
+        }
+        if (this.scene.otherLayer) {
+            this.scene.physics.add.collider(this.scene.bullets, this.scene.otherLayer, (bullet) => {
+                bullet.setVisible(false);
+                bullet.setActive(false);
+            });
+        }
+        const context = this;
+        this.scene.input.on('pointerdown', (pointer) => {
+            const {x, y} = character.bulletStartingPoint
+
+            character.lastTimeFired = (new Date()).getTime();
+
+            const vx = pointer.x + context.scene.cameras.main.scrollX - x
+            const vy = pointer.y + context.scene.cameras.main.scrollY - y
+
+            const BULLET_SPEED = 400
+            const mult = BULLET_SPEED / Math.sqrt(vx*vx + vy*vy)
+            this.scene.bullets.fireBullet(x, y, vx * mult, vy * mult);
+        });
+    }
+
+    /*
     buildPlayerCharacter(spriteSheetName, x, y) {
         let character = new Player(this.scene, x, y, spriteSheetName,2);
         character.maxSpeed = 100;
@@ -98,6 +183,9 @@ export default class CharacterFactory {
 
         //todo: add mixin
     }
+*/
+
+
 
     buildSlime(x, y, params) {
         const slimeType = params.slimeType || 1;
