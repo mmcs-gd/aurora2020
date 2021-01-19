@@ -70,9 +70,9 @@ export default function buildLevel(width, height, scene) {
     const tileSet = scene.map.addTilesetImage("tiles", null, tileSize, tileSize);
     
     // уровни сцены
-    const outsideLayer = scene.map.createBlankLayer("Outside", tileSet);
-    const groundLayer = scene.map.createBlankLayer("Ground", tileSet);
-    const wallsLayer = scene.map.createBlankLayer("Walls", tileSet);
+    const outsideLayer = scene.map.createBlankDynamicLayer("Outside", tileSet);
+    const groundLayer = scene.map.createBlankDynamicLayer("Ground", tileSet);
+    const wallsLayer = scene.map.createBlankDynamicLayer("Walls", tileSet);
 
     const levelGenerator = new QuadSpacePartitioning(width, height, LEVEL_SETTINGS);
     const { rooms, corridors, mask } = levelGenerator.generateMask();
@@ -85,7 +85,7 @@ export default function buildLevel(width, height, scene) {
     console.log(`${levelMetric.fillPercent() * 100} % заполнения`);
     console.log('связность: ' + levelMetric.connectivity());
 
-    // 
+    // по маске уровня подставляем tile
     //outsideLayer.fill(TILES.BLANK, 0,0, width. height);
     //groundLayer.weightedRandomize(0, 0, 10, 10, LEVEL_TO_TILE[1]);
 	for (let x = 0; x < width; x++) {
@@ -137,12 +137,10 @@ export default function buildLevel(width, height, scene) {
     // настройки камеры
     // https://photonstorm.github.io/phaser3-docs/Phaser.Cameras.Scene2D.Camera.html
 	const camera = scene.cameras.main;
-    //camera.setZoom(1.0);
+    camera.setZoom(1.0);
     camera.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels);
     camera.startFollow(scene.player);
     camera.roundPixels = true;
-    //camera.setScroll(room.x*32+32, room.y*32+32);
-    //camera.setPosition(0, 0);
 
     // настройки столкновений с границей пустого уровня
     // https://photonstorm.github.io/phaser3-docs/Phaser.Tilemaps.Tilemap.html#setCollision__anchor
@@ -152,7 +150,7 @@ export default function buildLevel(width, height, scene) {
     outsideLayer.setCollisionBetween(0, 320); // с любым tile уровня
     // сделать уровень стен и с ними обрабатывать столкновения Авроры
 
-    return {"Ground" : groundLayer, "Outside" : outsideLayer}
+    return {"Ground" : groundLayer, "Outside" : outsideLayer, "Walls" : wallsLayer}
 }
 
 /*function onNpcPlayerCollide() {

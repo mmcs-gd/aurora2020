@@ -20,14 +20,14 @@ export default class QuadSpacePartitioning {
     // 6-corner_top_left, 7-corner_top_right, 8-corner_bottom_left, 9-corner_bottom_right
     generateMask() {
         // 1. делим пространство на подобласти
-        const subSpaces = this.divideSpace();
+        const subSpaces = this._divideSpace();
         //console.log(subSpaces);
 
         // 2. в каждой подобласти делаем комнату
-        const rooms = subSpaces.map(s => this.generateRoom(s));
+        const rooms = subSpaces.map(s => this._generateRoom(s));
 
         // 3. соединяем комнаты с помощью коридоров, чтобы они были связными
-        const corridors = this.connectRooms(rooms, this.corridor_width);
+        const corridors = this._connectRooms(rooms, this.corridor_width);
 
         // 4. переводим комнаты и коридоры в маску уровня (матрицу из 0 и 1)
         const matrix = Array(this.width).fill().map(() => Array(this.height).fill(0));
@@ -75,7 +75,7 @@ export default class QuadSpacePartitioning {
     }
 
     //#divideSpace()
-    divideSpace() {
+    _divideSpace() {
         // 1. подобласть не может быть меньше минимального размера комнаты
         // 2. в каждом узле дерева комната
         // 3. делить подобласть дальше или нет решается случайным образом (с учётом нужного кол-ва комнат)
@@ -113,7 +113,7 @@ export default class QuadSpacePartitioning {
 
     // в указанной области случайным образом создаёт комнату
     //#generateRoom({ x,y,w,h })
-    generateRoom({x,y,w,h}) {
+    _generateRoom({x,y,w,h}) {
         const room_width = Phaser.Math.RND.between(this.roomWidth.min, this.roomWidth.max);
         //const room_height_max = Math.floor(this.roomMaxArea / room_width);
         const room_height = Phaser.Math.RND.between(this.roomWidth.min, this.roomWidth.max);
@@ -128,7 +128,7 @@ export default class QuadSpacePartitioning {
     }
 
     //#connectRooms()
-    connectRooms(rooms, corridor_width) {
+    _connectRooms(rooms, corridor_width) {
         const roomEdges = [];
 
         // 1. соединяем с ближайшей комнатой (расстояния между центрами комнат)

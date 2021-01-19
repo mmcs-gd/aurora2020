@@ -41,9 +41,10 @@ let SceneQuadSpacePartitioning = new Phaser.Class({
         this.characterFactory = new CharacterFactory(this);
 
         // генерация уровня
-        let layers = buildLevel(50, 50, this);
+        const layers = buildLevel(50, 50, this);
         this.groundLayer = layers["Ground"];
         this.outsideLayer = layers["Outside"];
+        this.wallsLayer = layers["Walls"];
 
         // вешаем события на кнопки
         this.input.keyboard.once("keydown_D", event => {
@@ -56,7 +57,7 @@ let SceneQuadSpacePartitioning = new Phaser.Class({
                 .setDepth(20);
         });
 
-        this.input.keyboard.once("keydown_M", event => {
+        this.input.keyboard.on("keydown_M", event => {
             // show/hide game map
             // how to make game map in phaser 3
             console.log("show/hide map")
