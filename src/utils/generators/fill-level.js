@@ -67,12 +67,12 @@ export default class FillLevel {
     }
 
     checkFreeSpaceForObjects(x, y, objects, tries) {
-        if (x < 0 || y < 0 || x > this.map.length || x > this.map[0].length) {
-            return false;
-        }
-        if (!this.checkFreeSpace(x, y)) {
-            return false;
-        }
+   			if(this.tileAt(x, y) !== config.FLOOR 
+				|| this.collideLayer.getTileAt(x, y) !== null 
+				|| this.upperLayer.getTileAt(x,y) !== null){
+					return false;
+				}
+					
         const characters = [this.scene.player, this.scene.npc];
         for (const c of characters) {
             if (this.calcDistance({ x, y }, c.body) < 20) {
@@ -92,8 +92,8 @@ export default class FillLevel {
         let playerX = 10, playerY = 10;
 
         while (!this.checkFreeSpace(playerX, playerY)) {
-            playerX = Phaser.Math.RND.between(0, this.map.length);
-            playerY = Phaser.Math.RND.between(0, this.map[0].length);
+            playerX = Phaser.Math.RND.between(0, this.map.length-1);
+            playerY = Phaser.Math.RND.between(0, this.map[0].length-1);
         }
 
         this.scene.player = this.scene.characterFactory.buildCharacter('aurora', playerX * this.tilemapper.tilesize, playerY * this.tilemapper.tilesize, { player: true, withGun: true });
@@ -466,7 +466,6 @@ export default class FillLevel {
 						y = j * this.tilemapper.tilesize;
 						if(this.map[i][j] === config.FLOOR && 
 						(this.countFloors(i,j) === 1)){ 
-						//|| this.countFloors(i,j) === 2 && this.countVoids(i,j) < 6 && this.countVoids(i,j) > 3)){
 							const g = new Gold(this.scene, x, y);
 							gold.add(g);
 						}
@@ -491,19 +490,18 @@ export default class FillLevel {
             scroll.interact(npc);
         });
 				
-				
-				//?
-        //#region --- POTIONS ---
+        //--- POTIONS ---
         const potionAmount = 10;
         for (let i = 0; i < potionAmount; i++) {
             let tries = 0;
-            x = Phaser.Math.RND.between(0, this.map.length);
-            y = Phaser.Math.RND.between(0, this.map[0].length);
+            x = Phaser.Math.RND.between(0, this.map.length-1);
+            y = Phaser.Math.RND.between(0, this.map[0].length-1);
 
             while (tries < 20 && !this.checkFreeSpaceForObjects(x, y, this.getAllObjects(), tries)) {
-                x = Phaser.Math.RND.between(0, this.map.length);
-                y = Phaser.Math.RND.between(0, this.map[0].length);
-                tries += 1;
+                if(this.tileAt(x,y) === config.FLOOR)
+									tries += 1;
+								x = Phaser.Math.RND.between(0, this.map.length-1);
+                y = Phaser.Math.RND.between(0, this.map[0].length-1);
             }
 
             x *= this.tilemapper.tilesize;
@@ -518,6 +516,5 @@ export default class FillLevel {
         this.scene.physics.add.collider(this.scene.npc, potions, (npc, potion) => {
             potion.interact(npc);
         });
-        //#endregion
     }
 }
