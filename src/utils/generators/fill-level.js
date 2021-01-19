@@ -48,10 +48,8 @@ export default class FillLevel {
     }
 
     checkFreeSpaceForMobs(x, y, mobs) {
-        if (x < 0 || y < 0 || x > this.map.length || x > this.map[0].length) {
-            return false;
-        }
-        if (!this.checkFreeSpace(x, y)) {
+        if (this.tileAt(x,y) !== config.FLOOR || this.collideLayer.getTileAt(x, y) !== null 
+				|| this.groundLayer.getTileAt(x,y) !== null) {
             return false;
         }
         if (this.calcDistance({ x, y }, this.scene.player.body) < 5) {
@@ -157,12 +155,12 @@ export default class FillLevel {
 
         const slimesAmount = 100;
         for (let i = 0; i < slimesAmount; i++) {
-            let x = Phaser.Math.RND.between(0, this.map.length);
-            let y = Phaser.Math.RND.between(0, this.map[0].length);
+            let x = Phaser.Math.RND.between(0, this.map.length-1);
+            let y = Phaser.Math.RND.between(0, this.map[0].length-1);
 
             while (!this.checkFreeSpaceForMobs(x, y, slimes.children.entries)) {
-                x = Phaser.Math.RND.between(0, this.map.length);
-                y = Phaser.Math.RND.between(0, this.map[0].length);
+                x = Phaser.Math.RND.between(0, this.map.length-1);
+                y = Phaser.Math.RND.between(0, this.map[0].length-1);
             }
 
             x *= this.tilemapper.tilesize;

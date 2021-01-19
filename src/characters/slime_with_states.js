@@ -3,7 +3,7 @@ import SlimeStates from '../ai/behaviour/slime_states';
 
 export default class SlimeWithStates extends Slime {
     constructor(scene, x, y, name, frame, initialState) {
-        super(scene, x, y, name, frame);
+        super(scene, x+16, y, name, frame);
         scene.physics.world.enable(this);
         scene.add.existing(this);
         this.setDepth(5);
