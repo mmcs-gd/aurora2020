@@ -119,6 +119,7 @@ class PlayerWithGun extends Phaser.GameObjects.Container {
                 }
             }
         } catch (e) {
+            console.log(e);
             console.error('[PlayerWithGun] updateAnimation failed')
         }
     }
@@ -198,13 +199,14 @@ let SlimeRushScene = new Phaser.Class({
         this.load.audio('footsteps', Footsteps);
 
 
-        this.characterFactory = new CharacterFactory(this);
-        this.effectsFactory = new EffectsFactory(this);
 
         this.load.image("gun", gunPng);
         this.load.image("bullet", bulletPng);
     },
     create: function () {
+
+        this.characterFactory = new CharacterFactory(this);
+        this.effectsFactory = new EffectsFactory(this);
         this.input.setDefaultCursor(`url(${cursorCur}), pointer`);
 
         this.effectsFactory.loadAnimations();
