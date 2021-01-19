@@ -14,5 +14,11 @@
     "min_frame": 0,
     "max_frame": 51,
     "framerate": 30
+  },
+  "phantom":
+  {
+    "min_frame": 0,
+    "max_frame": 61,
+    "framerate": 120
   }
 }

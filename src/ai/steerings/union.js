@@ -1,28 +1,51 @@
 import Steering from "./steering.js";
 import Vector2 from 'phaser/src/math/Vector2'
+import { getMessage } from '../../utils/messages';
 
 export default class Union extends Steering {
-	constructor(owner, group, index, force = 1, ownerSpeed = 50) {
+	constructor(owner, group, index, player, force = 1, ownerSpeed = 50) {
 		super(owner, group, index, [], force);
 		this.owner = owner;
 		this.group = group;
 		this.index = index;
+		this.player = player;
 		this.ownerSpeed = ownerSpeed;
+		this.direction = new Vector2(0, 0);
+		this.nextX = -32;
+		this.nextY = -32;
 	}
 
 	calculateImpulse () {
-		const { x, y } = this.group.expectedPosition(this.owner.gameObjects[this.index]);
-		const eps = 1;
-		if (Math.abs(this.owner.gameObjects[this.index].y - y) <= 0 && Math.abs(object.x - x) <= 0) {
-			return { x: 0, y: 0 };
-		}
-		let nextY = this.owner.gameObjects[this.index].y < y ? y : -y;
-		nextY = Math.abs(this.owner.gameObjects[this.index].y - y) < eps ? 0 : nextY;
-		let nextX = this.owner.gameObjects[this.index].x < x ? x : -x;
-		nextX = Math.abs(this.owner.gameObjects[this.index].x - x) < eps ? 0 : nextX;
-		const nextDirection = new Vector2({ x: nextX, y: nextY });
-		nextDirection.normalize().scale(this.ownerSpeed);
+		if (this.owner.gameObjects[this.index].visible) {
+			const { x, y } = this.player;
+			let nextX = x - this.owner.gameObjects[this.index].x;
+			let nextY = y - this.owner.gameObjects[this.index].y;
+			let nextDirection = new Vector2({ x: nextX, y: nextY });
+			if (Math.abs(nextDirection.lengthSq() - 10000) < 1000) {
+				nextDirection = new Vector2({ x: 0, y: 0 });
+			} else if (Math.abs(nextDirection.lengthSq()) < 2000) {
+				this.owner.cameras.main.shake(1000, 0.0025);
+				this.player.maxSpeed += 5;
+				this.owner.effectsFactory.makeOneEffect('phantom', x, y);
+				this.owner.gameObjects[this.index].catch();
+				getMessage(this.owner, this.owner.gameObjects.filter(npc => npc.visible).length - 1);
 
-		return nextDirection;
+			} else if (Math.abs(nextDirection.lengthSq()) < 10000) {
+				nextX = this.owner.gameObjects[this.index].x - x;
+				nextY = this.owner.gameObjects[this.index].y - y;
+				nextDirection = new Vector2({ x: nextX, y: nextY });
+			} else {
+				if (Math.random() < 0.005) {
+					this.nextX = -1 * this.nextX
+				}
+				if (Math.random() < 0.005) {
+					this.nextY = -1 * this.nextY
+				}
+				nextDirection = new Vector2({ x: this.nextX, y: this.nextY });
+			}
+			nextDirection.normalize().scale(this.ownerSpeed);
+			return nextDirection;
+		}
+		return this.direction;
 	}
 }

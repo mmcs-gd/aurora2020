@@ -5,31 +5,30 @@ export default class Npc extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         this.steering = steering;
         this.cnt = 0;
-
     }
 
     update() {
-
-        const body = this.body;
-        this.body.setVelocity(0);
-        if (this.steering != 1)
-        {
-            const dir = this.steering.calculateImpulse();
-        // console.log(dir)
-            this.body.setVelocityX(dir.x)
-            this.body.setVelocityY(dir.y)
-
+        if (this.visible) {
+            const body = this.body;
+            this.body.setVelocity(0);
+            if (this.steering != 1)
+            {
+                const dir = this.steering.calculateImpulse();
+            // console.log(dir)
+                this.body.setVelocityX(dir.x)
+                this.body.setVelocityY(dir.y)
+    
+                this.updateAnimation();
+            }
+    
+            if (this.steering) {
+                const dir = this.steering.calculateImpulse(!this.cntLess(500));
+                this.body.setVelocityX(dir.x)
+                this.body.setVelocityY(dir.y)
+                this.cnt = this.cntLess(500) ? this.cnt + 1 : 0;
+            }
             this.updateAnimation();
         }
-
-        if (this.steering) {
-            const dir = this.steering.calculateImpulse(!this.cntLess(500));
-            this.body.setVelocityX(dir.x)
-            this.body.setVelocityY(dir.y)
-            this.cnt = this.cntLess(500) ? this.cnt + 1 : 0;
-        }
-        this.updateAnimation();
-
     }
 
     updateAnimation() {
@@ -58,6 +57,12 @@ export default class Npc extends Phaser.Physics.Arcade.Sprite {
     }
     cntLess(steps) {
         return this.cnt < steps;
+    }
+    catch()
+    {
+        this.alive = false;
+        this.visible = false;
+        this.body.destroy()
     }
 }
 

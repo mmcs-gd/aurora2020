@@ -18,26 +18,26 @@ import ProcedurallyGeneratedScene from "./procedurally-generated-scene";
 import SteeringUnionGroupScene from './steering-union-group-scene';
 import EffectsScene from './effects-scene'
 import SlimeRushScene from "./slime-rush";
-import ScenePatseevUshakov from "./scene-patseev-ushakov";
+import StartGame from "./ushakov-game";
 
 const scenes = [
-    ['StartingScene', StartingScene],
-    ['SteeringFleeScene', SteeringFleeScene],
-    ['SteeringExploringScene', SteeringExploringScene],
-    ['RealLevelScene', RealLevelScene],
-    ['SteeringRudnevScene', SteeringRudnevScene],
-    [ 'EffectsScene', EffectsScene],
-    ['SlimeRushScene', SlimeRushScene],
-  //  ['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
-  //  ['SteeringPursuitScene', SteeringPursuitScene],
-  //  ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
-  //  ['SteeringWanderingScene', SteeringWanderingScene],
-  //  ['SteeringArrivalScene', SteeringArrivalScene],
-    ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
-    ['MinerScene', MinerScene],
-    ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
-    ['SteeringUnionGroupScene', SteeringUnionGroupScene],
-    ['ScenePatseevUshakov', ScenePatseevUshakov]
+//     ['StartingScene', StartingScene],
+//     ['SteeringFleeScene', SteeringFleeScene],
+//     ['SteeringExploringScene', SteeringExploringScene],
+//     ['RealLevelScene', RealLevelScene],
+//     ['SteeringRudnevScene', SteeringRudnevScene],
+//     [ 'EffectsScene', EffectsScene],
+//     ['SlimeRushScene', SlimeRushScene],
+//   //  ['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
+//   //  ['SteeringPursuitScene', SteeringPursuitScene],
+//   //  ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
+//   //  ['SteeringWanderingScene', SteeringWanderingScene],
+//   //  ['SteeringArrivalScene', SteeringArrivalScene],
+//     ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
+//     ['MinerScene', MinerScene],
+//     ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
+//     ['SteeringUnionGroupScene', SteeringUnionGroupScene],
+    ['Enter the laboratory', StartGame]
 ];
 
 let MenuScene = new Phaser.Class({
@@ -67,13 +67,19 @@ let MenuScene = new Phaser.Class({
         map.createStaticLayer('Main', tileset, 0, 0);
 
 
-        this.add.text(32 * 7 - 4, 32 * 2 + 4, 'SCENES', {fill: '#FFF', fontSize : 28})
+        this.add.text(32 * 7 + 8, 32 * 2 + 8, 'MESSAGE', {fill: '#FFD', fontSize : 18})
             .setShadow(2,2,'#000', true);
+        this.add.text(32 * 7 - 4, 32 * 3 + 4, 'Hello Eleven.', {fill: '#FFF', fontSize : 24})
+        this.add.text(32 * 7 - 4, 32 * 4 + 4, 'Are you ready to take revenge', {fill: '#FFF', fontSize : 18})
+        this.add.text(32 * 7 - 4, 32 * 5 + 4, 'on everyone who hurt you?', {fill: '#FFF', fontSize : 18})
+        this.add.text(32 * 7 - 4, 32 * 6 + 4, 'We too.', {fill: '#FFF', fontSize : 18})
+        this.add.text(32 * 7 - 4, 32 * 7 + 4, 'Get started!', {fill: '#FFF', fontSize : 18})
+        this.add.text(32 * 11 - 4, 32 * 14 + 4, 'Jim Hopper. With love.', {fill: '#EA4639', fontSize : 14})
 
         // creating list of buttons
         let k = 0;
         this.scenesButtons = scenes.map(s => {
-            return this.add.text(0, k++ * 32, s[0], {fill: '#AAA'})
+            return this.add.text(16, 6 * 32, s[0], {fill: '#AAA', fontSize: 24})
                 .setInteractive()
                 .setFixedSize(32 * 10, 32)
                 .setPadding({ top: 8 })
@@ -131,7 +137,7 @@ let MenuScene = new Phaser.Class({
     },
 });
 
-class Hint extends Phaser.Scene {
+export class Hint extends Phaser.Scene {
     constructor(x = 0, y = 0, text = '', time = 2000) {
         super();
         this.pos = {x, y};

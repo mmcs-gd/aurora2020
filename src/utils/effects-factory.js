@@ -1,6 +1,7 @@
 import magicSpellSpritesheet from '../../assets/sprites/vfx/1_magicspell_spritesheet.png'
 import vortexSpritesheet from '../../assets/sprites/vfx/13_vortex_spritesheet.png'
 import flamelashSpritesheet from '../../assets/sprites/vfx/6_flamelash_spritesheet.png'
+import phantomSpritesheet from '../../assets/sprites/vfx/14_phantom_spritesheet.png'
 import effectsConfigJson from '../../assets/animations/vfx/effects.json'
 
 export default class EffectsFactory {
@@ -10,7 +11,8 @@ export default class EffectsFactory {
         const frameConfig = {frameWidth: 100, frameHeight: 100};
         scene.load.spritesheet('magicSpell', magicSpellSpritesheet, frameConfig);
         scene.load.spritesheet('vortex', vortexSpritesheet, frameConfig);
-        scene.load.spritesheet('flamelash', flamelashSpritesheet, frameConfig)
+        scene.load.spritesheet('flamelash', flamelashSpritesheet, frameConfig);
+        scene.load.spritesheet('phantom', phantomSpritesheet, frameConfig);
 
     }
 
@@ -43,5 +45,12 @@ export default class EffectsFactory {
         effect.anims.setRepeat(-1);
     }
 
-
+    makeOneEffect(effectName, x, y, params = {}) {
+        let effect = new Phaser.Physics.Arcade.Sprite(this.scene, x, y, effectName, 0);
+        this.scene.physics.world.enable(effect);
+        this.scene.add.existing(effect);
+        // todo: make specific animation loader for vfx
+        effect.anims.play(effectName, true)
+        effect.anims.setRepeat(1);
+    }
 }

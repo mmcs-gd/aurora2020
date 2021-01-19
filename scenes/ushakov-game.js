@@ -9,6 +9,7 @@ import yellowSpriteSheet from '../assets/sprites/characters/yellow.png'
 import greenSpriteSheet from '../assets/sprites/characters/green.png'
 import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
+import StrangerThingsTheme from "../assets/audio/stranger-things-theme.mp3"
 import EffectsFactory from "../src/utils/effects-factory";
 import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 
@@ -16,13 +17,13 @@ import CellularAutomataMapGenerator from '../src/utils/automata_generator/map-ge
 import CellularAutomataLevelBuilder from '../src/utils/automata_generator/level-builder';
 import { TILES } from '../src/utils/automata_generator/tiles';
 
-let ScenePatseevUshakov = new Phaser.Class({
+let UshakovGame = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
 
     initialize: function StartingScene() {
-        Phaser.Scene.call(this, {key: 'ScenePatseevUshakov'});
+        Phaser.Scene.call(this, {key: 'Enter the laboratory'});
     },
 
     effectsFrameConfig: {frameWidth: 32, frameHeight: 32},
@@ -30,7 +31,6 @@ let ScenePatseevUshakov = new Phaser.Class({
     slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
 
     preload: function () {
-        //this.load.image("islands-tiles", tilemapPng);
         this.load.image("tiles", tilemapPng);
         //loading spitesheets
         this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
@@ -40,15 +40,19 @@ let ScenePatseevUshakov = new Phaser.Class({
         this.load.spritesheet('punk', punkSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('slime', slimeSpriteSheet, this.slimeFrameConfig);
         this.load.audio('footsteps', Footsteps);
+        this.load.audio('theme', StrangerThingsTheme);
         this.effectsFactory = new EffectsFactory(this);
     },
 
     create: function () {
         this.gameObjects = [];
+        this.filter = []
         this.characterFactory = new CharacterFactory(this);
         this.level++;
         this.tileSize = 32;
         this.effectsFactory.loadAnimations();
+        var music = this.sound.add('theme', {loop: true});
+        music.play();
 
         const generator = new CellularAutomataMapGenerator(200, 200);
         const levelMatrix = generator.buildLevel();
@@ -65,7 +69,6 @@ let ScenePatseevUshakov = new Phaser.Class({
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels, true, true, true, true);
 
         const tileset = map.addTilesetImage("Dungeon_Tileset", "tiles");
-
         this.groundLayer = map.createBlankDynamicLayer("Ground", tileset);
         this.stuffLayer = map.createBlankDynamicLayer("Stuff", tileset);
 
@@ -73,7 +76,13 @@ let ScenePatseevUshakov = new Phaser.Class({
             for (let y = 0; y < map.height; y++) {
                 if (levelMatrix[x][y] == 0)
                     this.groundLayer.putTileAt(TILES.WALL, x, y);
-                else this.stuffLayer.putTileAt(TILES.FLOOR, x, y);
+                else {
+                    if (Math.floor(Math.random() * 100) % 13 === 0) {
+                        this.stuffLayer.putTileAt(248, x, y);
+                    } else {
+                        this.stuffLayer.putTileAt(TILES.FLOOR, x, y);
+                    }
+                }
             }
         }
 
@@ -85,25 +94,22 @@ let ScenePatseevUshakov = new Phaser.Class({
         const playerPosition = this.tileToPixels(levelBuilder.playerPosition);
 
         this.player = this.characterFactory.buildCharacter("aurora", playerPosition.x, playerPosition.y, {
-            player: true
+            player: true,
         });
-        this.effectsFactory.buildEffect('flamelash', playerPosition.x, playerPosition.y);
 
         this.gameObjects.push(this.player);
 
         this.physics.add.collider(this.player, this.groundLayer);
         this.physics.add.collider(this.player, this.stuffLayer);
-
         const group = new Group([]);
         for (let i = 0; i < 200; i++) {
             const npc = this.tileToPixels(levelBuilder.calculateNpcPosition());
-            this.explorer = this.characterFactory.buildCharacter('green', npc.x, npc.y, {Steering: new Union(this, group, i)});
+            this.explorer = this.characterFactory.buildCharacter('green', npc.x, npc.y, {Steering: new Union(this, group, i + 1, this.player)});
             this.gameObjects.push(this.explorer);
             group.join(this.explorer);
             this.physics.add.collider(this.explorer, this.groundLayer);
             this.physics.add.collider(this.explorer, this.stuffLayer);
             this.physics.add.collider(this.explorer, this.player);
-            // console.log(npc);
         }
 
         const camera = this.cameras.main;
@@ -120,10 +126,10 @@ let ScenePatseevUshakov = new Phaser.Class({
                 .setAlpha(0.75)
                 .setDepth(20);
         });
-
-
+        this.input.keyboard.on("keydown_ESC", event => {
+            this.sound.stopAll();
+        });
     },
-
     update: function () {
         if (this.gameObjects) {
             this.gameObjects.forEach( function(element) {
@@ -137,4 +143,4 @@ let ScenePatseevUshakov = new Phaser.Class({
     }
 });
 
-export default ScenePatseevUshakov
+export default UshakovGame
