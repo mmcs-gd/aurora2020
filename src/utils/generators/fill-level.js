@@ -441,18 +441,62 @@ export default class FillLevel {
 			return neigbors.length;
 		}
 		
-		countVoids(x,y){
-			let voids = [
-			  this.tileAt(x-1,y),
-				this.tileAt(x-1,y-1),
-				this.tileAt(x, y-1),
-				this.tileAt(x+1,y-1),
-				this.tileAt(x+1,y),
-				this.tileAt(x+1,y+1),
-				this.tileAt(x,y+1),
-				this.tileAt(x-1,y+1)
-			].filter(o => o !== config.FLOOR);
-			return voids.length;
+		isConfigHor(x,y){
+			/* configurations
+			0000
+			0110
+			*11*
+			&
+			*11*
+			0110
+			0000			
+			*/
+			return this.tileAt(x,y) === config.FLOOR && (
+				this.tileAt(x-2,y-1) !== config.FLOOR && this.tileAt(x-1,y-1) !== config.FLOOR
+				&& this.tileAt(x,y-1) !== config.FLOOR && this.tileAt(x+1,y-1) !== config.FLOOR
+				&& this.tileAt(x-2,y) !== config.FLOOR && this.tileAt(x-1,y) === config.FLOOR
+				&& this.tileAt(x+1,y) !== config.FLOOR
+				&& this.tileAt(x-1,y+1) === config.FLOOR && this.tileAt(x,y+1) === config.FLOOR
+				
+				||
+				
+				this.tileAt(x-1,y-1) === config.FLOOR && this.tileAt(x,y-1) === config.FLOOR
+				&& this.tileAt(x-2,y) !== config.FLOOR && this.tileAt(x-1,y) === config.FLOOR
+				&& this.tileAt(x+1,y) !== config.FLOOR
+				&& this.tileAt(x-2,y+1) !== config.FLOOR && this.tileAt(x-1,y+1) !== config.FLOOR
+				&& this.tileAt(x,y+1) !== config.FLOOR && this.tileAt(x+1,y+1) !== config.FLOOR
+				);
+		}
+		
+		isConfigVert(x,y){
+			/* configurations
+			00*
+			011
+			011
+			00*
+			&
+			*00
+			110
+			110
+			*00
+			*/
+			return this.tileAt(x,y) === config.FLOOR && (
+			  this.tileAt(x-1,y-2) !== config.FLOOR && this.tileAt(x,y-2) !== config.FLOOR
+				&& this.tileAt(x-1,y-1) !== config.FLOOR && this.tileAt(x,y-1) === config.FLOOR
+				&& this.tileAt(x+1,y-1) === config.FLOOR
+				&& this.tileAt(x-1,y) !== config.FLOOR
+				&& this.tileAt(x+1,y) === config.FLOOR
+				&& this.tileAt(x-1,y+1) !== config.FLOOR && this.tileAt(x,y+1) !== config.FLOOR
+				
+				||
+				
+				this.tileAt(x,y-2) !== config.FLOOR && this.tileAt(x+1,y-2) !== config.FLOOR
+				&& this.tileAt(x-1,y-1) === config.FLOOR && this.tileAt(x,y-1) === config.FLOOR
+				&& this.tileAt(x+1,y-1) !== config.FLOOR
+				&& this.tileAt(x-1,y) === config.FLOOR
+				&& this.tileAt(x+1,y) !== config.FLOOR
+				&& this.tileAt(x,y+1) !== config.FLOOR && this.tileAt(x+1,y+1) !== config.FLOOR
+				);
 		}
 		
     addObjects() {
@@ -468,6 +512,12 @@ export default class FillLevel {
 						(this.countFloors(i,j) === 1)){ 
 							const g = new Gold(this.scene, x, y);
 							gold.add(g);
+						} else if(this.isConfigHor(i,j)){
+							gold.add(new Gold(this.scene, x, y));
+							gold.add(new Gold(this.scene, x - this.tilemapper.tilesize, y));
+						} else if(this.isConfigVert(i,j)){
+							gold.add(new Gold(this.scene, x, y));
+							gold.add(new Gold(this.scene, x, y - this.tilemapper.tilesize));
 						}
 						else if(this.map[i][j] === config.FLOOR && this.collideLayer.getTileAt(i,j-1) !== null
 						&& this.collideLayer.getTileAt(i-1,j-1) !== null && this.upperLayer.getTileAt(i,j-2) !== null
