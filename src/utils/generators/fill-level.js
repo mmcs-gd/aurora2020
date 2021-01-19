@@ -12,6 +12,7 @@ import Chase from '../../ai/steerings/chase';
 import RanawayFromObjects from '../../ai/steerings/ranaway_from_objects';
 import ChaseClosest from '../../ai/steerings/chaseClosest';
 import { Gold, Potion, Scroll } from '../../characters/interactive_objects';
+import { Shadowing } from '../../ai/steerings/shadowing';
 
 export default class FillLevel {
     constructor(tilemapper, groundLayer, collideLayer, upperLayer) {
@@ -102,25 +103,32 @@ export default class FillLevel {
     }
 
     setupText() {
-        this.scoreInfo = this.scene.add.text(0, 0, 'Score: 0 (your) - 0 (opponent)', { font: '32px Arial', fill: '#ff0000' });
+        const style = {
+            fontFamily: 'cursive',
+            fontSize: '28px',
+            fill: '#ffffff',
+            backgroundColor: '#00000080'
+        };
+        this.scoreInfo = this.scene.add.text(0, 0, 'Счёт: 0 (вы) - 0 (соперник)', style);
         this.scoreInfo.setDepth(11);
-        this.score = 0;
-        this.scoreNPC = 0;
-        this.hpInfo = this.scene.add.text(0, 25, 'HP: 100', { font: '32px Arial', fill: '#ff0000' });
+        this.slimesInfo = this.scene.add.text(0, this.scoreInfo.height, 'Осталось желе: 100', style);
+        this.slimesInfo.setDepth(11);
+        this.hpInfo = this.scene.add.text(0, this.scoreInfo.height + this.slimesInfo.height, 'HP: 100', style);
         this.hpInfo.setDepth(11);
+        
         this.scene.events.on('addScore', () => {
             const playerScore = this.scene.player.score;
             const npcScore = this.scene.npc.score;
-            
-            this.scoreInfo.setText('Score: ' + playerScore + ' (your) - ' + npcScore + ' (opponent)');
-        
-            if (this.scene.slimes.children.entries.length === 0) {
+            const slimesAmount = this.scene.slimes.children.entries.length;
+
+            this.scoreInfo.setText('Счёт: ' + playerScore + ' (вы) - ' + npcScore + ' (соперник)');
+            this.slimesInfo.setText('Осталось желе: ' + slimesAmount);
+            if (slimesAmount === 0) {
                 if (playerScore > npcScore) {
-                    alert(`Все желешки истреблены! \nВы самый кровожадный истребитель желе, примите поздравления\n\nВаш счёт: ${playerScore}, счёт противника: ${npcScore}`);
+                    this.scene.showText(`\nВсе желе-мутанты истреблены!\nВы — самый кровожадный истребитель желе,\nпримите поздравления!\n\nВаш счёт: ${playerScore}, счёт противника: ${npcScore}\n`, 150);
                 } else {
-                    alert(`Все желешки истреблены! \nВашему сопернику досталось больше... Может, в следующий раз?\n\nВаш счёт: ${playerScore}, счёт противника: ${npcScore}`);
+                    this.scene.showText(`\nВсе желе-мутанты истреблены!\nВам не удалось опередить соперника...\nМожет, в следующий раз?\n\nВаш счёт: ${playerScore}, счёт противника: ${npcScore}\n`, 150);
                 }
-                this.scene.stopGame();
             }
         }, this.scene);
 
@@ -131,8 +139,10 @@ export default class FillLevel {
         this.scene.events.on('moveCamera', (x, y) => {
             this.scoreInfo.setX(x);
             this.scoreInfo.setY(y);
+            this.slimesInfo.setX(x);
+            this.slimesInfo.setY(y + this.scoreInfo.height);
             this.hpInfo.setX(x);
-            this.hpInfo.setY(y + 30);
+            this.hpInfo.setY(y + this.scoreInfo.height + this.slimesInfo.height);
         }, this.scene);
     }
 
@@ -153,7 +163,7 @@ export default class FillLevel {
             addSlimesConditions: this.addSlimesConditions()
         };
 
-        const slimesAmount = 100;
+        const slimesAmount = 50;
         for (let i = 0; i < slimesAmount; i++) {
             let x = Phaser.Math.RND.between(0, this.map.length-1);
             let y = Phaser.Math.RND.between(0, this.map[0].length-1);
@@ -217,7 +227,6 @@ export default class FillLevel {
 
             slime.isEnemyClose = function () {
                 const enemies = [that.scene.player, that.scene.npc];
-                // add other if needed
 
                 for (const enemy of enemies) {
                     const d = Math.sqrt((slime.x - enemy.x) * (slime.x - enemy.x) + (slime.y - enemy.y) * (slime.y - enemy.y));
@@ -230,11 +239,10 @@ export default class FillLevel {
             };
             slime.isEnemyAround = function () {
                 const enemies = [that.scene.player, that.scene.npc];
-                // add other if needed
 
                 for (const enemy of enemies) {
                     const d = Math.sqrt((slime.x - enemy.x) * (slime.x - enemy.x) + (slime.y - enemy.y) * (slime.y - enemy.y));
-                    if (d < 100) {
+                    if (d < 300) {
                         slime.steerings[SlimeStates.Pursuing].objects = [enemy];
                         return true;
                     }
@@ -243,7 +251,8 @@ export default class FillLevel {
                 return false;
             }
             slime.canWander = function () {
-                return !slime.isAttacked && !slime.isEnemyAround() && !slime.isEnemyFiring();
+                const canWander = !slime.isAttacked && !slime.isEnemyAround() && !slime.isEnemyFiring();
+                return canWander;
             }
         }
     }
@@ -283,7 +292,7 @@ export default class FillLevel {
         return function (slime) {
             let steerings = {
                 [SlimeStates.Searching]: new Wander(slime),
-                [SlimeStates.Pursuing]: new Chase(slime, []),
+                [SlimeStates.Pursuing]: new Chase(slime, [], 300),
                 [SlimeStates.Running]: new RanawayFromObjects(slime, [that.scene.player]),
                 [SlimeStates.Attacking]: new Attack(slime, []),
 
@@ -326,13 +335,21 @@ export default class FillLevel {
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.slimeIsCloser, NpcStates.ChasingSlime));
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.goldIsCloser, NpcStates.ChasingObject));
 
+            npc.stateTable.addState(new StateTableRow(NpcStates.Following, npc.slimeIsCloser, NpcStates.ChasingSlime));
+            npc.stateTable.addState(new StateTableRow(NpcStates.Following, npc.goldIsCloser, NpcStates.ChasingObject));
+            
             npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, () => !npc.canAttackSlime() && npc.goldIsCloser(), NpcStates.ChasingObject));
 
+            npc.stateTable.addState(new StateTableRow(NpcStates.Following, npc.needToHeal, NpcStates.ChasingObject));
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.needToHeal, NpcStates.ChasingObject));
             npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, npc.needToHeal, NpcStates.ChasingObject));
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, () => !npc.needToHeal() && npc.goldIsCloser(), NpcStates.ChasingObject));
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, () => !npc.needToHeal() && npc.slimeIsCloser(), NpcStates.ChasingSlime));
 
+            npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.shouldFollowPlayer, NpcStates.Following));
+            npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, npc.shouldFollowPlayer, NpcStates.Following));
+            npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, npc.shouldFollowPlayer, NpcStates.Following));
+            
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, () => npc.isDead, NpcStates.Dead));
             npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, () => npc.isDead, NpcStates.Dead));
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, () => npc.isDead, NpcStates.Dead));
@@ -346,7 +363,8 @@ export default class FillLevel {
             let steerings = {
                 [NpcStates.ChasingSlime]: new ChaseClosest(npc, that.scene.slimes.children.entries, 80),
                 [NpcStates.Attacking]: new Attack(npc, []),
-                [NpcStates.ChasingObject]: new ChaseClosest(npc, [])
+                [NpcStates.ChasingObject]: new ChaseClosest(npc, []),
+                [NpcStates.Following]: new Shadowing(npc, [that.scene.player])
             };
             npc.steerings = steerings;
         }
@@ -370,11 +388,9 @@ export default class FillLevel {
                     return true;
                 }
 
-                // if target is too close, follow the player?
-
                 const d1 = ChaseClosest.calculateDistance(npc, slime);
                 const d2 = ChaseClosest.calculateDistance(npc, object);
-                if (d1 <= d2) {
+                if (d1 <= d2 && d1 < 300) {
                     npc.target = slime;
                     return true;
                 }
@@ -400,7 +416,7 @@ export default class FillLevel {
 
                 const d1 = ChaseClosest.calculateDistance(npc, object);
                 const d2 = ChaseClosest.calculateDistance(npc, slime);
-                if (d1 <= d2) {
+                if (d1 <= d2 && d1 < 300) {
                     npc.steerings[NpcStates.ChasingObject].objects = objects;
                     npc.target = object;
                     return true;
@@ -417,12 +433,20 @@ export default class FillLevel {
             };
 
             npc.needToHeal = function () {
-                const needToHeal = npc.hp < 20;
+                const needToHeal = npc.hp < 70;
                 if (needToHeal) {
                     npc.target = null;
                     npc.steerings[NpcStates.ChasingObject].objects = that.scene.potions.children.entries;
                 }
                 return needToHeal;
+            }
+
+            npc.shouldFollowPlayer = function () {
+                const shouldFollow = !npc.slimeIsCloser() && !npc.goldIsCloser() && !npc.canAttackSlime() && !npc.needToHeal();
+                if (shouldFollow) {
+                    console.log("FOLLOW")
+                }
+                return shouldFollow;
             }
         }
     }

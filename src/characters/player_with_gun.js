@@ -67,13 +67,15 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
         this.hp -= value;
         this.scene.events.emit('changeHP');
         if (this.isDead) {
-            alert('Вы погибли!');
-            this.scene.stopGame();
+            this.scene.showText('\nВы погибли!');
         }
     }
 
     addHP(value) {
         this.hp += value;
+        if (this.hp > 100) {
+            this.hp = 100;
+        }
         this.scene.events.emit('changeHP');
     }
 

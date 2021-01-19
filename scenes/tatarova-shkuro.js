@@ -92,9 +92,7 @@ let TatarovaShkuro = new Phaser.Class({
             markedMap = (new MapLayout(map, width, height)).getMapLayout();
         //} while (fillability(markedMap) < 0.3);
     
-        //info(map);
-				
-        const layers = (new TileMapper(markedMap, this, width, height, this.tileSize)).generateLevel();
+        (new TileMapper(markedMap, this, width, height, this.tileSize)).generateLevel();
         
         let grid = [];
         for(let y = 0; y < this.groundLayer.tilemap.height; y++){
@@ -108,16 +106,6 @@ let TatarovaShkuro = new Phaser.Class({
 
         this.finder.setGrid(grid);
         this.finder.setAcceptableTiles([0]);
-				
-        /*this.input.keyboard.once("keydown_D", event => {
-             // Turn on physics debugging to show player's hitbox
-					this.physics.world.createDebugGraphic();
-
-          const graphics = this.add
-            .graphics()
-            .setAlpha(0.75)
-            .setDepth(20);
-        });*/
     },
     update: function () {
 				if (this.gameObjects)
@@ -133,8 +121,35 @@ let TatarovaShkuro = new Phaser.Class({
     {
         return [tileX*this.tileSize, tileY*this.tileSize];
     },
-    stopGame() {
-        this.scene.stop();
+    showText(text, height = 200, style = {}) {
+        const textStyle = {
+            fontFamily: 'cursive',
+            fontSize: '32px',
+            fill: '#ffffff', 
+            backgroundColor: '#000000cc', 
+            fixedWidth: this.game.canvas.width + 60, 
+            align: 'center',
+            ...style
+        }
+        const gameOver = this.add.text(0,height, text, textStyle);
+            console.log(gameOver)
+        const exitText = this.add.text(0, height + gameOver.height, '\nДля выхода нажмите Esc\n',
+        {
+            ...textStyle,
+            fontSize: '28px',
+            fontStyle: 'italic',
+        });
+        gameOver.setDepth(11);
+        exitText.setDepth(11);
+        
+        this.events.on('moveCamera', (x, y) => {
+            gameOver.setX(x);
+            gameOver.setY(y + height);
+            exitText.setX(x);
+            exitText.setY(y + height + gameOver.height);
+        }, this);
+        
+        this.scene.pause();        
     }
 });
 
