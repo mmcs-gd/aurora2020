@@ -43,10 +43,10 @@ export default class QuadSpacePartitioning {
             if (rect_dy) rectToMask(rect_dy);
         });
 
-        // 5. находим стены
+        // 5. отмечаем стены на маске уровня
         // берём комнаты и корридоры и смотрим чтобы с внешней стороны был 0, тогда этот элемент матрицы будет стеной
         // другой способ: обход четырёхсвязной области для внешнего контура, а затем тоже самое для возможных внутренних пустот
-        /*const makeWall = ({ x,y,w,h }) => {
+        const makeWall = ({ x,y,w,h }) => {
             for (let i = x; i < x+w; i++) { // верхняя стена
                 if (0 < y && matrix[i][y-1] === 0) matrix[i][y-1] = 4;
             }
@@ -69,7 +69,7 @@ export default class QuadSpacePartitioning {
         corridors.forEach( ({ rect_dx, rect_dy }) => {
             if (rect_dx) makeWall(rect_dx);
             if (rect_dy) makeWall(rect_dy);
-        });*/
+        });
 
         return { rooms: rooms, corridors:corridors, mask:matrix };
     }
@@ -133,7 +133,7 @@ export default class QuadSpacePartitioning {
 
         // 1. соединяем с ближайшей комнатой (расстояния между центрами комнат)
         const calcDist = (r1, r2) => Math.abs(r1.x-r2.x) + Math.abs(r1.y-r2.y);
-        const graphEdges = Array(rooms.length).fill().map(_ => Array(rooms.length).fill(0)); // для остовного дерева
+        const graphEdges = Array(rooms.length).fill().map(_ => Array(rooms.length).fill(0)); // веса для построения остовного дерева
         
         for (let i = 0; i < rooms.length-1; i++){
             let minDist = Number.MAX_SAFE_INTEGER;

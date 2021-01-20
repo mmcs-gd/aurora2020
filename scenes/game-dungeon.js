@@ -1,15 +1,17 @@
 import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 import auroraSpriteSheet from '../assets/sprites/characters/aurora.png'
 import punkSpriteSheet from '../assets/sprites/characters/punk.png'
-import blueSpriteSheet from '../assets/sprites/characters/blue.png'
-import yellowSpriteSheet from '../assets/sprites/characters/yellow.png'
-import greenSpriteSheet from '../assets/sprites/characters/green.png'
-import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
+//import blueSpriteSheet from '../assets/sprites/characters/blue.png'
+//import yellowSpriteSheet from '../assets/sprites/characters/yellow.png'
+//import greenSpriteSheet from '../assets/sprites/characters/green.png'
+//import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 import EffectsFactory from "../src/utils/effects-factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 
 import buildLevel from '../src/utils/level_generator/level-build';
+//import Aggressive from "../src/ai/aggressive";
+//import MobAI from "../src/ai/mob";
 
 
 let SceneDungeon = new Phaser.Class({
@@ -22,7 +24,7 @@ let SceneDungeon = new Phaser.Class({
 
     effectsFrameConfig: {frameWidth: 32, frameHeight: 32},
     characterFrameConfig: {frameWidth: 31, frameHeight: 31},
-    slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
+    //slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
     //mineFrameConfig: { frameWidth: 130, frameHeight: 130 },
 
     preload: function () {
@@ -31,11 +33,11 @@ let SceneDungeon = new Phaser.Class({
         
         //loading spitesheets
         this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
-        this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
-        this.load.spritesheet('green', greenSpriteSheet, this.characterFrameConfig);
-        this.load.spritesheet('yellow', yellowSpriteSheet, this.characterFrameConfig);
+        //this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
+        //this.load.spritesheet('green', greenSpriteSheet, this.characterFrameConfig);
+        //this.load.spritesheet('yellow', yellowSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('punk', punkSpriteSheet, this.characterFrameConfig);
-        this.load.spritesheet('slime', slimeSpriteSheet, this.slimeFrameConfig);
+        //this.load.spritesheet('slime', slimeSpriteSheet, this.slimeFrameConfig);
         this.load.audio('footsteps', Footsteps);
 
         this.effectsFactory = new EffectsFactory(this);
@@ -93,6 +95,12 @@ let SceneDungeon = new Phaser.Class({
             this.showMap = !this.showMap;
         });
 
+        // https://www.html5gamedevs.com/topic/10139-phaser-keyboard-codes-cheatsheet/
+        this.input.keyboard.on("keydown_ONE", event => {
+            // skill 1
+            console.log("skill 1");
+        });
+
         // запускаем сцену в которой выводим текст
         this.scene.run("SceneText");
     },
@@ -112,7 +120,9 @@ let SceneDungeon = new Phaser.Class({
 
     onNpcPlayerCollide() {
         alert('Погиб!');
-        this.pause(this._runningScene);
+        this.scene.pause("SceneDungeon");
+        this.scene.pause("SceneText");
+        this.scene.pause("SceneMap");
     },
 
     runSceneBoss() {

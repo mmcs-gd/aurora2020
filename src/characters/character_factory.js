@@ -8,11 +8,10 @@ import AnimationLoader from "../utils/animation-loader";
 
 import Mine from "./mine";
 import SmartSlime from './minerScene/smartSlime';
-import NPC from "../characters/npc";
+import NPC from "./npc";
+import Boss from "./boss";
 
 export default class CharacterFactory {
-
-
 
     constructor(scene) {
         this.scene = scene;
@@ -54,15 +53,16 @@ export default class CharacterFactory {
                 if (params.player)
                     return this.buildPlayerCharacter(spriteSheetName, x, y, params);
                 else {
-                        return this.buildNPCCharacter(spriteSheetName, x, y, params);
+                    return this.buildNPCCharacter(spriteSheetName, x, y, params);
                 }
             case "slime":
                 return this.buildSlime(x, y, params);
             case "mine":
                 return this.buildMine(x, y, params);
+            case "boss":
+                return this.buildBoss(x, y, params);
         }
     }
-
 
     buildNPCCharacter(spriteSheetName, x, y, params) {
         let character = new NPC(this.scene, x, y,
@@ -94,7 +94,6 @@ export default class CharacterFactory {
 
 
         return character;
-
     }
 
     buildCyberpunkCharacter(spriteSheetName, x, y, params) {
@@ -121,8 +120,7 @@ export default class CharacterFactory {
         return slime;
     }
 
-    slimeNumberToName(n)
-    {
+    slimeNumberToName(n) {
         switch (n) {
             case 0: return 'Blue';
             case 1: return 'Green';
@@ -130,11 +128,16 @@ export default class CharacterFactory {
             case 3: return 'Pink';
             case 4: return 'Violet';
         }
-
     }
     
     buildMine(x, y, params) {
         let mine = new Mine(this.scene, x, y, this.mineSpriteSheet, 0);
         mine.animations = this.animationLibrary.get(this.mineSpriteSheet).get("Mine");
+    }
+
+    buildBoss(x, y, params) {
+        /*const boss = new Boss(this.scene, x, y, this.bossSpriteSheet);
+        boss.animations = this.animationLibrary.get(this.bossSpriteSheet);
+        return boss;*/
     }
 }

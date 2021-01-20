@@ -22,7 +22,7 @@ export default class Chase extends Steering {
             const targetPos = new Vector2(target.x, target.y);
 
             // reached target
-            if (Math.abs(targetPos.x - this.owner.x) < 35 && Math.abs(targetPos.y - this.owner.y) < 35) {
+            if (Math.abs(targetPos.x - this.owner.x) < 25 && Math.abs(targetPos.y - this.owner.y) < 25) {
                 return new Vector2(0, 0);
             }
 

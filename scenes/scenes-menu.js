@@ -73,6 +73,10 @@ let MenuScene = new Phaser.Class({
         const tileset = map.addTilesetImage('Dungeon_Tileset', 'tiles');
         map.createStaticLayer('Main', tileset, 0, 0);
 
+        // инфа по кнопкам управления
+        this.add.text(32 * 7 - 4, 0, '↑→↓← движение', {fill: '#FFF', fontSize : 18})
+        this.add.text(32 * 7 - 4, 24, 'M - карта', {fill: '#FFF', fontSize : 18})
+        this.add.text(32 * 7 - 4, 48, 'ЛКМ - стрельба', {fill: '#FFF', fontSize : 18})
 
         this.add.text(32 * 7 - 4, 32 * 2 + 4, 'SCENES', {fill: '#FFF', fontSize : 28})
             .setShadow(2,2,'#000', true);
