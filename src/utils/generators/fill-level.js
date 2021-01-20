@@ -444,7 +444,7 @@ export default class FillLevel {
             npc.shouldFollowPlayer = function () {
                 const shouldFollow = !npc.slimeIsCloser() && !npc.goldIsCloser() && !npc.canAttackSlime() && !npc.needToHeal();
                 if (shouldFollow) {
-                    console.log("FOLLOW")
+                    npc.target = that.scene.player;
                 }
                 return shouldFollow;
             }
