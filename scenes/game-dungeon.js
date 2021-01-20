@@ -12,12 +12,12 @@ import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 import buildLevel from '../src/utils/level_generator/level-build';
 
 
-let SceneQuadSpacePartitioning = new Phaser.Class({
+let SceneDungeon = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
     initialize: function StartingScene () {
-        Phaser.Scene.call(this, {key: 'SceneQuadSpacePartitioning'});
+        Phaser.Scene.call(this, {key: 'SceneDungeon'});
     },
 
     effectsFrameConfig: {frameWidth: 32, frameHeight: 32},
@@ -45,6 +45,7 @@ let SceneQuadSpacePartitioning = new Phaser.Class({
         this.gameObjects = [];
         this.characterFactory = new CharacterFactory(this);
         this.effectsFactory.loadAnimations();
+        this.showMap = false;
         
         // генерация уровня
         // убрать while, try после исправления генерации
@@ -79,14 +80,20 @@ let SceneQuadSpacePartitioning = new Phaser.Class({
                 .setDepth(20);
         });
 
-        this.input.keyboard.once("keydown_M", event => {
+        this.input.keyboard.on("keydown_M", event => {
             // show/hide game map
-            // how to make game map in phaser 3
-            // запустить поверх новую сцену. старую не останавливать?
             console.log("dungeon.js keydown_M");
-            this.scene.run("SceneMap");
+
+            if (!this.showMap) {
+                this.scene.run("SceneMap");
+            } else {
+                this.scene.pause("SceneMap");
+                this.scene.stop("SceneMap");
+            }
+            this.showMap = !this.showMap;
         });
 
+        // запускаем сцену в которой выводим текст
         this.scene.run("SceneText");
     },
 
@@ -101,7 +108,20 @@ let SceneQuadSpacePartitioning = new Phaser.Class({
 
     tilesToPixels (tileX, tileY) {
         return [tileX*this.tileSize, tileY*this.tileSize];
+    },
+
+    onNpcPlayerCollide() {
+        alert('Погиб!');
+        this.pause(this._runningScene);
+    },
+
+    runSceneBoss() {
+        // переход на сцену босса
+        console.log('runSceneBoss');
+        this.scene.pause("SceneDungeon");
+        this.scene.stop("SceneDungeon");
+        this.scene.run("SceneBoss");
     }
 });
 
-export default SceneQuadSpacePartitioning
+export default SceneDungeon

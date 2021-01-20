@@ -18,26 +18,33 @@ import ProcedurallyGeneratedScene from "./procedurally-generated-scene";
 import SteeringUnionGroupScene from './steering-union-group-scene';
 import EffectsScene from './effects-scene'
 import SlimeRushScene from "./slime-rush";
-import SceneQuadSpacePartitioning from "./scene-quad-space-partitioning";
+
+import SceneDungeon from "./game-dungeon";
+import SceneBoss from "./game-boss";
+import SceneMap from "./game-map";
+import SceneText from "./game-text";
 
 const scenes = [
     ['StartingScene', StartingScene],
-    ['SteeringFleeScene', SteeringFleeScene],
+    //['SteeringFleeScene', SteeringFleeScene],
     ['SteeringExploringScene', SteeringExploringScene],
     ['RealLevelScene', RealLevelScene],
     ['SteeringRudnevScene', SteeringRudnevScene],
-    [ 'EffectsScene', EffectsScene],
+    ['EffectsScene', EffectsScene],
     ['SlimeRushScene', SlimeRushScene],
-  //  ['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
-  //  ['SteeringPursuitScene', SteeringPursuitScene],
-  //  ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
-  //  ['SteeringWanderingScene', SteeringWanderingScene],
-  //  ['SteeringArrivalScene', SteeringArrivalScene],
+    //['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
+    //['SteeringPursuitScene', SteeringPursuitScene],
+    //['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
+    //['SteeringWanderingScene', SteeringWanderingScene],
+    //['SteeringArrivalScene', SteeringArrivalScene],
     ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
     ['MinerScene', MinerScene],
     ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
     ['SteeringUnionGroupScene', SteeringUnionGroupScene],
-    ['SceneQuadSpacePartitioning', SceneQuadSpacePartitioning],
+    ['SceneDungeon', SceneDungeon],
+    ['SceneBoss', SceneBoss],
+    ['SceneMap', SceneMap],
+    ['SceneText', SceneText],
 ];
 
 let MenuScene = new Phaser.Class({
