@@ -14,7 +14,6 @@ import SlimeStates from '../ai/behaviour/slime_states';
 
 import { Bullets, PlayerWithGun } from './player_with_gun';
 import UserControlled from '../ai/behaviour/user_controlled';
-import { Spells, PlayerWithMagic } from './player_with_magic';
 import NpcWithStates from './npc_with_states';
 import NpcStates from '../ai/behaviour/npc_states';
 
@@ -83,8 +82,8 @@ export default class CharacterFactory {
         return character;
     }
 
-    addBulletsBehaviour(character, BulletsClass) {
-        this.scene.bullets = new BulletsClass(this.scene);
+    addBulletsBehaviour(character) {
+        this.scene.bullets = new Bullets(this.scene);
         if (this.scene.groundLayer) {
             this.scene.physics.add.collider(this.scene.bullets, this.scene.groundLayer, (bullet) => {
                 bullet.setVisible(false);
@@ -124,17 +123,7 @@ export default class CharacterFactory {
                 right:Phaser.Input.Keyboard.KeyCodes.D
             });
             character.addBehaviour(new UserControlled(150, wasdCursorKeys));
-            this.addBulletsBehaviour(character, Bullets);
-        } else if (params.withMagic) {
-            character = new PlayerWithMagic(this.scene, x, y, spriteSheetName);
-            const wasdCursorKeys = this.scene.input.keyboard.addKeys({
-                up:Phaser.Input.Keyboard.KeyCodes.W,
-                down:Phaser.Input.Keyboard.KeyCodes.S,
-                left:Phaser.Input.Keyboard.KeyCodes.A,
-                right:Phaser.Input.Keyboard.KeyCodes.D
-            });
-            character.addBehaviour(new UserControlled(150, wasdCursorKeys));
-            this.addBulletsBehaviour(character, Spells);
+            this.addBulletsBehaviour(character);
         } else {
             character = new Player(this.scene, x, y, spriteSheetName, 2, params);
             character.setCollideWorldBounds(true);
