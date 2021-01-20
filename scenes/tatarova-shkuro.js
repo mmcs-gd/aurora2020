@@ -97,11 +97,16 @@ let TatarovaShkuro = new Phaser.Class({
             let col = [];
             for(let x = 0; x < this.groundLayer.tilemap.width; x++) {
                 const tile = this.groundLayer.tilemap.getTileAt(x, y);
-                col.push(tile ? tile.index : 0);
+                const jewelry = this.collideObjectsLayer.tilemap.getTileAt(x, y);
+                if (!jewelry && !tile) {
+                    col.push(0);
+                } else {
+                    col.push(1);
+                }
+
             }
             grid.push(col);
         }
-
         this.finder.setGrid(grid);
         this.finder.setAcceptableTiles([0]);
     },
@@ -130,7 +135,6 @@ let TatarovaShkuro = new Phaser.Class({
             ...style
         }
         const gameOver = this.add.text(0,height, text, textStyle);
-            console.log(gameOver)
         const exitText = this.add.text(0, height + gameOver.height, '\nДля выхода нажмите Esc\n',
         {
             ...textStyle,
