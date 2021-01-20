@@ -3,10 +3,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
         super(scene, x, y, name, frame);
         scene.physics.world.enable(this);
         scene.add.existing(this);
-        this.hp = 3
+        this.hp = 100
         this.kushCount = 0
     }
-
+    damage(){
+        this.hp = this.hp -10
+    }
     get HP(){
         return this.hp
     }

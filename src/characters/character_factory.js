@@ -1,7 +1,6 @@
 import {StateTableRow, StateTable} from '../ai/behaviour/state';
 import Slime from "./slime";
 import Player from "./player";
-
 import NPC from "../characters/npc";
 import cyberpunkConfigJson from "../../assets/animations/cyberpunk.json";
 import slimeConfigJson from "../../assets/animations/slime.json";
@@ -12,6 +11,14 @@ import Arrival from "../ai/steerings/arrival";
 import {Bullets} from '../stuff/bullets';
 import { PlayerWithGun} from './player_with_gun';
 import UserControlled from '../ai/behaviour/user_controlled';
+import NpcWithGun from "./npc_with_gun";
+import NpcStates from "../ai/behaviour/npc_state";
+import wandering from "../ai/steerings/wandering";
+import ChaseClosest from "../ai/steerings/chaseClosest";
+import Attack from "../ai/steerings/attack";
+import pursuit from "../ai/steerings/pursuit";
+import evade from "../ai/steerings/evade";
+
 
 export default class CharacterFactory {
     constructor(scene) {
@@ -36,6 +43,7 @@ export default class CharacterFactory {
     }
 
     buildCharacter(spriteSheetName, x, y, params = {}) {
+
         switch (spriteSheetName) {
             case 'green':
             case 'punk':
@@ -44,6 +52,9 @@ export default class CharacterFactory {
             case 'punk':
                 if (params.player)
                     return this.buildPlayerCharacter(spriteSheetName,x,y);
+                else {
+                    return this.buildNPCCharacter(spriteSheetName, x, y, params)
+                }
 
             case 'yellow':
             case 'green':
@@ -59,12 +70,72 @@ export default class CharacterFactory {
     }
 	
 		buildNPCCharacter(spriteSheetName, x, y, params) {
+
+            const p = {
+                useStates: true,
+                createStateTable: (npc) =>{
+                    npc.stateTable = new StateTable(this.scene);
+                    npc.stateTable.addState(new StateTableRow(NpcStates.Wandering, npc.canAttackPlayer, NpcStates.Attacking));
+                    npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, npc.PlayerIsClose, NpcStates.Pursuing));
+                    npc.stateTable.addState(new StateTableRow(NpcStates.Pursuing, npc.canAttackPlayer, NpcStates.Attacking));
+                    npc.stateTable.addState(new StateTableRow(NpcStates.Pursuing, npc.PlayerIsSoClose, NpcStates.Wandering));
+                    npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, npc.PlayerIsSoClose, NpcStates.Wandering));
+                },
+                initSteerings: (npc) =>{
+                    let NpcSteerings = {
+                        [NpcStates.Wandering]:  new Wandering(npc, npc,1,10,70,params.boundary),
+                        [NpcStates.Attacking]: new Attack(npc, this.scene.playerWithGun),
+                        [NpcStates.Pursuing]: new pursuit(npc, this.scene.playerWithGun),
+                        [NpcStates.Evade]: new evade(npc, this.scene.playerWithGun),
+                    };
+                    npc.steerings = NpcSteerings;
+
+                },
+                addConditions: (npc) =>{
+                    npc.PlayerIsClose = function () {
+                        const target = npc.steerings[NpcStates.Attacking].target
+                        const d1 = ChaseClosest.calculateDistance(npc, target);
+                        if (d1 <= 300) {
+                            return true;
+                        }
+                        return false;
+                    };
+                    npc.PlayerIsSoClose = function () {
+                        const target = npc.steerings[NpcStates.Attacking].target
+                        const d1 = ChaseClosest.calculateDistance(npc, target);
+                        if (d1 >= 400) {
+                            return true;
+                        }
+                        return false;
+                    };
+                    npc.canAttackPlayer = function () {
+                        const target = npc.steerings[NpcStates.Attacking].target
+                        const canAtack =  ChaseClosest.calculateDistance(npc, target) <= 200;
+                        return  canAtack
+                    };
+                }
+            }
+
+        let character;
+            if (params.withGun) {
+                character = new NpcWithGun(this.scene, x, y, spriteSheetName, 'gun', NpcStates.Wandering);
+                p.addConditions(character);
+                p.createStateTable(character);
+                p.initSteerings(character);
+            } else {
+                character = new NPC(this.scene, x, y, spriteSheetName, 2, params.Steering);
+            }
+            character.animationSets = this.animationLibrary.get(spriteSheetName);
+
+            return character;
+        /*
         let character = new NPC(this.scene, x, y, spriteSheetName, 2);
 				if(params.steering){
 					character.steering = this.getSteerings(params, character, []);
 				}
         character.animationSets = this.animationLibrary.get(spriteSheetName);
         return character;
+         */
     }
 
     buildNpcCharacter(spriteSheetName, x, y,params){

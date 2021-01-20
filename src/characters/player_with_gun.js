@@ -31,6 +31,10 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
         scene.input.on('pointermove', pointer => this._onPointerMove(pointer, scene));
     }
 
+    damage(){
+        this.hp = this.hp -10
+    }
+
     get isFiring() {
         const now = (new Date()).getTime();
         return (now - this.lastTimeFired) < 1000;
@@ -102,9 +106,7 @@ export class PlayerWithGun extends Phaser.GameObjects.Container {
         // Now it's not making a full circle as expected, it gets stuck
         // Some rare time it magically works, but I have no idea why
         try {
-            // TODO: There is no such animation,
-            // so there are hundreds of errors in the console
-            // need to ask about it
+
             const animations = this.animationSets.get('Walk');
             const animsController = this.character.anims;
             const angle = this.viewDirectionAngle

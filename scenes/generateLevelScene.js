@@ -19,6 +19,8 @@ import {PlayerWithGun} from "../src/characters/player_with_gun";
 import {Bullet} from "../src/stuff/bullet";
 import {Bullets} from "../src/stuff/Bullets";
 
+import wandering from "../src/ai/steerings/wandering";
+
 let generateLevelScene = new Phaser.Class({
         Extends: Phaser.scene,
         initialize:
@@ -87,11 +89,11 @@ let generateLevelScene = new Phaser.Class({
             let enemies = []
             let rooms = gen.generateRoom();
             this.characterFactory = new CharacterFactory(this);
-            /*
-            this.player = this.characterFactory.buildPlayerCharacter('green',
-                            (rooms[0].x + rooms[0].width/2) * map.tileWidth,(rooms[0].y + rooms[0].height/2) *map.tileHeight)
-            this.gameObject.push(this.player)
-             */
+
+            const playerX = (rooms[0].x + rooms[0].width/2) * map.tileWidth
+            const playerY = (rooms[0].y + rooms[0].height/2) * map.tileHeight
+            this.playerWithGun = new PlayerWithGun(this, playerX, playerY, 'aurora', 'gun')
+            this.playerWithGun.animationSets = this.characterFactory.animationLibrary.get('aurora');
 
             rooms.forEach(room =>{
                 const {x,y,width,height} = room
@@ -100,32 +102,15 @@ let generateLevelScene = new Phaser.Class({
 
                 for (let i = 0 ;i<width/2-1;i++){
 
-                    const npc = this.characterFactory.buildNPCCharacter(
+                    const npc = this.characterFactory.buildCharacter(
                         "punk",getRandomIntInclusive((room.x * map.tileWidth) + 25,(room.x + room.width) * map.tileWidth),
-                        getRandomIntInclusive((room.y* map.tileWidth)+25,(room.y + room.height)* map.tileWidth),{ steering: "wandering",boundary:room}
-                    );
+                        getRandomIntInclusive((room.y* map.tileWidth)+25,(room.y + room.height)* map.tileWidth),{withGun:true,boundary:room});
                     enemies.push(npc)
                     this.gameObject.push(npc);
                     this.physics.add.collider(npc, groundLayer);
-                    //this.physics.add.collider(npc, this.playerWithGun);
-                    //this.physics.add.overlap(this.player,npc,overlap,null,this)
-                    //this.physics.add.overlap(npc,this.player,overlap2,null,this)
-
-
                     StuffLayer.putTileAt(TILES.TRAP[0],getRandomIntInclusive(room.x,room.x + room.width)
                         ,getRandomIntInclusive(room.y,room.y + room.height))
                 }
-                //в этим рамках душно го со мной наружу
-                /*
-                floorLayer.putTileAt(TILES.WALL.TOP_LEFT,x,y);
-                floorLayer.fill(TILES.WALL.TOP,x+1,y,width-2,1);
-                floorLayer.fill(TILES.WALL.LEFT,x,y+1,1,height-1);
-                floorLayer.fill(TILES.WALL.RIGHT,x+width-1,y+1,1,height-1);
-                floorLayer.fill(TILES.WALL.BOTTOM,x,y+height,width-1,1);
-                floorLayer.putTileAt(TILES.WALL.TOP_RIGHT,x+width-1,y);
-                floorLayer.putTileAt(TILES.WALL.BOTTOM_LEFT,x,y + height);
-                floorLayer.putTileAt(TILES.WALL.BOTTOM_RIGHT,x+width-1,y + height);
-                 */
             })
             rooms.sort((a,b)=>{
                 return a.width-b.width;
@@ -156,29 +141,11 @@ let generateLevelScene = new Phaser.Class({
             StuffLayer.setTileIndexCallback(TILES.TRAP[0],(obj,tile)=>{
                 StuffLayer.putTileAt(TILES.TRAP[2], tile.x, tile.y)
                 this.playerWithGun.HP = this.playerWithGun.HP-10;
-                /*
-                StuffLayer.culledTiles.forEach(x=>{
-                    if((Math.abs(x.x- Math.round(this.playerWithGun.x/32))<=1) && (Math.abs(x.y- Math.round(this.playerWithGun.y/32))<=1)){
-                        StuffLayer.putTileAt(TILES.TRAP[2], x.x, x.y)
-                        this.playerWithGun.HP = this.playerWithGun.HP-10;
-                        return
-                    }
-                })
-                 */
             })
 
             StuffLayer.setTileIndexCallback(TILES.KUSH,(obj,tile)=>{
                 StuffLayer.putTileAt(105, tile.x, tile.y)
                 this.playerWithGun.kushCount ++;
-                /*
-                StuffLayer.culledTiles.forEach(x=>{
-                    if((Math.abs(x.x- Math.round(this.playerWithGun.x/32))<=1) && (Math.abs(x.y- Math.round(this.playerWithGun.y/32))<=1)){
-                        StuffLayer.putTileAt(105, x.x, x.y)
-                        this.playerWithGun.kushCount ++;
-                        return
-                    }
-                })
-                 */
             })
 
             this.finder = new EasyStar.js();
@@ -204,10 +171,7 @@ let generateLevelScene = new Phaser.Class({
 
 
             // Player
-            const playerX = (rooms[0].x + rooms[0].width/2) * map.tileWidth
-            const playerY = (rooms[0].y + rooms[0].height/2) * map.tileHeight
-            this.playerWithGun = new PlayerWithGun(this, playerX, playerY, 'aurora', 'gun')
-            this.playerWithGun.animationSets = this.characterFactory.animationLibrary.get('aurora');
+
 
             const wasdCursorKeys = this.input.keyboard.addKeys({
                 up:Phaser.Input.Keyboard.KeyCodes.W,
@@ -216,7 +180,7 @@ let generateLevelScene = new Phaser.Class({
                 right:Phaser.Input.Keyboard.KeyCodes.D
             });
 
-            this.playerWithGun.addBehaviour(new UserControlled(70, wasdCursorKeys));
+            this.playerWithGun.addBehaviour(new UserControlled(150, wasdCursorKeys));
             this.gameObject.push(this.playerWithGun);
             this.physics.add.collider(this.playerWithGun, groundLayer);
             this.physics.add.collider(this.playerWithGun, StuffLayer);
@@ -227,10 +191,16 @@ let generateLevelScene = new Phaser.Class({
                 bullet.setVisible(false);
                 bullet.setActive(false);
             });
-            console.log(enemies)
-            this.physics.add.collider(this.bullets, enemies, (n, bullet) => {
+            this.physics.add.collider(this.bullets, enemies, (bullet, n) => {
+                if (n.active) {
+                    bullet.damage(this.scene);
+                    n.setActive(false);
+                    n.setVisible(false);
+                }
+            })
+            this.physics.add.collider(this.bullets, this.playerWithGun, ( player,bullet) => {
                 if (bullet.active) {
-                    n.damage(this.scene);
+                    player.damage();
                     bullet.setActive(false);
                     bullet.setVisible(false);
                 }
@@ -249,9 +219,9 @@ let generateLevelScene = new Phaser.Class({
 
 
 
-            this.cameras.main.setBounds(0,0,this.physics.world.bounds.width,this.physics.world.bounds.height);
-            this.cameras.main.startFollow(this.playerWithGun);
-            this.cameras.main.setZoom(2)
+            //this.cameras.main.setBounds(0,0,this.physics.world.bounds.width,this.physics.world.bounds.height);
+            //this.cameras.main.setZoom(2)
+            //this.cameras.main.startFollow(this.playerWithGun);
 
             /*
             this.input.keyboard.once("keydown_D", event => {
@@ -271,7 +241,6 @@ let generateLevelScene = new Phaser.Class({
                     element.update();
                 });
             }
-           
         },
 
         tilesToPixels(tileX, tileY)
@@ -281,14 +250,6 @@ let generateLevelScene = new Phaser.Class({
 }
 )
 
-function overlap (player, npc)
-{
-    npc.disableBody(true, true);
-}
-function overlap2 (npc,player)
-{
-    npc.disableBody(true, true);
-}
 
 function getRandomIntInclusive(min, max) {
     min = Math.ceil(min);

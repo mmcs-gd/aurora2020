@@ -61,17 +61,8 @@ export default class Npc extends Phaser.Physics.Arcade.Sprite {
 
     damage(scene)
     {
-        if (this.hp > 0) {
+        if (this.hp > 0)
             this.hp = this.hp - 10
-        }
-        if (this.hp <= 0) {
-
-            //this.destroy();
-
-            //if (scene) {
-            //    scene.events.emit('addScore');
-            //}
-        }
     }
 
     cntLess(steps) {
