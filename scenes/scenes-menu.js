@@ -1,46 +1,10 @@
-//import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 import tilemapPng from '../assets/tileset/Crystal_tileset.png'
-//import menuBackgroundJson from '../assets/menu_background.json'
 import menuBackgroundJson from '../assets/background.json'
 
-
-import StartingScene from "./starting-scene";
-import RealLevelScene from './real-level-scene';
-import ExplorationAndShadowingScene from "./exploration-and-shadowing-scene";
-import SteeringWanderingScene from "./steering-wandering-scene";
-import SteeringArrivalScene from "./steering-arrival-scene";
-import SteeringPursuitScene from './steering-pursuit-scene';
-import SteeringEvadeAndPursuitScene from './steering-evade-and-pursuit-scene';
-import MinerScene from "./miner-scene";
-import SteeringRudnevScene from './scene-Rudnev';
-import SteeringPursuitWithDistanceScene from './steering-pursuit-with-distance'
-import SteeringFleeScene from './steering-flee-scene';
-import SteeringExploringScene from './steering-exploring-scene';
-import ProcedurallyGeneratedScene from "./procedurally-generated-scene";
-import SteeringUnionGroupScene from './steering-union-group-scene';
-import EffectsScene from './effects-scene'
-import SlimeRushScene from "./slime-rush";
 import TatarovaShkuro from './tatarova-shkuro';
 
 const scenes = [
-  //  ['StartingScene', StartingScene],
-  //  ['SteeringFleeScene', SteeringFleeScene],
-  //  ['SteeringExploringScene', SteeringExploringScene],
-  //  ['RealLevelScene', RealLevelScene],
-  //  ['SteeringRudnevScene', SteeringRudnevScene],
-  //  [ 'EffectsScene', EffectsScene],
-  //  ['SlimeRushScene', SlimeRushScene],
-  //  ['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
-  //  ['SteeringPursuitScene', SteeringPursuitScene],
-  //  ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
-  //  ['SteeringWanderingScene', SteeringWanderingScene],
-  //  ['SteeringArrivalScene', SteeringArrivalScene],
-  //  ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
-  //  ['MinerScene', MinerScene],
-  //  ['SteeringUnionGroupScene', SteeringUnionGroupScene],
-  //  ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
     ['Начать игру', TatarovaShkuro]
-
 ];
 
 let MenuScene = new Phaser.Class({
@@ -67,6 +31,7 @@ let MenuScene = new Phaser.Class({
         const map = this.make.tilemap({key: 'menu_map'});
         const tileset = map.addTilesetImage('Crystal_tileset', 'tiles');
         map.createStaticLayer('Main', tileset, 0, 0);
+				map.createStaticLayer('Objects', tileset, 0, 0);
 
 
         this.add.text(32 * 2, 32 * 1, 'Подземелья наводнили желе-мутанты,', {fill: '#FFF', fontSize : 28})
@@ -75,7 +40,7 @@ let MenuScene = new Phaser.Class({
 				.setShadow(2,2,'#000', true);
 				this.add.text(32 * 2, 32 * 3, 'Сразитесь ли вы с соперником за звание', {fill: '#FFF', fontSize : 28} )
 				.setShadow(2,2,'#000', true);
-				this.add.text(32 * 2, 32 * 4, 'самого успешного охотника за желе?', {fill: '#FFF', fontSize : 28} )
+				this.add.text(32 * 2, 32 * 4, 'самого успешного охотника на желе?', {fill: '#FFF', fontSize : 28} )
 				.setShadow(2,2,'#000', true);
 				
         // creating list of buttons
