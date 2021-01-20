@@ -18,8 +18,6 @@ import TileMapper from '../src/utils/generators/tile-mapper';
 
 import gunPng from '../assets/sprites/gun.png'
 import bulletPng from '../assets/sprites/bullet.png'
-import spellPng from '../assets/sprites/spell.png'
-import spell2Png from '../assets/sprites/spell2.png'
 import gold from '../assets/sprites/gold.png'
 import potion from '../assets/sprites/potion.png'
 import scrolls from '../assets/sprites/scrolls.png'
@@ -59,8 +57,6 @@ let TatarovaShkuro = new Phaser.Class({
         this.load.image("crystals", crystalTilemapPng);
         this.load.image("gun", gunPng);
         this.load.image("bullet", bulletPng);
-        this.load.image("spell", spellPng);
-        this.load.image("spell2", spell2Png);
         this.load.image("gold", gold);
         this.load.image("potion", potion);
         this.load.image("scrolls", scrolls);
