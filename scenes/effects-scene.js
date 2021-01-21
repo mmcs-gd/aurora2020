@@ -62,9 +62,9 @@ let EffectsScene = new Phaser.Class({
         this.gameObjects.push(this.player);
         this.physics.add.collider(this.player, worldLayer);
 
-        //this.effectsFactory.buildEffect('magicSpell', 100, 200);
+        this.effectsFactory.buildEffect('magicSpell', 100, 200);
         this.effectsFactory.buildEffect('vortex', 100, 350);
-        //this.effectsFactory.buildEffect('flamelash', 400, 350);
+        this.effectsFactory.buildEffect('flamelash', 400, 350);
 
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox

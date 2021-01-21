@@ -8,10 +8,13 @@ import yellowSpriteSheet from '../assets/sprites/characters/yellow.png'
 import greenSpriteSheet from '../assets/sprites/characters/green.png'
 import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
-
 import EffectsFactory from "../src/utils/effects-factory";
-import Portal from "../src/utils/portal/portal"
+
+import GeneratorArtifacts from '../src/utils/generator-artifacts/generator-artifacts'
+import TeleportManager from '../src/utils/portal/teleport-manager'
+import PortalManager from '../src/utils/portal/portal-manager'
 import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
+import GeneratoArtifacts from "../src/utils/generator-artifacts/generator-artifacts";
 
 let CubeScene = new Phaser.Class({
 
@@ -40,6 +43,8 @@ let CubeScene = new Phaser.Class({
     },
 
     create: function () {
+        this.sizeMapTileX = 60;
+        this.sizeMapTileY = 60;
         this.effectsFactory.loadAnimations();
         this.gameObjects = [];
         this.characterFactory = new CharacterFactory(this);
@@ -48,15 +53,15 @@ let CubeScene = new Phaser.Class({
         
         this.portals = [];
 
-        const roomGenerator = new RoomGenerator(32, this, 420, 420);
+        const roomGenerator = new RoomGenerator(32, this, this.sizeMapTileX, this.sizeMapTileY);
         const layersOfLevel = roomGenerator.generateRooms();
         
-        console.log(layersOfLevel);
 
-        this.groundLayer = layersOfLevel["Ground"];
-        this.stuffLayer = layersOfLevel["Stuff"];
+        this.groundLayer  = layersOfLevel["Ground"];
+        this.stuffLayer   = layersOfLevel["Stuff"];
         this.outsideLayer = layersOfLevel["Outside"];
-
+        this.gridRooms    = layersOfLevel['GridRooms'];
+        this.setRooms   = layersOfLevel['SetRooms'];
         const startCoordinates = roomGenerator.getStartPoint();
 
         this.player = this.characterFactory.buildCharacter('aurora', startCoordinates["X"],  startCoordinates["Y"], {player: true});
@@ -64,10 +69,6 @@ let CubeScene = new Phaser.Class({
         this.physics.add.collider(this.player, this.groundLayer);
         this.physics.add.collider(this.player, this.stuffLayer);
         this.physics.add.collider(this.player, this.outsideLayer);
-
-        //this.effectsFactory.buildEffect('magicSpell', 100, 200);
-        
-        //this.effectsFactory.buildEffect('flamelash', 400, 350);
         
         const camera = this.cameras.main;
         camera.setZoom(1.0)
@@ -84,67 +85,34 @@ let CubeScene = new Phaser.Class({
                 .setAlpha(0.75)
                 .setDepth(20);
         });
+        
+        this.widthTile = 32;
+        this.heightTile = 32;
         this.keySetPortal = this.input.keyboard.addKey('S');
         this.KOSTYL = true;
-        this.time = 0;
+        this.countArtifacts = 20;
+
+        this.portalManager      = new PortalManager(this.portals, this.keySetPortal, this.player,
+            'vortex', this.KOSTYL, this.widthTile, this.heightTile, this.effectsFactory);
+        this.teleportManager    = new TeleportManager(this.player);
+        this.generatorArtifacts = new GeneratoArtifacts(this.setRooms, 
+            this.effectsFactory, this.widthTile, this.heightInPixels, this.countArtifacts);
+        
     },
 
     update: function () {
-        this.widthTile = 32;
-        this.heightTile = 32;
-
         if (this.gameObjects) {
             this.gameObjects.forEach( function(element) {
                 element.update();
             });
-        if (this.portals.length >= 2 && this.portals[0].x == this.portals[1].x && this.portals[0].y == this.portals[1].y) {
-            for (let i = 0; i < this.portals.length; i++) {
-                this.portals[i].effect.destroy();
+            this.portals = this.portalManager.updatePortal();
+            this.teleportManager.updateTeleport(this.portals);
             }
-            this.portals = [];
-        }
-        if (this.keySetPortal.isDown && this.KOSTYL) {
-            if (this.portals.length == 2) {
-                for (let i = 0; i < this.portals.length; i++) {
-                    this.portals[i].effect.destroy();
-                }
-                this.portals = [];
-            }
-            this.KOSTYL = false;
-            this.time++;
-            let effectName = 'vortex';
-
-            let x = this.player.body.x;
-            let y = this.player.body.y;
-
-            let tileX = Math.floor((x + (this.player.body.gameObject.width / 2)) / this.widthTile);
-            let tileY = Math.floor((y + (this.player.body.gameObject.height / 2)) / this.heightTile);
-
-            console.log(tileX + " " + tileY);
-            
-            if (this.player.faceDirection == 0) tileX -= 2;
-            if (this.player.faceDirection == 1) tileX += 2;
-            if (this.player.faceDirection == 2) tileY -= 2;
-            if (this.player.faceDirection == 3) tileY += 2;
-            
-            x = tileX * this.widthTile;
-            y = tileY * this.heightTile;
-            console.log(x + " " + y);
-            if (this.portals.length < 2) {
-                let effect = this.effectsFactory.buildEffect(effectName, x, y)
-                let portal = new Portal(x, y, effect);
-                this.portals.push(portal);
-            }
-            return;
-        }
-        this.KOSTYL = this.keySetPortal.isUp;
-    }
-},
+        },
     tilesToPixels(tileX, tileY) {
         return [tileX*this.tileSize, tileY*this.tileSize];
     },
 
 
 });
-
 export default CubeScene

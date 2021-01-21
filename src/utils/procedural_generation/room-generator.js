@@ -34,7 +34,9 @@ export default class RoomGenerator {
         this.startPointY = 0;
     }
     generateRooms() {
-        const matrix = getMatrixRooms(this.width, this.height);
+        const generatedMatrixAndRooms = getMatrixRooms(this.width, this.height);
+        const matrix = generatedMatrixAndRooms['Matrix'];
+        const rooms = generatedMatrixAndRooms['Rooms'];
         for (let y = 0; y < this.height; y++) 
         {
             for (let x = 0; x < this.width; x++) 
@@ -49,9 +51,14 @@ export default class RoomGenerator {
                 }
             }
         }
-
+        console.log(rooms);
         this._settingWorld();
-        return {"Ground" : this.groundLayer, "Stuff" : this.stuffLayer, "Outside" : this.outsideLayer}
+        return {"Ground"    : this.groundLayer, 
+                "Stuff"     : this.stuffLayer, 
+                "Outside"   : this.outsideLayer,
+                "GridRooms" : matrix,
+                "SetRooms"  : this.rooms
+            }
     }
     getStartPoint() { return {"X" : this.startPointX, "Y" : this.startPointY};}
 

@@ -3,8 +3,7 @@ export default class Portal {
         this.x = x; 
         this.y = y;
         this.effect = effect;
-    }
-    update() {
-
+        this.width = effect.width; 
+        this.height = effect.height;
     }
 }

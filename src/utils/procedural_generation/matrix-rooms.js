@@ -10,7 +10,7 @@ export default function getMatrixRooms(width, height) {
         }
     }
     let rooms = getRooms(matrix, width, height);
-    return matrix;
+    return {'Matrix' : matrix, 'Rooms' : rooms};
 }
 
 function getRooms(matrix, width, height) {
