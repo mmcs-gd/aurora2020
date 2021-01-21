@@ -136,8 +136,10 @@ export default class CharacterFactory {
     }
 
     buildBoss(x, y, params) {
-        /*const boss = new Boss(this.scene, x, y, this.bossSpriteSheet);
-        boss.animations = this.animationLibrary.get(this.bossSpriteSheet);
-        return boss;*/
+        const spriteSheetName = 'punk';
+        const character = new Boss(this.scene, x, y, spriteSheetName, 2);
+
+        character.animationSets = this.animationLibrary.get(spriteSheetName);
+        return character;
     }
 }

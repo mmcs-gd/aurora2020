@@ -18,4 +18,7 @@ export default class BossAI{
       this.table.context.timer += 1;
       return this.table.getNextState(state);
     }
+
+    // босс призывает желешки. желешек столько же сколько игроков
+    // каждая желешка атакует своего игрока
 }

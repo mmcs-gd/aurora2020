@@ -6,6 +6,7 @@ import auroraSpriteSheet from '../assets/sprites/characters/aurora.png'
 import punkSpriteSheet from '../assets/sprites/characters/punk.png'
 import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
+import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 
 import EasyStar from "easystarjs";
 import Aggressive from "../src/ai/aggressive";
@@ -22,9 +23,7 @@ let SceneBoss = new Phaser.Class({
 
     characterFrameConfig: {frameWidth: 31, frameHeight: 31},
     slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
-    bossFrameConfig: {frameWidth: 96, frameHeight: 96},
-    // босс призывает желешки. желешек столько же сколько игроков
-    // каждая желешка атакует своего игрока
+    //bossFrameConfig: {frameWidth: 96, frameHeight: 96},
 
     preload: function () {
 
@@ -37,6 +36,7 @@ let SceneBoss = new Phaser.Class({
         this.load.spritesheet('slime', slimeSpriteSheet, this.slimeFrameConfig);
         this.load.spritesheet('punk', punkSpriteSheet, this.characterFrameConfig);
         //this.load.spritesheet('boss', bossSpriteSheet, this.bossFrameConfig);
+        this.load.audio('footsteps', Footsteps);
     },
 
     create: function () {
@@ -77,7 +77,7 @@ let SceneBoss = new Phaser.Class({
         this.physics.add.collider(this.player, worldLayer);
 
         //
-        this.boss = this.characterFactory.buildCharacter('punk', 700, 300);
+        this.boss = this.characterFactory.buildCharacter('boss', 700, 300);
         this.boss.setAI(new Aggressive(this.boss, [this.player]), 'idle');
         this.gameObjects.push(this.boss);
         this.physics.add.collider(this.boss, worldLayer);
@@ -106,7 +106,6 @@ let SceneBoss = new Phaser.Class({
                 element.update();
             });
         }
-        //console.log('boss.js update');
     },
 
     tilesToPixels(tileX, tileY) {
