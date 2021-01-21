@@ -119,7 +119,7 @@ export default function buildLevel(width, height, maxRooms, maxNpcs, scene){
     camera.startFollow(scene.player);
     
     scene.physics.world.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels, true, true, true, true);
-    groundLayer.setCollisionBetween(1, 500);
+    //groundLayer.setCollisionBetween(1, 500);
     stuffLayer.setDepth(900);
     stuffLayer.setCollisionBetween(1, 500);
     //upperObjectsLayer.setDepth(9999);
