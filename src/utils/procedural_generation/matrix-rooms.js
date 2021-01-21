@@ -86,7 +86,7 @@ class Room {
         this.y = y;
         this.width = width;
         this.height = height;
-
+        this.isExamination = false;
         this.room = new Array();
         for (let y = 0; y < height; y++) {
             this.room[y] = new Array();

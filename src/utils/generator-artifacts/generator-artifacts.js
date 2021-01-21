@@ -9,20 +9,38 @@ export default class GeneratoArtifacts {
     }
 
     setArtifacts(effectName) {
-        let numberRooms = [];
-
-        for (let i = 0; i < this.countArtifacts; i++) {
-            numberRooms.push(this._getRandom(1, this.rooms.length));
-        }
-
-        for (let i = 0; i < numberRooms.length; i++) {
-            for(let j = 0; j < numberRooms.length; j++) {
-                while(numberRooms[i] == numberRooms[j]) {
-                    numberRooms[i] = this._getRandom(1, this.rooms.length); 
-                }
+        let artifacts = [];
+        let countRooms = 0;
+        for (let i = 0; i < this.rooms.length; i++) {
+            let rand = this._getRandom(0, 1);
+            if (i != 0 && countRooms < this.countArtifacts && countRooms < this.rooms.length - 1 && rand == 1) {
+                let xArtifact = (this.rooms[i].x + this.rooms[i].width / 2) * 32; 
+                let yArtifact = (this.rooms[i].y + this.rooms[i].height / 2) * 32;
+                let effect = this.effectsFactory.buildEffect(effectName, xArtifact, yArtifact);
+                let artifact = new Artifact(xArtifact, yArtifact, effect, this.rooms[i]);
+                artifacts.push(artifact);
+                countRooms++
             }
-        }
-        console.log(numberRooms);
+        }   
+        this.artifacts = artifacts;
+        return artifacts;
     }
+
+    updateArtifacts(player, artifacts) {
+        this.artifacts = artifacts;
+        for (let i = 0; i < this.artifacts.length; i++) {
+            if (player.body.x + player.body.gameObject.width / 2 > this.artifacts[i].x - this.artifacts[i].width / 2
+                && player.body.y + player.body.gameObject.height / 2 > this.artifacts[i].y - this.artifacts[i].height / 2
+                && player.body.x + player.body.gameObject.width / 2 < this.artifacts[i].x + this.artifacts[i].width / 2 
+                && player.body.y + player.body.gameObject.height / 2 < this.artifacts[i].y + this.artifacts[i].height / 2) {
+                    this.artifacts[i].effect.destroy();
+                    this.artifacts.splice(i, 1);
+                    player.countArtifacts++;
+                    return true;
+                }
+        }
+        return false;
+    }
+
     _getRandom(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 }
