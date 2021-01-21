@@ -17,4 +17,4 @@ cd ./dist
 ```
 # Weekend in Bataysk
 Убивайте banditos и собирайте kush
-##P.S zoom камеры и restart сделать не удалось
+P.S zoom камеры и restart сделать не удалось
