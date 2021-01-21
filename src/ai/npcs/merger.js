@@ -36,7 +36,7 @@ export default class Merger{
             powerLevel: powerLevel,
             realTint: tints[powerLevel],
         });
-        owner.isFriendly = false;
+        owner.isFriendly = true;
         
         /*this.table.addState(new StateTableRow('idle',
             this.playerNear,
@@ -132,6 +132,7 @@ export default class Merger{
 
     onStartFollowingPlayer() {
         const context = this;
+        context.me.isFriendly = false;
         context.me.tint = context.realTint
         context.me.steering = new Chase(context.me, [context.player], 1, context.distance);
         this.timer = 0;
@@ -139,6 +140,7 @@ export default class Merger{
 
     onStopFollowingPlayer() {
         const context = this;
+        context.me.isFriendly = true;
         context.me.tint = 0xbfff00
         context.me.steering = null
         context.timer = -80;
@@ -159,6 +161,7 @@ export default class Merger{
 
     onStopMerge() {
         const context = this;
+        context.me.isFriendly = true;
         context.me.steering = null
         context.timer = 0;
     }
