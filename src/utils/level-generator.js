@@ -2,7 +2,7 @@ import Vector2 from 'phaser/src/math/Vector2'
 
 export default class Level{
     constructor(width, height, roomsCount, minRoomWidth = 5, maxRoomWidth = 9, 
-        minRoomHeight = 5, maxRoomHeight = 9, pathWidth = 3, maxPaths = 2, roomFullness = 1){
+        minRoomHeight = 5, maxRoomHeight = 9, pathWidth = 3, maxPaths = 2, roomFullness = 0.03){
         this.width = width,
         this.height = height,
         this.roomsCount = roomsCount,
@@ -22,34 +22,41 @@ export default class Level{
         this.placeRooms(rooms);
         rooms = rooms.filter(r => r.square > 1);
         this.paveTheWays(rooms);
-        //this.fillRooms(rooms);
-        
+        this.fillRooms(rooms);
+        //console.log(this.levelMatrix)
         this.rooms = rooms;
         return rooms;
     }
     
-    fillRooms(rooms)
+    fillRooms(rooms, cornerDistance = 1)
     {
         for(let i = 0; i < rooms.length; i++){
             const room = rooms[i];
-            for(let y = room.top + 1; y <= room.down - 1; y++)
+            for(let y = room.top + cornerDistance; y <= room.down - cornerDistance; y++)
             {
-                for(let x = room.left + 1; x <= room.right - 1; x++)
+                for(let x = room.left + cornerDistance; x <= room.right - cornerDistance; x++)
                 {
                     if (Math.random() <= this.roomFullness && !this.anyPropsAround(x,y) && (x != room.startCenter.x || y != room.startCenter.y))
                     {
-                        this.levelMatrix[y,x] = 2;
+                        this.levelMatrix[y][x] = 2;
                     }
                 }
             }
         }
     }
     
+    outOfBounds(x, y)
+    {
+        if (y < 0 || y >= this.levelMatrix.length || x < 0 || x >= this.levelMatrix[0].length)
+            return true;
+        return false;
+    }
+    
     anyPropsAround(x, y, depth = 1)
     {
         for (let y1 = y - depth; y1 <= y + depth; y1++)
             for (let x1 = x - depth; x1 <= x + depth; x1++)
-                if (this.levelMatrix[y1,x1] == 2)
+                if (!this.outOfBounds(x1, y1) && this.levelMatrix[y1][x1] == 2)
                     return true;
         return false;
     }

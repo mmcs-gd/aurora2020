@@ -7,12 +7,15 @@ const TILE_MAPPING = {
     FLOOR: [{name:'NORMAL', index: 95, weight: 1},
             {name:'DIRT', index: 172, weight: 1},
             {name:'BROKEN', index: 248, weight: 1},
-            //{name:'BLACK', index: 151, weight: 1}
+            //{name:'TRASH', index: 86, weight: 1},
+            //{name:'BLACK', index: 151, weight: 1},
            ],
-    STUFF: [{name:'TRASH', index: 86, weight: 1},
+    STUFF: [
             {name:'CHEST', index: 260, weight: 1},
-            {name:'TOWERHEAD', index: 208, weight: 1},
-            {name:'TOWERTAIL', index: 224, weight: 1}
+            //{name:'TOWERHEAD', index: 208, weight: 1},
+            {name:'TOWERTAIL', index: 224, weight: 1},
+            {name:'TOWERTAILCRUMBLED', index: 225, weight: 1},
+            {name:'SPIKES', index: 243, weight: 1},
            ],
 };
 
@@ -36,6 +39,8 @@ export default function buildLevel(width, height, maxRooms, maxNpcs, scene){
     const outsideLayer = scene.map.createBlankDynamicLayer("Outside", tileset);
     const groundLayer = scene.map.createBlankDynamicLayer("Ground", tileset);
     const stuffLayer = scene.map.createBlankDynamicLayer("Stuff", tileset);
+    //const upperObjectsLayer = scene.map.createBlankDynamicLayer("upperObjects", tileset);
+    //scene.props = scene.physics.add.group();
 
     // ground tiles mapping
     for(let y = 0; y < height; y++)
@@ -46,11 +51,14 @@ export default function buildLevel(width, height, maxRooms, maxNpcs, scene){
                 case 1: groundLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.FLOOR); break;
                 case 2: 
                     groundLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.FLOOR);
-                    stuffLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.STUFF); break;
+                    stuffLayer.weightedRandomize(x, y, 1, 1, TILE_MAPPING.STUFF);
+                    //let newProp = new Phaser.Physics.Arcade.Image(scene, x, y, "prop", TILE_MAPPING.STUFF[1]);
+                    //scene.props.add(newProp);
+                    break;
             }   
         
 
-    if (rooms.length >= 3)
+    if (rooms.length >= 1)
     {
         scene.player = scene.characterFactory.buildCharacter('aurora', 
                                                              rooms[0].startCenter.x * 32 + 10, 
@@ -60,29 +68,32 @@ export default function buildLevel(width, height, maxRooms, maxNpcs, scene){
         // Watch the player and tilemap layers for collisions, for the duration of the scene:
         scene.physics.add.collider(scene.player, groundLayer);
         scene.physics.add.collider(scene.player, stuffLayer);
+        //scene.physics.add.collider(scene.player, upperObjectsLayer);
         scene.physics.add.collider(scene.player, outsideLayer);
+        //scene.physics.add.collider(scene.player, scene.props);
         scene.gameObjects.push(scene.player);
         //console.log(scene.player)
         
         let npcAmount = Math.min(maxNpcs, rooms.length - 1)
-        if (npcAmount % 2 == 1)
+        /*if (npcAmount % 2 == 0)
         {
             npcAmount -= 1;
-        }
-        console.log(npcAmount)
+        }*/
+        //console.log(npcAmount)
         scene.npcs = []
-        let notUsedRooms = rooms.map((x, index) => index).filter(x => x != 0);
-        console.log(notUsedRooms)
+        let notUsedRooms = rooms.map((x, index) => {return index}).filter(x => x != 0);
         for (let z = 0; z < npcAmount; z++)
         {
-            let roomIndex = notUsedRooms[randomInt(0, notUsedRooms.length - 1)]
-            notUsedRooms = notUsedRooms.filter(x => x != roomIndex);
-            let npc = scene.characterFactory.buildCharacter('green', rooms[roomIndex].startCenter.x * 32 + 10, 
+            let randIndex = randomInt(0, notUsedRooms.length - 1);
+            let roomIndex = notUsedRooms[randIndex]
+            notUsedRooms.splice(randIndex, 1); // randIndex - индекс, 1 - кол-во удаляемых элементов
+            //notUsedRooms.filter(x => x != roomIndex);
+            let npc = scene.characterFactory.buildCharacter('blue', rooms[roomIndex].startCenter.x * 32 + 10, 
                                                              rooms[roomIndex].startCenter.y * 32 + 10); 
-            npc.setAI(new Merger(npc, [], scene.player), 'idle');
+            npc.setAI(new Merger(npc, scene.player), 'idle');
             scene.gameObjects.push(npc);
             scene.physics.add.collider(npc, groundLayer);
-            scene.physics.add.collider(npc, stuffLayer);
+            //scene.physics.add.collider(npc, stuffLayer);
             scene.physics.add.collider(npc, outsideLayer);
             scene.physics.add.collider(npc, scene.player, scene.onNpcPlayerCollide.bind(scene));
             for (let npc2 of scene.npcs)
@@ -109,12 +120,14 @@ export default function buildLevel(width, height, maxRooms, maxNpcs, scene){
     
     scene.physics.world.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels, true, true, true, true);
     groundLayer.setCollisionBetween(1, 500);
-    stuffLayer.setDepth(-10);
+    stuffLayer.setDepth(900);
     stuffLayer.setCollisionBetween(1, 500);
+    //upperObjectsLayer.setDepth(9999);
+    //upperObjectsLayer.setCollisionBetween(1, 500);
     outsideLayer.setDepth(9999);
     outsideLayer.setCollisionBetween(1, 500);
 
-    return {"Ground" : groundLayer, "Stuff" : stuffLayer, "Outside" : outsideLayer}
+    return {"Ground" : groundLayer, "Outside" : outsideLayer}
 };
 
 function serialize(instance) {

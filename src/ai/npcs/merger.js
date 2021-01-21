@@ -2,26 +2,52 @@ import {StateTable, StateTableRow} from '../behaviour/state'
 import Chase from "../steerings/chase";
 import Exploring from "../steerings/exploring";
 
+const tints =
+{
+ 0: 0xffffff,
+ 1: 0xff9999,
+ 2: 0xff4c4c,
+ 3: 0xcc0000,
+ 4: 0x4c0000,
+}
+
+function randomInt(min, max)
+{
+    return (Math.random() * (max - min + 1)) | 0 + min
+}
+
 export default class Merger{
-    constructor(owner, npcs, player) {
+    constructor(owner, player, powerLevell) {
+        const powerLevel = powerLevell || randomInt(0, 2);
+        if (powerLevel > 4)
+        {
+            powerLevel = 4
+        }
+        //console.log(powerLevel)
+        owner.maxSpeed = ((powerLevel * 0.12) + 0.3) * player.maxSpeed;
+        owner.tint = 0xbfff00
         this.table = new StateTable({
             me: owner,
-            npcs: npcs,
+            npcs: [],
             player: player,
             selectedEnemy: null,
             distance: 200,
-            timer: 0
+            timer: 0,
+            powerLevel: powerLevel,
+            realTint: tints[powerLevel],
         });
-
-        this.table.addState(new StateTableRow('idle',
+        owner.isFriendly = false;
+        
+        /*this.table.addState(new StateTableRow('idle',
             this.playerNear,
             'follow',
             this.onStartFollowingPlayer));
         
+        
         this.table.addState(new StateTableRow('idle',
             this.npcNear,
             'merge',
-            this.onStartMerge));
+            this.onStartMerge));*/
         
         this.table.addState(new StateTableRow('idle',
             this.waitedEnough,
@@ -52,6 +78,16 @@ export default class Merger{
             this.npcFar,
             'idle',
             this.onStopMerge));
+        
+        this.table.addState(new StateTableRow('merge',
+            this.waitedEnough,
+            'rage',
+            this.onStartRage));
+        
+        this.table.addState(new StateTableRow('rage',
+            this.waitedEnough,
+            'idle',
+            this.onStopRage));
     }
     
     addNpcs(newNpcs)
@@ -85,6 +121,7 @@ export default class Merger{
     
     npcNear() {
         const context = this;
+        //console.log(context.npcs)
         return context.npcs.some(n => n.body.position.distance(context.me.body.position) <= context.distance)
     }
 
@@ -95,27 +132,29 @@ export default class Merger{
 
     onStartFollowingPlayer() {
         const context = this;
-        context.me.maxSpeed = 100;
+        context.me.tint = context.realTint
         context.me.steering = new Chase(context.me, [context.player], 1, context.distance);
         this.timer = 0;
     }
 
     onStopFollowingPlayer() {
         const context = this;
+        context.me.tint = 0xbfff00
         context.me.steering = null
-        context.timer = 0;
+        context.timer = -80;
     }
     
     onStartMerge() {
         const context = this;
+        context.me.isFriendly = true;
+        context.me.tint = 0xbfff00
         const targets = context.npcs.filter(x =>
             x.body.position.distance(context.me.body.position) <= context.distance)
         const target = targets.reduce(function(previousValue, currentValue, index, array) {
             return currentValue.body.position.distance(context.me.body.position) < previousValue.body.position.distance(context.me.body.position) ? currentValue : previousValue;
         });
-        context.me.maxSpeed = 100;
         context.me.steering = new Chase(context.me, [target], 1, context.distance);
-        this.timer = 0;
+        this.timer = -160;
     }
 
     onStopMerge() {
@@ -126,12 +165,32 @@ export default class Merger{
 
     waitedEnough() {
         const context = this;
-        return context.timer > 120;
+        return context.timer > 80;
     }
 
     onStartResearch() {
         const context = this;
+        context.me.tint = context.realTint
+        context.me.isFriendly = false;
         context.me.steering = new Exploring(context.me, 1, 20);
         context.timer = 0;
+    }
+    
+    onStartRage() {
+        const context = this;
+        context.me.tint = 0x000000
+        context.me.isFriendly = false;
+        context.me.maxSpeed = context.me.maxSpeed * 1.5
+        context.me.steering = new Chase(context.me, [context.player], 1, context.distance * 8);
+        context.timer = 0;
+    }
+    
+    onStopRage() {
+        const context = this;
+        context.me.tint = 0xbfff00
+        context.me.isFriendly = true;
+        context.me.maxSpeed = context.me.maxSpeed / 1.5
+        context.me.steering = null
+        context.timer = -100;
     }
 }
