@@ -46,8 +46,6 @@ let ProcedurallyGeneratedScene = new Phaser.Class({
         this.stuffLayer = layers["Stuff"];
         this.outsideLayer = layers["Outside"];
 
-        console.log(this);
-
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
             this.physics.world.createDebugGraphic();

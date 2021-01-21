@@ -7,6 +7,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
         scene.add.existing(this);
         this.lastMineTime = 0;
         this.abilities  = params.abilities || []
+        this.faceDirection = 3;
     }
 
     update() {
@@ -21,8 +22,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
                 this.scene.characterFactory.buildMine(this.body.x, this.body.y);
             }
         }
-
-
         if (cursors.left.isDown) {
             body.velocity.x -= speed;
         } else if (cursors.right.isDown) {
@@ -39,6 +38,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
         body.velocity.normalize().scale(speed);
         this.updateAnimation();
     };
+    
     updateAnimation() {
         const animations = this.animationSets.get('Walk');
         const animsController = this.anims;
@@ -50,12 +50,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
         }
         if (x < 0) {
             animsController.play(animations[0], true);
+            this.faceDirection = 0;
         } else if (x > 0) {
             animsController.play(animations[1], true);
+            this.faceDirection = 1;
         } else if (y < 0) {
             animsController.play(animations[2], true);
+            this.faceDirection = 2;
         } else if (y > 0) {
             animsController.play(animations[3], true);
+            this.faceDirection = 3;
         } else {
             this.footstepsMusic.pause();
             const currentAnimation = animsController.currentAnim;
@@ -64,5 +68,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
                 this.setTexture(frame.textureKey, frame.textureFrame);
             }
         }
+    }
+    setPortal(portal) {
+
     }
 }

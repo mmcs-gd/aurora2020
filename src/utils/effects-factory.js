@@ -41,7 +41,6 @@ export default class EffectsFactory {
         // todo: make specific animation loader for vfx
         effect.anims.play(effectName, true)
         effect.anims.setRepeat(-1);
+        return effect;
     }
-
-
 }

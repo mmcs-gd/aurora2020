@@ -35,8 +35,8 @@ let EffectsScene = new Phaser.Class({
         this.load.audio('footsteps', Footsteps);
         this.characterFactory = new CharacterFactory(this);
         this.effectsFactory = new EffectsFactory(this);
-
     },
+
     create: function () {
         this.effectsFactory.loadAnimations();
         this.gameObjects = [];
@@ -62,9 +62,10 @@ let EffectsScene = new Phaser.Class({
         this.gameObjects.push(this.player);
         this.physics.add.collider(this.player, worldLayer);
 
-        this.effectsFactory.buildEffect('magicSpell', 100, 200);
+        //this.effectsFactory.buildEffect('magicSpell', 100, 200);
         this.effectsFactory.buildEffect('vortex', 100, 350);
-        this.effectsFactory.buildEffect('flamelash', 400, 350);
+        //this.effectsFactory.buildEffect('flamelash', 400, 350);
+
         this.input.keyboard.once("keydown_D", event => {
             // Turn on physics debugging to show player's hitbox
             this.physics.world.createDebugGraphic();
@@ -81,8 +82,11 @@ let EffectsScene = new Phaser.Class({
                 element.update();
             });
         }
-
+        this.input.keyboard.once('keydown_S', event => { 
+            console.log(event.keyCode);
+        });
     },
+
     tilesToPixels(tileX, tileY) {
         return [tileX*this.tileSize, tileY*this.tileSize];
     }

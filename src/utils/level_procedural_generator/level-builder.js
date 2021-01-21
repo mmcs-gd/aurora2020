@@ -28,6 +28,7 @@ export default function buildLevel(width, height, maxRooms, scene){
     const outsideLayer = scene.map.createBlankDynamicLayer("Water", tileset);
     const groundLayer = scene.map.createBlankDynamicLayer("Ground", tileset);
     const stuffLayer = scene.map.createBlankDynamicLayer("Stuff", tileset);
+
     for(let y = 0; y < height; y++)
     {
         for(let x = 0; x < width; x++)
