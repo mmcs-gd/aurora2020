@@ -94,7 +94,7 @@ let TatarovaShkuro = new Phaser.Class({
             for(let x = 0; x < this.groundLayer.tilemap.width; x++) {
                 const tile = this.groundLayer.tilemap.getTileAt(x, y);
                 const jewelry = this.collideObjectsLayer.tilemap.getTileAt(x, y);
-                if (!jewelry && !tile) {
+                if (jewelry || tile || !markedMap[x][y]) {
                     col.push(0);
                 } else {
                     col.push(1);

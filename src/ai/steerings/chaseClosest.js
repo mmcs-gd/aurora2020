@@ -41,33 +41,28 @@ export default class ChaseClosest extends Steering {
             }
         }
         const targetPos = this.owner.target;
-				let desiredVelocity = new Vector2(targetPos.x - this.owner.x, targetPos.y - this.owner.y)
-          .normalize()
-          .scale(this.owner.maxSpeed);
-				const curVelocity = new Vector2(this.owner.body.x - this.owner.body.prev.x, this.owner.body.y - this.owner.body.prev.y);
+				let desiredVelocity = null;
 				
 				this.finder.findPath(Math.round(this.owner.x/32), Math.round(this.owner.y/32), 
 				Math.round(targetPos.x/32), Math.round(targetPos.y/32), function (path){
-					desiredVelocity = null
 					if(path == null || path == []){
-						console.warn("This is fine :(");
+						//console.warn("This is fine :(");
 					}
 					else {
-						let ex = 32 * path[2].x;
-						let ey = 32 * path[2].y;
-						console.warn(path);
+						let ex = 32 * path[1].x;
+						let ey = 32 * path[1].y;
 						desiredVelocity = new Vector2(ex,ey);
 					}
 				})
 				
 				this.finder.calculate();
 				
-			if(desiredVelocity === null )				
+			if(desiredVelocity !== null )				
 				return new Vector2(desiredVelocity.x - this.owner.x, desiredVelocity.y - this.owner.y);//.normalize().scale(this.owner.maxSpeed);
       else {
 					// no min dist was set
         if (this.minDist === null) {
-            const desiredVelocity = new Vector2(targetPos.x - this.owner.x, targetPos.y - this.owner.y)
+            desiredVelocity = new Vector2(targetPos.x - this.owner.x, targetPos.y - this.owner.y)
                 .normalize()
                 .scale(this.owner.maxSpeed);
             const curVelocity = new Vector2(this.owner.body.x - this.owner.body.prev.x, this.owner.body.y - this.owner.body.prev.y);
@@ -75,7 +70,7 @@ export default class ChaseClosest extends Steering {
         }
         const distance = ChaseClosest.calculateDistance(this.owner, targetPos);
 
-        let desiredVelocity = new Vector2(targetPos.x - this.owner.x, targetPos.y - this.owner.y)
+        desiredVelocity = new Vector2(targetPos.x - this.owner.x, targetPos.y - this.owner.y)
         desiredVelocity.normalize().scale(this.owner.maxSpeed);
         if (distance > this.minDist) {
             return desiredVelocity;

@@ -21,7 +21,7 @@ export class Scroll extends Phaser.Physics.Arcade.Sprite
         scene.physics.world.enable(this);
         scene.add.existing(this);
         this.setDepth(1);
-        this.value = 10;
+        this.value = 5;
     }
 
     interact(target) {
@@ -37,7 +37,7 @@ export class Gold extends Phaser.Physics.Arcade.Sprite
         scene.physics.world.enable(this);
         scene.add.existing(this);
         this.setDepth(1);
-        this.value = 25;
+        this.value = 15;
     }
 
     interact(target) {
