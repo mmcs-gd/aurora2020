@@ -1,17 +1,11 @@
 import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 import auroraSpriteSheet from '../assets/sprites/characters/aurora.png'
 import punkSpriteSheet from '../assets/sprites/characters/punk.png'
-//import blueSpriteSheet from '../assets/sprites/characters/blue.png'
-//import yellowSpriteSheet from '../assets/sprites/characters/yellow.png'
-//import greenSpriteSheet from '../assets/sprites/characters/green.png'
-//import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 import EffectsFactory from "../src/utils/effects-factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 
 import buildLevel from '../src/utils/level_generator/level-build';
-//import Aggressive from "../src/ai/aggressive";
-//import MobAI from "../src/ai/mob";
 
 
 let SceneDungeon = new Phaser.Class({
@@ -24,8 +18,6 @@ let SceneDungeon = new Phaser.Class({
 
     effectsFrameConfig: {frameWidth: 32, frameHeight: 32},
     characterFrameConfig: {frameWidth: 31, frameHeight: 31},
-    //slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
-    //mineFrameConfig: { frameWidth: 130, frameHeight: 130 },
 
     preload: function () {
         //loading map tiles
@@ -33,11 +25,7 @@ let SceneDungeon = new Phaser.Class({
         
         //loading spitesheets
         this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
-        //this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
-        //this.load.spritesheet('green', greenSpriteSheet, this.characterFrameConfig);
-        //this.load.spritesheet('yellow', yellowSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('punk', punkSpriteSheet, this.characterFrameConfig);
-        //this.load.spritesheet('slime', slimeSpriteSheet, this.slimeFrameConfig);
         this.load.audio('footsteps', Footsteps);
 
         this.effectsFactory = new EffectsFactory(this);
@@ -57,18 +45,37 @@ let SceneDungeon = new Phaser.Class({
                 this.groundLayer = layers["Ground"];
                 this.outsideLayer = layers["Outside"];
                 this.wallsLayer = layers["Walls"];
+
+                // убрать потом
+                this.rooms = layers["rooms"];
+                this.corridors = layers["corridors"];
+                this.fillPercent = layers["fillPercent"];
                 break;
             } catch (err) {}
         }
 
         // передаём инфу в сцену с текстом
         this.game.scene.scenes[0]._SceneTextInfo = {
-            mapSize: {
+            mapSize: { // canvas 800x600
                 width: 50*32,
                 height: 50*32
             },
-            roomsCount: 2,
-            fillPercent: 38,
+            roomsCount: this.rooms.length,
+            fillPercent: this.fillPercent,
+            countNPC: this.npc.length, // buildLevel добавил npc
+        };
+
+        // передаём инфу в сцену с картой
+        this.game.scene.scenes[0]._SceneMapInfo = {
+            mapSize: { // canvas 800x600
+                width: 50*32,
+                height: 50*32
+            },
+            rooms: this.rooms,
+            corridors: this.corridors,
+            portal: undefined,
+            npc: this.npc,
+            player: this.player,
         };
 
         // вешаем события на кнопки
@@ -103,6 +110,9 @@ let SceneDungeon = new Phaser.Class({
 
         // запускаем сцену в которой выводим текст
         this.scene.run("SceneText");
+
+        // соединение с сервером
+        // глянуть видосик на youtube по socket.io, websocket
     },
 
     update: function () {

@@ -146,5 +146,5 @@ export default function buildLevel(width, height, scene) {
     wallsLayer.setDepth(10);
     wallsLayer.setCollisionBetween(0, 320); // столкновение с тайлами у которых индексы 0..320
 
-    return {"Ground" : groundLayer, "Outside" : outsideLayer, "Walls" : wallsLayer}
+    return {"Ground" : groundLayer, "Outside" : outsideLayer, "Walls" : wallsLayer, "rooms":rooms, "corridors":corridors, "fillPercent": levelMetric.fillPercent() * 100}
 }

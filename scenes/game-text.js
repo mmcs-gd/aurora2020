@@ -14,23 +14,28 @@ let SceneText = new Phaser.Class({
 
     create: function () {
         console.log('game-text.js create');
-        const { mapSize, roomsCount, fillPercent } = this.game.scene.scenes[0]._SceneTextInfo;
+        const { mapSize, roomsCount, fillPercent, countNPC } = this.game.scene.scenes[0]._SceneTextInfo;
 
         this.add.text(0, 0, `map size: ${mapSize.width} x ${mapSize.height}`, {fill: '#FFF', fontSize: 16});
-        this.add.text(0, 18, 'rooms count: ', {fill: '#FFF', fontSize: 16});
-        this.add.text(0, 36, ' % заполнения', {fill: '#FFF', fontSize: 16});
+        this.add.text(0, 18, 'rooms count: ' + roomsCount, {fill: '#FFF', fontSize: 16});
+        this.add.text(0, 36, `заполнение: ${fillPercent} %`, {fill: '#FFF', fontSize: 16});
+        this.add.text(0, 54, 'кол-во NPC: ' + countNPC, {fill: '#FFF', fontSize: 16});
+
+        this.countNPC = countNPC;
     },
 
     update: function () {
         //console.log('game-text.js update');
-        const { countNPC, countPlayers } = this.game.scene.scenes[0]._SceneTextInfo;
-        const seconds = (new Date()).getSeconds();
-        console.log(seconds);
-        if (0 === seconds % 2) {
+        const { countNPC } = this.game.scene.scenes[0]._SceneTextInfo;
+        if (countNPC !== this.countNPC){
             // замедляет в 2 раза если обновлять каждый кадр
             this.add.text(0, 54, 'кол-во NPC: ' + countNPC, {fill: '#FFF', fontSize: 16});
-            this.add.text(0, 72, 'кол-во игроков: ' + countPlayers, {fill: '#FFF', fontSize: 16});
+            this.countNPC = countNPC;
         }
+
+        // FPS
+        const seconds = (new Date()).getSeconds();
+        console.log(seconds);
     },
 });
 

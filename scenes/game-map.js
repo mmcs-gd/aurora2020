@@ -1,6 +1,3 @@
-import tilemapPng from '../assets/tileset/Dungeon_Tileset.png';
-import dungeonRoomJson from '../assets/dungeon_room.json';
-
 // сцена для отображения карты игры
 let SceneMap = new Phaser.Class({
 
@@ -11,47 +8,54 @@ let SceneMap = new Phaser.Class({
     },
 
     preload: function () {
-        console.log('game-map.js preload');
-
-        //loading map tiles and json with positions
-        this.load.image("tiles", tilemapPng);
-        this.load.tilemapTiledJSON("map", dungeonRoomJson);
+        //console.log('game-map.js preload');
     },
 
     create: function () {
-        console.log('game-map.js create');
+        //console.log('game-map.js create');
+        this.time = Date.now();
 
-        this.gameObjects = [];
-        const map = this.make.tilemap({key: "map"});
-
-        // Parameters are the name you gave the tileset in Tiled and then the key of the tileset image in
-        // Phaser's cache (i.e. the name you used in preload)
-        const tileset = map.addTilesetImage("Dungeon_Tileset", "tiles");
-
-
-        // Parameters: layer name (or index) from Tiled, tileset, x, y
-        //const belowLayer = map.createStaticLayer("Floor", tileset, 0, 0);
-        const worldLayer = map.createStaticLayer("Walls", tileset, 0, 0);
-        this.tileSize = 32;
-        let grid = [];
-        for(let y = 0; y < worldLayer.tilemap.height; y++){
-            let col = [];
-            for(let x = 0; x < worldLayer.tilemap.width; x++) {
-                const tile = worldLayer.tilemap.getTileAt(x, y);
-                col.push(tile ? tile.index : 0);
-            }
-            grid.push(col);
-        }
+        this.drawMap();
     },
 
     update: function () {
         //console.log('game-map.js update');
+        const { player, npc } = this.game.scene.scenes[0]._SceneMapInfo;
+
+        // обновлять позиции объектов кажд. 0.5 сек
         // красную точку или png изображение на месте где стоит игрок
+        const time = Date.now();
+        if (500 < time - this.time){
+            this.drawMap();
+            this.graphics.fillStyle(0xFF0000, 1.0);
+            this.graphics.fillCircle(player.x / 32 * 8, player.y / 32 * 8, 3);
+
+            this.graphics.fillStyle(0x0000FF, 1.0);
+            npc.forEach(obj => this.graphics.fillCircle(obj.x / 32 * 8, obj.y / 32 * 8, 3));
+            this.time = time;
+        }
     },
 
-    tilesToPixels(tileX, tileY) {
-        return [tileX*this.tileSize, tileY*this.tileSize];
-    },
+    drawMap() {
+        const { mapSize, rooms, corridors, portal } = this.game.scene.scenes[0]._SceneMapInfo;
+
+        // https://photonstorm.github.io/phaser3-docs/Phaser.GameObjects.Graphics.html
+        this.graphics = this.add.graphics();
+        this.graphics.fillStyle(0x000000, 1.0);
+        this.graphics.fillRect(0, 0, 790, 590);
+
+        this.graphics.lineStyle(2, 0xFF0000, 1.0);
+        this.graphics.strokeRect(0, 0, 50*8, 50*8);
+
+        this.graphics.fillStyle(0xCCCCCC, 1.0);
+        corridors.forEach( ({ rect_dx, rect_dy }) => {
+            if (rect_dx) this.graphics.fillRect(rect_dx.x*8, rect_dx.y*8, rect_dx.w*8, rect_dx.h*8);
+            if (rect_dy) this.graphics.fillRect(rect_dy.x*8, rect_dy.y*8, rect_dy.w*8, rect_dy.h*8);
+        });
+
+        this.graphics.fillStyle(0xBBBBBB, 1.0);
+        rooms.forEach( ({x,y,w,h}) => this.graphics.fillRect(x*8, y*8, w*8, h*8));
+    }
 });
 
 export default SceneMap
