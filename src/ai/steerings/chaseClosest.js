@@ -2,9 +2,10 @@ import Vector2 from "phaser/src/math/Vector2";
 import Steering from "./steering";
 
 export default class ChaseClosest extends Steering {
-    constructor(owner, objects, minDist = null, force = 1) {
+    constructor(finder, owner, objects, minDist = null, force = 1) {
         super(owner, objects, force);
         this.minDist = minDist;
+				this.finder = finder;
     }
 
     static calculateDistance(owner, object) {
@@ -40,8 +41,31 @@ export default class ChaseClosest extends Steering {
             }
         }
         const targetPos = this.owner.target;
-
-        // no min dist was set
+				let desiredVelocity = new Vector2(targetPos.x - this.owner.x, targetPos.y - this.owner.y)
+          .normalize()
+          .scale(this.owner.maxSpeed);
+				const curVelocity = new Vector2(this.owner.body.x - this.owner.body.prev.x, this.owner.body.y - this.owner.body.prev.y);
+				
+				this.finder.findPath(Math.round(this.owner.x/32), Math.round(this.owner.y/32), 
+				Math.round(targetPos.x/32), Math.round(targetPos.y/32), function (path){
+					desiredVelocity = null
+					if(path == null || path == []){
+						console.warn("This is fine :(");
+					}
+					else {
+						let ex = 32 * path[2].x;
+						let ey = 32 * path[2].y;
+						console.warn(path);
+						desiredVelocity = new Vector2(ex,ey);
+					}
+				})
+				
+				this.finder.calculate();
+				
+			if(desiredVelocity === null )				
+				return new Vector2(desiredVelocity.x - this.owner.x, desiredVelocity.y - this.owner.y);//.normalize().scale(this.owner.maxSpeed);
+      else {
+					// no min dist was set
         if (this.minDist === null) {
             const desiredVelocity = new Vector2(targetPos.x - this.owner.x, targetPos.y - this.owner.y)
                 .normalize()
@@ -62,7 +86,6 @@ export default class ChaseClosest extends Steering {
             newDesiredVelocity.normalize().scale(this.owner.maxSpeed);
             return newDesiredVelocity;
         }
-
-
+			}
     }
 }

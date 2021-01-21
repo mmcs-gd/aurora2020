@@ -335,20 +335,21 @@ export default class FillLevel {
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.slimeIsCloser, NpcStates.ChasingSlime));
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.goldIsCloser, NpcStates.ChasingObject));
 
-            npc.stateTable.addState(new StateTableRow(NpcStates.Following, npc.slimeIsCloser, NpcStates.ChasingSlime));
-            npc.stateTable.addState(new StateTableRow(NpcStates.Following, npc.goldIsCloser, NpcStates.ChasingObject));
+            //npc.stateTable.addState(new StateTableRow(NpcStates.Following, npc.slimeIsCloser, NpcStates.ChasingSlime));
+            //npc.stateTable.addState(new StateTableRow(NpcStates.Following, npc.goldIsCloser, NpcStates.ChasingObject));
             
             npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, () => !npc.canAttackSlime() && npc.goldIsCloser(), NpcStates.ChasingObject));
+						//npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, () => !npc.canAttackSlime(), NpcStates.ChasingObject));
 
-            npc.stateTable.addState(new StateTableRow(NpcStates.Following, npc.needToHeal, NpcStates.ChasingObject));
+            //npc.stateTable.addState(new StateTableRow(NpcStates.Following, npc.needToHeal, NpcStates.ChasingObject));
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.needToHeal, NpcStates.ChasingObject));
             npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, npc.needToHeal, NpcStates.ChasingObject));
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, () => !npc.needToHeal() && npc.goldIsCloser(), NpcStates.ChasingObject));
-            npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, () => !npc.needToHeal() && npc.slimeIsCloser(), NpcStates.ChasingSlime));
+						npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, () => !npc.needToHeal() && npc.slimeIsCloser(), NpcStates.ChasingSlime));
 
-            npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.shouldFollowPlayer, NpcStates.Following));
-            npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, npc.shouldFollowPlayer, NpcStates.Following));
-            npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, npc.shouldFollowPlayer, NpcStates.Following));
+            //npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.shouldFollowPlayer, NpcStates.Following));
+            //npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, npc.shouldFollowPlayer, NpcStates.Following));
+            //npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, npc.shouldFollowPlayer, NpcStates.Following));
             
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, () => npc.isDead, NpcStates.Dead));
             npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, () => npc.isDead, NpcStates.Dead));
@@ -361,9 +362,9 @@ export default class FillLevel {
         const that = this;
         return function (npc) {
             let steerings = {
-                [NpcStates.ChasingSlime]: new ChaseClosest(npc, that.scene.slimes.children.entries, 80),
+                [NpcStates.ChasingSlime]: new ChaseClosest(that.scene.finder, npc, that.scene.slimes.children.entries, 80),
                 [NpcStates.Attacking]: new Attack(npc, []),
-                [NpcStates.ChasingObject]: new ChaseClosest(npc, []),
+                [NpcStates.ChasingObject]: new ChaseClosest(that.scene.finder, npc, []),
                 [NpcStates.Following]: new Shadowing(npc, [that.scene.player])
             };
             npc.steerings = steerings;
@@ -390,7 +391,8 @@ export default class FillLevel {
 
                 const d1 = ChaseClosest.calculateDistance(npc, slime);
                 const d2 = ChaseClosest.calculateDistance(npc, object);
-                if (d1 <= d2 && d1 < 300) {
+                //if (d1 <= d2 && d1 < 300) {
+								if (d1 <= d2) {
                     npc.target = slime;
                     return true;
                 }
@@ -416,7 +418,8 @@ export default class FillLevel {
 
                 const d1 = ChaseClosest.calculateDistance(npc, object);
                 const d2 = ChaseClosest.calculateDistance(npc, slime);
-                if (d1 <= d2 && d1 < 300) {
+                //if (d1 <= d2 && d1 < 300) {
+								if (d1 <= d2) {
                     npc.steerings[NpcStates.ChasingObject].objects = objects;
                     npc.target = object;
                     return true;
