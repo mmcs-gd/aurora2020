@@ -10,15 +10,16 @@ import EasyStar from "easystarjs";
 import CharacterFactory from "../src/characters/character_factory";
 import {config} from '../src/index'
 import generator from "../roomGenerator/generator";
-
+import resetPng from '../assets/sprites/stuff/reset.png'
 import gunPng from '../assets/sprites/stuff/gun.png'
+import heartPng from '../assets/sprites/stuff/heart.png'
 import bulletPng from '../assets/sprites/stuff/bullet.png'
 import cursorCur from '../assets/sprites/stuff/cursor.cur'
 import UserControlled from "../src/ai/behaviour/user_controlled";
 import {PlayerWithGun} from "../src/characters/player_with_gun";
 import {Bullet} from "../src/stuff/bullet";
 import {Bullets} from "../src/stuff/Bullets";
-
+import MenuScene from "./scenes-menu";
 import wandering from "../src/ai/steerings/wandering";
 
 let generateLevelScene = new Phaser.Class({
@@ -35,7 +36,8 @@ let generateLevelScene = new Phaser.Class({
 
             this.load.image("gun", gunPng);
             this.load.image("bullet", bulletPng);
-
+            this.load.image("heart", heartPng);
+            this.load.image('reset', resetPng);
             //loading spitesheets
             this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
             this.load.spritesheet('blue', blueSpriteSheet, this.characterFrameConfig);
@@ -94,6 +96,9 @@ let generateLevelScene = new Phaser.Class({
             const playerY = (rooms[0].y + rooms[0].height/2) * map.tileHeight
             this.playerWithGun = new PlayerWithGun(this, playerX, playerY, 'aurora', 'gun')
             this.playerWithGun.animationSets = this.characterFactory.animationLibrary.get('aurora');
+            this.hpInfo = this.add.text(20, 20, 'HP ' + this.playerWithGun.hp);
+            this.scoreInfo = this.add.text(20, 40, 'KUSH ' + this.playerWithGun.kushCount);
+
 
             rooms.forEach(room =>{
                 const {x,y,width,height} = room
@@ -140,12 +145,14 @@ let generateLevelScene = new Phaser.Class({
 
             StuffLayer.setTileIndexCallback(TILES.TRAP[0],(obj,tile)=>{
                 StuffLayer.putTileAt(TILES.TRAP[2], tile.x, tile.y)
-                this.playerWithGun.HP = this.playerWithGun.HP-10;
+                this.playerWithGun.hp = this.playerWithGun.hp-10;
+                updateHP(this.hpInfo,this.playerWithGun)
             })
 
             StuffLayer.setTileIndexCallback(TILES.KUSH,(obj,tile)=>{
                 StuffLayer.putTileAt(105, tile.x, tile.y)
                 this.playerWithGun.kushCount ++;
+                updateKush(this.scoreInfo,this.playerWithGun)
             })
 
             this.finder = new EasyStar.js();
@@ -168,8 +175,20 @@ let generateLevelScene = new Phaser.Class({
             this.physics.world.bounds.width = map.widthInPixels;
             this.physics.world.bounds.height = map.heightInPixels;
 
+            let hp = []
+            for(let i = 0;i<getRandomIntInclusive(3, 5);i++) {
+                let hearth1 = this.physics.add.sprite(rooms[i].x * map.tileWidth + 50, rooms[i].y * map.tileWidth + 50, 'heart');
+                hp.push(hearth1)
+            }
+            this.physics.add.collider(hp, this.playerWithGun, (h,p) => {
+                h.destroy();
+                p.hp = p.hp + 50
+                updateHP(this.hpInfo,p)
+            });
 
 
+            //this.gameObject.push(hearth)
+            //console.log(hearth)
             // Player
 
 
@@ -201,6 +220,7 @@ let generateLevelScene = new Phaser.Class({
             this.physics.add.collider(this.bullets, this.playerWithGun, ( player,bullet) => {
                 if (bullet.active) {
                     player.damage();
+                    updateHP(this.hpInfo,player)
                     bullet.setActive(false);
                     bullet.setVisible(false);
                 }
@@ -218,11 +238,23 @@ let generateLevelScene = new Phaser.Class({
             });
 
 
-
+            // не смог подебить коректное отображение пушек с включенным зумом
             //this.cameras.main.setBounds(0,0,this.physics.world.bounds.width,this.physics.world.bounds.height);
             //this.cameras.main.setZoom(2)
             //this.cameras.main.startFollow(this.playerWithGun);
 
+            this.events.on('moveCamera', (x,y) => {
+                this.scoreInfo.setX(x);
+                this.scoreInfo.setY(y);
+                this.hpInfo.setX(x);
+                this.hpInfo.setY(y + 30);
+            }, this.scene);
+
+
+
+             this.input.keyboard.once("keydown_F", event => {
+                 this.scene.restart()
+            });
             /*
             this.input.keyboard.once("keydown_D", event => {
                 // Turn on physics debugging to show player's hitbox
@@ -235,12 +267,26 @@ let generateLevelScene = new Phaser.Class({
             });*/
         },
         update:function () {
+            if (this.playerWithGun.hp > 0){
+                if(this.playerWithGun.kushCount ==5){
+                    this.add.text(config.width/2, config.height/2, 'You grabbed all kush and you still alive.Congratulations! Press F to restart')
+                        .setInteractive()
+                        .on('pointerdown', () => {this.scene.restart()});
+                    this.scene.pause()
 
-            if (this.gameObject) {
-                this.gameObject.forEach(function (element) {
-                    element.update();
-                });
-            }
+                }
+                if (this.gameObject) {
+                    this.gameObject.forEach(function (element) {
+                        element.update();
+                    });
+                }
+                const camera = this.cameras.main;
+                this.events.emit('moveCamera', camera.scrollX, camera.scrollY);
+            }else{
+                showTxt(this)
+                this.scene.pause(this)
+        }
+
         },
 
         tilesToPixels(tileX, tileY)
@@ -250,6 +296,21 @@ let generateLevelScene = new Phaser.Class({
 }
 )
 
+function showTxt(scene){
+
+    let txt = scene.add.text(config.width/2, config.height/2, 'You died! Press F to restart')
+    txt.setInteractive() ;
+    txt.on('pointerup',(pointer) =>{console.log('as')})
+}
+
+function updateHP(hpInfo,player){
+
+    hpInfo.setText('HP ' + player.hp);
+}
+
+function updateKush(scoreInfo,player){
+    scoreInfo.setText('KUSH ' + player.kushCount);
+}
 
 function getRandomIntInclusive(min, max) {
     min = Math.ceil(min);

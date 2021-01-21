@@ -16,7 +16,7 @@ export default class NpcWithGun extends Phaser.GameObjects.Container {
         this.add(this.character)
         this.add(this.gun)
 
-        this.hp = 100;
+        this.hp = 50;
         this.radius = 100;
         this.groupId = 1;
 
