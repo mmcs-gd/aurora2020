@@ -24,12 +24,13 @@ let SceneMap = new Phaser.Class({
         const { sceneSize, rooms, corridors, portal, player, npc } = this.game.scene.scenes[0]._SceneMapInfo;
         this.sceneSize = sceneSize;
 
-        // вычисляем размеры и положение карты на canvas
+        // вычисляем размеры и положение карты на canvas. задано вручную
+        // todo: вычисляется автоматически
         const map = {
             x: 100,
-            y: 20,
-            width: 50*10,
-            height: 50*10
+            y: 0,
+            width: 600,
+            height: 600
         }
         this.map = map;
 

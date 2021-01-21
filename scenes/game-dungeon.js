@@ -4,8 +4,10 @@ import punkSpriteSheet from '../assets/sprites/characters/punk.png'
 import CharacterFactory from "../src/characters/character_factory";
 import EffectsFactory from "../src/utils/effects-factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
+import bulletPng from '../assets/sprites/bullet.png'
 
 import buildLevel from '../src/utils/level_generator/level-build';
+import Bullet from '../src/characters/bullet';
 
 
 let SceneDungeon = new Phaser.Class({
@@ -28,11 +30,15 @@ let SceneDungeon = new Phaser.Class({
         this.load.spritesheet('punk', punkSpriteSheet, this.characterFrameConfig);
         this.load.audio('footsteps', Footsteps);
 
+        //loading images
+        this.load.image("bullet", bulletPng);
+
         this.effectsFactory = new EffectsFactory(this);
     },
 
     create: function () {
         this.gameObjects = [];
+        this.bullets = [];
         this.characterFactory = new CharacterFactory(this);
         this.effectsFactory.loadAnimations();
         this.showMap = false;
@@ -107,6 +113,36 @@ let SceneDungeon = new Phaser.Class({
             this.showMap = !this.showMap;
         });
 
+        this.input.on('pointerdown', (pointer) => {
+            // стрельба
+            const [ x, y ] = [ this.player.x + 40, this.player.y + 40 ];
+
+            const vx = pointer.x - x;
+            const vy = pointer.y - y;
+
+            const BULLET_SPEED = 400;
+            const mult = BULLET_SPEED / Math.sqrt(vx*vx + vy*vy);
+
+            const bullet = new Bullet(x, y, vx * mult, vy * mult);
+            this.bullets.push(bullet);
+
+            // прописать столкновения
+            // столкновение со стеной
+            /*this.physics.add.collider(this.bullets, wallLayer, (bullet) => {
+                bullet.setVisible(false);
+                bullet.setActive(false);
+            });
+
+            // столкновение с npc
+            this.physics.add.collider(bullet, this.npc, (npc) => {
+                if (bullet.active) {
+                    npc.damage();
+                    bullet.setActive(false);
+                    bullet.setVisible(false);
+                }
+            });*/
+        });
+
         // https://www.html5gamedevs.com/topic/10139-phaser-keyboard-codes-cheatsheet/
         this.input.keyboard.on("keydown_ONE", event => {
             // skill 1
@@ -115,9 +151,6 @@ let SceneDungeon = new Phaser.Class({
 
         // запускаем сцену в которой выводим текст
         this.scene.run("SceneText");
-
-        // соединение с сервером
-        // глянуть видосик на youtube по socket.io, websocket
     },
 
     update: function () {
@@ -126,7 +159,6 @@ let SceneDungeon = new Phaser.Class({
                 element.update();
             });
         }
-        //console.log('dungeon.js update');
     },
 
     tilesToPixels (tileX, tileY) {
