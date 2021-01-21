@@ -1,4 +1,5 @@
 // сцена для отображения карты игры
+// падает FPS при запуске этой сцены поверх другой
 let SceneMap = new Phaser.Class({
 
     Extends: Phaser.Scene,
@@ -8,53 +9,109 @@ let SceneMap = new Phaser.Class({
     },
 
     preload: function () {
-        //console.log('game-map.js preload');
+
     },
 
     create: function () {
-        //console.log('game-map.js create');
         this.time = Date.now();
+        this.graphics = this.add.graphics();
+        this.tileSize = 32;
+        this.canvasSize = {
+            width: 800,
+            height: 600
+        }
+
+        const { sceneSize, rooms, corridors, portal, player, npc } = this.game.scene.scenes[0]._SceneMapInfo;
+        this.sceneSize = sceneSize;
+
+        // вычисляем размеры и положение карты на canvas
+        const map = {
+            x: 100,
+            y: 20,
+            width: 50*10,
+            height: 50*10
+        }
+        this.map = map;
+
+        // коэффициенты для перевода из пикселей сцены в пиксели карты. не забывать про отступ map.x, map.y
+        console.log(this.sceneSize);
+        const coef = {
+            w: this.map.width / this.sceneSize.width,
+            h: this.map.height / this.sceneSize.height
+        }
+        this.coef = coef;
+
+        // переводим из координат tile в координаты canvas
+        this.rooms = rooms.map( ({ x,y,w,h }) => {
+            return { x: x*32*coef.w + map.x, y: y*32*coef.h + map.y, w: w*32*coef.w, h: h*32*coef.h };
+        });
+
+        this.corridors = corridors.map( ({ rect_dx, rect_dy }) => {
+            const rx = rect_dx;
+            const ry = rect_dy;
+            return {
+                rect_dx: rect_dx ? { x: rx.x*32*coef.w + map.x, y: rx.y*32*coef.h + map.y, w: rx.w*32*coef.w, h: rx.h*32*coef.h } : rect_dx,
+                rect_dy: rect_dy ? { x: ry.x*32*coef.w + map.x, y: ry.y*32*coef.h + map.y, w: ry.w*32*coef.w, h: ry.h*32*coef.h } : rect_dy
+            }
+        });
+
+        // координаты в пикселях
+        this.portal = portal;
+        this.player = player;
+        this.npc = npc;
 
         this.drawMap();
     },
 
     update: function () {
-        //console.log('game-map.js update');
-        const { player, npc } = this.game.scene.scenes[0]._SceneMapInfo;
-
         // обновлять позиции объектов кажд. 0.5 сек
         // красную точку или png изображение на месте где стоит игрок
         const time = Date.now();
         if (500 < time - this.time){
             this.drawMap();
-            this.graphics.fillStyle(0xFF0000, 1.0);
-            this.graphics.fillCircle(player.x / 32 * 8, player.y / 32 * 8, 3);
 
+            // draw player
+            const coef = this.coef;
+            const map = this.map;
+            this.graphics.fillStyle(0xFF0000, 1.0);
+            this.graphics.fillCircle(map.x + this.player.x * coef.w, map.y + this.player.y * coef.h, 3);
+
+            // draw NPC
             this.graphics.fillStyle(0x0000FF, 1.0);
-            npc.forEach(obj => this.graphics.fillCircle(obj.x / 32 * 8, obj.y / 32 * 8, 3));
+            this.npc.forEach(obj => this.graphics.fillCircle(map.x + obj.x * coef.w, map.y + obj.y * coef.h, 3));
             this.time = time;
         }
     },
 
     drawMap() {
-        const { mapSize, rooms, corridors, portal } = this.game.scene.scenes[0]._SceneMapInfo;
-
         // https://photonstorm.github.io/phaser3-docs/Phaser.GameObjects.Graphics.html
-        this.graphics = this.add.graphics();
+
+        // clear
         this.graphics.fillStyle(0x000000, 1.0);
-        this.graphics.fillRect(0, 0, 790, 590);
+        this.graphics.fillRect(0, 0, this.canvasSize.width, this.canvasSize.height);
 
-        this.graphics.lineStyle(2, 0xFF0000, 1.0);
-        this.graphics.strokeRect(0, 0, 50*8, 50*8);
+        // canvas borders
+        this.graphics.lineStyle(1, 0xFFFFFF, 1.0);
+        this.graphics.strokeRect(0, 0, this.canvasSize.width, this.canvasSize.height);
 
+        // map borders
+        this.graphics.lineStyle(1, 0xFF0000, 1.0);
+        this.graphics.strokeRect(this.map.x, this.map.y, this.map.width, this.map.height);
+
+        // corridors
         this.graphics.fillStyle(0xCCCCCC, 1.0);
-        corridors.forEach( ({ rect_dx, rect_dy }) => {
-            if (rect_dx) this.graphics.fillRect(rect_dx.x*8, rect_dx.y*8, rect_dx.w*8, rect_dx.h*8);
-            if (rect_dy) this.graphics.fillRect(rect_dy.x*8, rect_dy.y*8, rect_dy.w*8, rect_dy.h*8);
+        this.corridors.forEach( ({ rect_dx, rect_dy }) => {
+            if (rect_dx) this.graphics.fillRect(rect_dx.x, rect_dx.y, rect_dx.w, rect_dx.h);
+            if (rect_dy) this.graphics.fillRect(rect_dy.x, rect_dy.y, rect_dy.w, rect_dy.h);
         });
 
-        this.graphics.fillStyle(0xBBBBBB, 1.0);
-        rooms.forEach( ({x,y,w,h}) => this.graphics.fillRect(x*8, y*8, w*8, h*8));
+        // rooms
+        this.graphics.fillStyle(0xAAAAAA, 1.0);
+        this.rooms.forEach( ({x,y,w,h}) => this.graphics.fillRect(x, y, w, h));
+
+        // portal
+        this.graphics.fillStyle(0x00FF00, 1.0);
+        this.graphics.fillCircle(this.map.x + this.portal.x * this.coef.w, this.map.y + this.portal.y * this.coef.h, 5);
     }
 });
 

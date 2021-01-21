@@ -62,18 +62,18 @@ let SceneDungeon = new Phaser.Class({
             },
             roomsCount: this.rooms.length,
             fillPercent: this.fillPercent,
-            countNPC: this.npc.length, // buildLevel добавил npc
+            npc: this.npc, // buildLevel добавил npc
         };
 
         // передаём инфу в сцену с картой
         this.game.scene.scenes[0]._SceneMapInfo = {
-            mapSize: { // canvas 800x600
+            sceneSize: {
                 width: 50*32,
                 height: 50*32
             },
             rooms: this.rooms,
             corridors: this.corridors,
-            portal: undefined,
+            portal: this.portal, // buildLevel добавил portal
             npc: this.npc,
             player: this.player,
         };
@@ -94,10 +94,15 @@ let SceneDungeon = new Phaser.Class({
             console.log("dungeon.js keydown_M");
 
             if (!this.showMap) {
+                //this.scene.pause("SceneDungeon");
+                this.scene.pause("SceneText");
+                this.scene.stop("SceneText");
                 this.scene.run("SceneMap");
             } else {
                 this.scene.pause("SceneMap");
                 this.scene.stop("SceneMap");
+                this.scene.run("SceneText");
+                //this.scene.run("SceneDungeon");
             }
             this.showMap = !this.showMap;
         });
