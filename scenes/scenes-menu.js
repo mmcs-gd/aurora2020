@@ -1,43 +1,14 @@
 import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
 import menuBackgroundJson from '../assets/menu_background.json'
 
-
-import StartingScene from "./starting-scene";
-import RealLevelScene from './real-level-scene';
-import ExplorationAndShadowingScene from "./exploration-and-shadowing-scene";
-import SteeringWanderingScene from "./steering-wandering-scene";
-import SteeringArrivalScene from "./steering-arrival-scene";
-import SteeringPursuitScene from './steering-pursuit-scene';
-import SteeringEvadeAndPursuitScene from './steering-evade-and-pursuit-scene';
-import MinerScene from "./miner-scene";
-import SteeringRudnevScene from './scene-Rudnev';
-import SteeringPursuitWithDistanceScene from './steering-pursuit-with-distance'
-import SteeringFleeScene from './steering-flee-scene';
-import SteeringExploringScene from './steering-exploring-scene';
-import ProcedurallyGeneratedScene from "./procedurally-generated-scene";
-import SteeringUnionGroupScene from './steering-union-group-scene';
-import EffectsScene from './effects-scene'
-import SlimeRushScene from "./slime-rush";
-import SteeringHideAndSeekScene from './steering-hide&seek-scene'
+import HideAndSeekScene from './steering-hide&seek-scene';
+import HideAndSeekWin from './hide&seek-win';
+import HideAndSeekLose from './hide&seek-lose';
 
 const scenes = [
-    ['StartingScene', StartingScene],
-    ['SteeringFleeScene', SteeringFleeScene],
-    ['SteeringExploringScene', SteeringExploringScene],
-    ['RealLevelScene', RealLevelScene],
-    ['SteeringRudnevScene', SteeringRudnevScene],
-    [ 'EffectsScene', EffectsScene],
-    ['SlimeRushScene', SlimeRushScene],
-  //  ['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
-  //  ['SteeringPursuitScene', SteeringPursuitScene],
-  //  ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
-  //  ['SteeringWanderingScene', SteeringWanderingScene],
-  //  ['SteeringArrivalScene', SteeringArrivalScene],
-    ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
-    ['MinerScene', MinerScene],
-    ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
-    ['SteeringUnionGroupScene', SteeringUnionGroupScene],
-	['SteeringHide&SeekScene', SteeringHideAndSeekScene]
+	['Hide-and-seek for your life', HideAndSeekScene],
+	['HideAndSeekWin', HideAndSeekWin],
+	['HideAndSeekLose', HideAndSeekLose]
 ];
 
 let MenuScene = new Phaser.Class({
@@ -72,7 +43,7 @@ let MenuScene = new Phaser.Class({
 
         // creating list of buttons
         let k = 0;
-        this.scenesButtons = scenes.map(s => {
+        this.scenesButtons = scenes.slice(0,1).map(s => {
             return this.add.text(0, k++ * 32, s[0], {fill: '#AAA'})
                 .setInteractive()
                 .setFixedSize(32 * 10, 32)

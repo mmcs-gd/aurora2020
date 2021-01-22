@@ -17,7 +17,7 @@ export default function createLevel(width, height, scene) {
 	const tileSize = 32;
 
 	let bsp = new BSP();
-	let res = bsp.generate(width, height, 10);
+	let res = bsp.generate(width, height, 6);
 	let mask = res[0], rooms = res[1];
 	let objects = res[2].map((z) => ({ x: z.y * tileSize, y: z.x * tileSize }));
 
@@ -46,7 +46,7 @@ export default function createLevel(width, height, scene) {
 		}
 	}
 
-	let roomAurora = rooms[Math.floor(Math.random() * rooms.length)];
+	let roomAurora = rooms[rooms.length - 1];
 	let auroraY = tileSize * (roomAurora.top + roomAurora.height / 2);
 	let auroraX = tileSize * (roomAurora.left + roomAurora.width / 2);
 	scene.player = scene.characterFactory.buildCharacter('aurora', auroraX, auroraY, {player: true});
@@ -55,19 +55,20 @@ export default function createLevel(width, height, scene) {
     scene.physics.add.collider(scene.player, outsideLayer);
     scene.gameObjects.push(scene.player);
 
-	let roomSeeker;
-	do {
-		roomSeeker = rooms[Math.floor(Math.random() * rooms.length)];
-	} while (roomSeeker == roomAurora);
-	let seekerY = tileSize * (roomSeeker.top + roomSeeker.height / 2);
-	let seekerX = tileSize * (roomSeeker.left + roomSeeker.width / 2);
-	scene.seeker = scene.characterFactory.buildCharacter('blue', seekerX, seekerY, {Steering: new HideAndSeek(scene, objects, scene.player)});
-	scene.seeker.hide = true;
-    scene.gameObjects.push(scene.seeker);
-    scene.physics.add.collider(scene.seeker, groundLayer);
-    scene.physics.add.collider(scene.seeker, stuffLayer);
-    scene.physics.add.collider(scene.seeker, outsideLayer);
-    scene.physics.add.collider(scene.seeker, scene.player);
+	scene.seekers = [];
+	for (let i = 0; i < rooms.length - 1; ++i) {
+		let roomSeeker = rooms[i];
+		let seekerY = tileSize * (roomSeeker.top + roomSeeker.height / 2);
+		let seekerX = tileSize * (roomSeeker.left + roomSeeker.width / 2);
+		let seeker = scene.characterFactory.buildCharacter('blue', seekerX, seekerY, {Steering: new HideAndSeek(i, scene, objects, scene.player)});
+		seeker.hide = true;
+		scene.gameObjects.push(seeker);
+		scene.physics.add.collider(seeker, groundLayer);
+		scene.physics.add.collider(seeker, stuffLayer);
+		scene.physics.add.collider(seeker, outsideLayer);
+		scene.physics.add.collider(seeker, scene.player, scene.collide.bind(scene, seeker));
+		scene.seekers.push(seeker);
+	}
 
 	const camera = scene.cameras.main;
     camera.setZoom(1.0)

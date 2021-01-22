@@ -10,14 +10,14 @@ import slimeSpriteSheet from '../assets/sprites/characters/slime.png'
 import CharacterFactory from "../src/characters/character_factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 
-let SteeringHideAndSeekScene = new Phaser.Class({
+let HideAndSeekScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
     initialize:
 
         function StartingScene() {
-            Phaser.Scene.call(this, {key: 'SteeringHide&SeekScene'});
+            Phaser.Scene.call(this, {key: 'Hide-and-seek for your life'});
         },
         characterFrameConfig: {frameWidth: 31, frameHeight: 31},
         slimeFrameConfig: {frameWidth: 32, frameHeight: 32},
@@ -62,11 +62,36 @@ let SteeringHideAndSeekScene = new Phaser.Class({
             });
         }
 
+		if (this.winTimerId == undefined && this.seekers.every(z => z.seek)) {
+			this.winTimerId = setTimeout(() => this.win(), 10000);
+		}
     },
     tilesToPixels(tileX, tileY)
     {
         return [tileX*this.tileSize, tileY*this.tileSize];
+    },
+
+	collide(seeker) {
+		if (seeker.seek) this.lose();
+	},
+
+	win() {
+        this.game.scene.scenes[0].scene.pause(this.game.scene.scenes[0]._runningScene);
+        this.game.scene.scenes[0].scene.stop(this.game.scene.scenes[0]._runningScene);
+        this.game.scene.scenes[0]._runningScene = 'HideAndSeekWin';
+        this.game.scene.scenes[0].scene.run('HideAndSeekWin');
+    },
+
+    lose() {
+		if (this.winTimerId != undefined) {
+			clearTimeout(this.winTimerId);
+		}
+
+        this.game.scene.scenes[0].scene.pause(this.game.scene.scenes[0]._runningScene);
+        this.game.scene.scenes[0].scene.stop(this.game.scene.scenes[0]._runningScene);
+        this.game.scene.scenes[0]._runningScene = 'HideAndSeekLose';
+        this.game.scene.scenes[0].scene.run('HideAndSeekLose');
     }
 });
 
-export default SteeringHideAndSeekScene
+export default HideAndSeekScene
