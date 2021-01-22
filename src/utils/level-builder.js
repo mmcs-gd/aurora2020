@@ -11,7 +11,7 @@ const TILE_MAPPING = {
             //{name:'BLACK', index: 151, weight: 1},
            ],
     STUFF: [
-            {name:'CHEST', index: 260, weight: 1},
+            //{name:'CHEST', index: 260, weight: 1},
             //{name:'TOWERHEAD', index: 208, weight: 1},
             {name:'TOWERTAIL', index: 224, weight: 1},
             {name:'TOWERTAILCRUMBLED', index: 225, weight: 1},
@@ -65,6 +65,7 @@ export default function buildLevel(width, height, maxRooms, maxNpcs, scene){
                                                              rooms[0].startCenter.y * 32 + 10, 
                                                              {player: true});
         scene.player.maxSpeed = 300;
+        scene.player.setSize(scene.player.width * 0.6, scene.player.height * 0.8);
         // Watch the player and tilemap layers for collisions, for the duration of the scene:
         scene.physics.add.collider(scene.player, groundLayer);
         scene.physics.add.collider(scene.player, stuffLayer);
