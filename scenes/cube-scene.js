@@ -47,7 +47,7 @@ let CubeScene = new Phaser.Class({
     },
 
     create: function () {
-        this.sound.setVolume(0.3);
+        this.sound.setVolume(0.5);
         this.sound.play('musicBox');
         this.sizeMapTileX = 60;
         this.sizeMapTileY = 60;
