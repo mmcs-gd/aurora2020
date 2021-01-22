@@ -1,3 +1,29 @@
+// целое число в диапазоне [ min, ..., max ]
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+function getRandomIntInclusive(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+// https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+function shuffleArray(array) {
+    let currentIndex = array.length, temporaryValue, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+    return array;
+}
+
 export default class QuadSpacePartitioning {
 
 	constructor(width, height, params) {
@@ -11,7 +37,7 @@ export default class QuadSpacePartitioning {
         this.roomWidth = params.rooms.width;   // min, max
         this.roomHeight = params.rooms.height; // min, max
         //this.roomMaxArea = params.rooms.maxArea;
-        this.roomCount = Phaser.Math.RND.between(params.rooms.minRooms, params.rooms.maxRooms);
+        this.roomCount = getRandomIntInclusive(params.rooms.minRooms, params.rooms.maxRooms);
         this.corridor_width = params.corridor_width;
     }
     
@@ -104,7 +130,7 @@ export default class QuadSpacePartitioning {
         console.log(this.roomCount);
 
         const randomSpaces = Array(subSpaces.length).fill().map( (_,i) => i);
-        Phaser.Math.RND.shuffle(randomSpaces);
+        shuffleArray(randomSpaces);
         console.log("randomSpaces indexes");
         console.log(randomSpaces);
 
@@ -114,14 +140,14 @@ export default class QuadSpacePartitioning {
     // в указанной области случайным образом создаёт комнату
     //#generateRoom({ x,y,w,h })
     _generateRoom({x,y,w,h}) {
-        const room_width = Phaser.Math.RND.between(this.roomWidth.min, this.roomWidth.max);
+        const room_width = getRandomIntInclusive(this.roomWidth.min, this.roomWidth.max);
         //const room_height_max = Math.floor(this.roomMaxArea / room_width);
-        const room_height = Phaser.Math.RND.between(this.roomWidth.min, this.roomWidth.max);
+        const room_height = getRandomIntInclusive(this.roomWidth.min, this.roomWidth.max);
 
         const x_max = w - room_width;
         const y_max = h - room_height;
-        const room_x = Phaser.Math.RND.between(x, x + x_max);
-        const room_y = Phaser.Math.RND.between(y, y + y_max);
+        const room_x = getRandomIntInclusive(x, x + x_max);
+        const room_y = getRandomIntInclusive(y, y + y_max);
         //console.log(`${room_width} ${room_height} ${x_max} ${y_max} ${room_x} ${room_y}`);
 
         return new Room(room_x, room_y, room_width, room_height);
@@ -337,8 +363,8 @@ class QuadTree {
         const {x, y, w, h} = this.boundary;
 
         // случайная точка (в допустимых пределах) для деления на подобласти
-        const dx = Phaser.Math.RND.between(-w/10, w/10);
-        const dy = Phaser.Math.RND.between(-h/10, h/10);
+        const dx = getRandomIntInclusive(-w/10, w/10);
+        const dy = getRandomIntInclusive(-h/10, h/10);
         const p = { x: x + w/2 + dx, y: y + h/2 + dy};
         p.x = Math.floor(p.x);
         p.y = Math.floor(p.y);
