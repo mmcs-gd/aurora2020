@@ -99,11 +99,11 @@ let SceneNetwork = new Phaser.Class({
 
     create: function () {
         // ожидаем получения маски карты от сервера
-        console.log('game-network.js create');
+        //console.log('game-network.js create');
 
         while (!this.id || !this.mask || !this.rooms || !this.corridors) {}
 
-        console.log(this.id);
+        console.log(`id: ${this.id}`);
         console.log(this.mask);
         console.log(this.rooms);
         console.log(this.corridors);
@@ -158,7 +158,7 @@ let SceneNetwork = new Phaser.Class({
 
         this.input.keyboard.on("keydown_M", event => {
             // show/hide game map
-            console.log("game-network.js keydown_M");
+            //console.log("game-network.js keydown_M");
 
             if (!this.showMap) {
                 this.scene.pause("SceneText");
@@ -175,11 +175,26 @@ let SceneNetwork = new Phaser.Class({
         this.input.keyboard.on("keydown_ESC", event => {
             this.scene.pause("SceneText");
             this.scene.stop("SceneText");
+
+            // отключаемся от сервера
+            /*const dataJSON = JSON.stringify({
+                id: this.id,
+                frame: this.frameN,
+                x: this.player.x,
+                y: this.player.y,
+                vx: 0,
+                vy: 0,
+                alive: false,
+            });
+            this.ws.send(dataJSON);
+            //this.ws.close();
+            this.buffer.delete(this.id);
+            this.npc.delete(this.id);*/
         });
 
         // запускаем сцену в которой выводим текст
         this.scene.run("SceneText");
-        console.log(this.player);
+        //console.log(this.player);
     },
 
     update: function () {
@@ -197,8 +212,8 @@ let SceneNetwork = new Phaser.Class({
                 frame: this.frameN++,
                 x: this.player.x,
                 y: this.player.y,
-                vx: 0,
-                vy: 0,
+                vx: this.player.body.velocity.x,
+                vy: this.player.body.velocity.y,
                 alive: true,
             });
             this.ws.send(dataJSON);
@@ -217,6 +232,7 @@ let SceneNetwork = new Phaser.Class({
                 this.physics.add.collider(npc, this.outsideLayer);
                 this.gameObjects.push(npc);
                 this.npc.set(key, npc);
+                console.log(`добавили игрока с id ${key}`);
             }
 
             if (this.id !== key && 0 < val.length) {
@@ -227,9 +243,13 @@ let SceneNetwork = new Phaser.Class({
                 npc.x = x;
                 npc.y = y;
 
-                // удалить с карты
-                if (!alive) {
+                npc.body.setVelocityX(vx);
+                npc.body.setVelocityY(vy);
+                npc.updateAnimation();
 
+                // удалить игрока с карты
+                if (!alive) {
+                    console.log(`удалили игрока с id ${key}`);
                 }
             }
 

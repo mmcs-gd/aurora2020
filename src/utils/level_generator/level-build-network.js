@@ -53,14 +53,6 @@ export default function buildLevel(width, height, scene, { rooms, corridors, mas
     scene.portal = scene.effectsFactory.buildEffect('vortex', portalRoom.x*32+32, portalRoom.y*32+32);
     scene.physics.add.collider(scene.portal, scene.player, scene.runSceneDungeon.bind(scene));
 
-    // добавляем NPC в сцену. при касании игрок погибает
-    //scene.npc = [];
-    /*const npc = scene.characterFactory.buildCharacter('punk', startRoom.x*32+64, startRoom.y*32+64);
-    //scene.physics.add.collider(npc, wallsLayer);
-    scene.physics.add.collider(npc, outsideLayer);
-    scene.gameObjects.push(npc);
-    scene.npc.push(npc);*/
-
     // настройки камеры
     // https://photonstorm.github.io/phaser3-docs/Phaser.Cameras.Scene2D.Camera.html
 	const camera = scene.cameras.main;
