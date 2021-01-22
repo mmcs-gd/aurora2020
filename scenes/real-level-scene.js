@@ -89,9 +89,12 @@ let RealLevelScene = new Phaser.Class({
     },
     onNpcNpcCollide(npc1, npc2) {
         //destroy old npcs
-        //alert('Слияние!');
-        console.log(npc1)
-        let params = {x: (npc1.x + npc2.x) / 2, y: (npc1.y + npc2.y) / 2, pL: (((npc1.ai.table.powerLevel + npc2.ai.table.powerLevel) / 2) | 0) + 1}
+        //console.log(npc1)
+        let params = {
+            x: (npc1.x + npc2.x) / 2
+            , y: (npc1.y + npc2.y) / 2
+            , pL: npc1.ai.table.context.powerLevel == npc2.ai.table.context.powerLevel ? npc1.ai.table.context.powerLevel - 1 : Math.max(npc1.ai.table.context.powerLevel, npc2.ai.table.context.powerLevel) + 1           
+        }
         this.npcs.splice(this.npcs.indexOf(npc1), 1)
         this.npcs.splice(this.npcs.indexOf(npc2), 1)
         for (let npc of this.npcs)
