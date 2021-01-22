@@ -49,18 +49,28 @@ let SceneNetwork = new Phaser.Class({
             console.log(`Код: ${event.code} причина: ${event.reason}`);
         };
         //
+        this.buffer = [];
         this.ws.onmessage = (event) => {
-            console.log("Получены данные");
+            //console.log("Получены данные");
 
             const data = JSON.parse(event.data);
-            if (data.name === 'mask') {
+            if (data.name === 'id') {
+                this.id = data.data;
+            } else if (data.name === 'mask') {
                 this.mask = data.data;
             } else if (data.name === 'rooms') {
                 this.rooms = data.data;
             } else if (data.name === 'corridors') {
                 this.corridors = data.data;
             } else if (data.name === 'user') {
+                // получили позицию другого игрока
+                // frame - какой кадр с начала игры воспроизводится
+                const { id, frame, x, y, vx, vy, alive } = data.data;
 
+                if (id !== this.id){
+                    //console.log(data.data);
+                    this.buffer.push(data.data);
+                }
             }
         };
         //
@@ -86,9 +96,9 @@ let SceneNetwork = new Phaser.Class({
         // ожидаем получения маски карты от сервера
         console.log('game-network.js create');
 
-        this.id = Math.random();
-        while (!this.mask || !this.rooms || !this.corridors) {}
+        while (!this.id || !this.mask || !this.rooms || !this.corridors) {}
 
+        console.log(this.id);
         console.log(this.mask);
         console.log(this.rooms);
         console.log(this.corridors);
@@ -157,6 +167,7 @@ let SceneNetwork = new Phaser.Class({
 
         // запускаем сцену в которой выводим текст
         this.scene.run("SceneText");
+        console.log(this.player);
     },
 
     update: function () {
@@ -165,13 +176,27 @@ let SceneNetwork = new Phaser.Class({
                 element.update();
             });
         }
-        // отправить инфу о себе
-        // обновить инфу о других
 
-        /*if (this.ws.readyState === WebSocket.OPEN){
-            console.log('Отправляем данные');
-            //this.ws.send("hello, server" + this.id);
-        }*/
+        // отправить инфу о себе другим
+        if (this.ws.readyState === WebSocket.OPEN){
+            //console.log('Отправляем данные');
+            const dataJSON = JSON.stringify({
+                id: this.id,
+                frame: 1000,
+                x: this.player.x,
+                y: this.player.y,
+                vx: 0,
+                vy: 0,
+                alive: true,
+            });
+            this.ws.send(dataJSON);
+        }
+
+        // изменить состояние других игроков
+        this.npc[0].x = this.player.x + 64;
+        this.npc[0].y = this.player.y + 64;
+        // могут потеряться записи во время update?
+        this.buffer = [];
     },
 
     tilesToPixels (tileX, tileY) {
@@ -180,17 +205,43 @@ let SceneNetwork = new Phaser.Class({
 
     onNpcPlayerCollide() {
         alert('Погиб!');
-        this.scene.pause("SceneDungeon");
+        this.scene.pause("SceneNetwork");
         this.scene.pause("SceneText");
         this.scene.pause("SceneMap");
+
+        if (this.ws.readyState === WebSocket.OPEN){
+            console.log('помер');
+
+            const dataJSON = JSON.stringify({
+                id: this.id,
+                frame: 1000,
+                x: this.player.x,
+                y: this.player.y,
+                vx: 0,
+                vy: 0,
+                alive: false,
+            });
+            this.ws.send(dataJSON);
+        }
     },
 
     runSceneBoss() {
-        // переход на сцену босса
-        console.log('runSceneBoss');
-        this.scene.pause("SceneDungeon");
-        this.scene.stop("SceneDungeon");
-        this.scene.run("SceneBoss");
+        // переход на сцену SceneDungeon
+        //console.log('runSceneDungeon');
+        this.scene.pause("SceneNetwork");
+        this.scene.stop("SceneNetwork");
+        this.scene.run("SceneDungeon");
+
+        const dataJSON = JSON.stringify({
+            id: this.id,
+            frame: 1000,
+            x: this.player.x,
+            y: this.player.y,
+            vx: 0,
+            vy: 0,
+            alive: false,
+        });
+        this.ws.send(dataJSON);
     }
 });
 

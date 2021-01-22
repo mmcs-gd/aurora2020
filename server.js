@@ -48,7 +48,7 @@ const corridorsJSON = JSON.stringify({ name: 'corridors', data:corridors});
 
 // игроки на карте
 const players = {}; // new Map()
-let playerID = 0;
+let playerID = 1;
 
 
 // работа по сети
@@ -57,13 +57,16 @@ server.on('connection', ws => {
   console.log('Соединение установлено');
 
   // добавить в список игроков
-  players[playerID++] = {
+  const id = playerID++;
+  players[id] = {
     x: 100,
     y: 100,
     health: 100,
   };
 
   // отправить карту подземелья
+  const idJSON = JSON.stringify({ name: 'id', data: id });
+  ws.send(idJSON);
   ws.send(maskJSON);
   ws.send(roomsJSON);
   ws.send(corridorsJSON);
@@ -72,8 +75,11 @@ server.on('connection', ws => {
   ws.on('message', message => {
     console.log(`received: ${message}}`);
 
+    const data = JSON.parse(message);
+    const dataSend = JSON.stringify({ name: 'user', data: data });
+    // переслать сообщение другим игрокам
     server.clients.forEach(client => {
-      if (client.readyState === WebSocket.OPEN) client.send(message);
+      if (client.readyState === WebSocket.OPEN) client.send(dataSend);
     });
   });
 
