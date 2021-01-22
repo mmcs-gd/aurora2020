@@ -4,11 +4,38 @@ import punkSpriteSheet from '../assets/sprites/characters/punk.png'
 import CharacterFactory from "../src/characters/character_factory";
 import EffectsFactory from "../src/utils/effects-factory";
 import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
-import bulletPng from '../assets/sprites/bullet.png'
+//import bulletPng from '../assets/sprites/bullet.png'
 
+import QuadSpacePartitioning from "../src/utils/level_generator/quad-space-partitioning";
 import buildLevel from '../src/utils/level_generator/level-build';
-import Bullet from '../src/characters/bullet';
+import LevelMetric from "../src/utils/level_generator/level-metric";
+//import Bullets from '../src/characters/bullet';
 
+
+const LEVEL_SETTINGS = {
+    // The dungeon's grid size
+    //width: 30,
+    //height: 30,
+    corridor_width: 2,
+    rooms: {
+      // Random range for the width of a room (grid units)
+      width: {
+        min: 5,
+        max: 8
+      },
+      // Random range for the height of a room (grid units)
+      height: {
+        min: 5,
+        max: 8
+      },
+      // Cap the area of a room - e.g. this will prevent large rooms like 10 x 20
+      //maxArea: 20,
+      // Max rooms to place
+      maxRooms: 13,
+      // Min rooms to place
+      minRooms: 9,
+    }
+}
 
 let SceneDungeon = new Phaser.Class({
 
@@ -24,38 +51,48 @@ let SceneDungeon = new Phaser.Class({
     preload: function () {
         //loading map tiles
         this.load.image("tiles", tilemapPng);
-        
+
         //loading spitesheets
         this.load.spritesheet('aurora', auroraSpriteSheet, this.characterFrameConfig);
         this.load.spritesheet('punk', punkSpriteSheet, this.characterFrameConfig);
         this.load.audio('footsteps', Footsteps);
 
         //loading images
-        this.load.image("bullet", bulletPng);
+        //this.load.image("bullet", bulletPng);
 
         this.effectsFactory = new EffectsFactory(this);
     },
 
     create: function () {
         this.gameObjects = [];
-        this.bullets = [];
         this.characterFactory = new CharacterFactory(this);
         this.effectsFactory.loadAnimations();
         this.showMap = false;
         
         // генерация уровня
-        // убрать while, try после исправления генерации
+        // while, try на всякий случай
         while (true) {
             try {
-                const layers = buildLevel(50, 50, this);
+                const [ width, height ] = [ 50, 50 ];
+
+                const levelGenerator = new QuadSpacePartitioning(width, height, LEVEL_SETTINGS);
+                const { rooms, corridors, mask } = levelGenerator.generateMask();
+                this.levelMetric = new LevelMetric(width, height, rooms, corridors, mask);
+
+                this.rooms = rooms;
+                this.corridors = corridors;
+
+                console.log(rooms);
+                console.log(corridors);
+                console.log(mask);
+                // метрики уровня
+                console.log(`${this.levelMetric.fillPercent() * 100} % заполнения`);
+                console.log('связность: ' + this.levelMetric.connectivity());
+
+                const layers = buildLevel(width, height, this, { rooms:rooms, corridors:corridors, mask:mask });
                 this.groundLayer = layers["Ground"];
                 this.outsideLayer = layers["Outside"];
                 this.wallsLayer = layers["Walls"];
-
-                // убрать потом
-                this.rooms = layers["rooms"];
-                this.corridors = layers["corridors"];
-                this.fillPercent = layers["fillPercent"];
                 break;
             } catch (err) {}
         }
@@ -67,7 +104,7 @@ let SceneDungeon = new Phaser.Class({
                 height: 50*32
             },
             roomsCount: this.rooms.length,
-            fillPercent: this.fillPercent,
+            fillPercent: this.levelMetric.fillPercent() * 100,
             npc: this.npc, // buildLevel добавил npc
         };
 
@@ -111,36 +148,6 @@ let SceneDungeon = new Phaser.Class({
                 //this.scene.run("SceneDungeon");
             }
             this.showMap = !this.showMap;
-        });
-
-        this.input.on('pointerdown', (pointer) => {
-            // стрельба
-            const [ x, y ] = [ this.player.x + 40, this.player.y + 40 ];
-
-            const vx = pointer.x - x;
-            const vy = pointer.y - y;
-
-            const BULLET_SPEED = 400;
-            const mult = BULLET_SPEED / Math.sqrt(vx*vx + vy*vy);
-
-            const bullet = new Bullet(x, y, vx * mult, vy * mult);
-            this.bullets.push(bullet);
-
-            // прописать столкновения
-            // столкновение со стеной
-            /*this.physics.add.collider(this.bullets, wallLayer, (bullet) => {
-                bullet.setVisible(false);
-                bullet.setActive(false);
-            });
-
-            // столкновение с npc
-            this.physics.add.collider(bullet, this.npc, (npc) => {
-                if (bullet.active) {
-                    npc.damage();
-                    bullet.setActive(false);
-                    bullet.setVisible(false);
-                }
-            });*/
         });
 
         // https://www.html5gamedevs.com/topic/10139-phaser-keyboard-codes-cheatsheet/

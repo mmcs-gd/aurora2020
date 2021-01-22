@@ -1,8 +1,4 @@
 import Aggressive from "../../ai/aggressive";
-//import MobAI from "../../ai/mob";
-
-import QuadSpacePartitioning from "./quad-space-partitioning";
-import LevelMetric from "./level-metric";
 
 // Tiled Map Editor
 const TILES = {
@@ -22,32 +18,8 @@ const TILES = {
     CORNER_BOTTOM_RIGHT: 37,
 }
 
-const LEVEL_SETTINGS = {
-    // The dungeon's grid size
-    //width: 30,
-    //height: 30,
-    corridor_width: 2,
-    rooms: {
-      // Random range for the width of a room (grid units)
-      width: {
-        min: 5,
-        max: 8
-      },
-      // Random range for the height of a room (grid units)
-      height: {
-        min: 5,
-        max: 8
-      },
-      // Cap the area of a room - e.g. this will prevent large rooms like 10 x 20
-      //maxArea: 20,
-      // Max rooms to place
-      maxRooms: 13,
-      // Min rooms to place
-      minRooms: 9,
-    }
-}
 
-export default function buildLevel(width, height, scene) {
+export default function buildLevel(width, height, scene, { rooms, corridors, mask }) {
     const tileSize = 32;
     
 	scene.map = scene.make.tilemap({
@@ -63,17 +35,6 @@ export default function buildLevel(width, height, scene) {
     const outsideLayer = scene.map.createBlankDynamicLayer("Outside", tileSet);
     const groundLayer = scene.map.createBlankDynamicLayer("Ground", tileSet);
     const wallsLayer = scene.map.createBlankDynamicLayer("Walls", tileSet);
-
-    const levelGenerator = new QuadSpacePartitioning(width, height, LEVEL_SETTINGS);
-    const { rooms, corridors, mask } = levelGenerator.generateMask();
-    const levelMetric = new LevelMetric(width, height, rooms, corridors, mask);
-
-    console.log(rooms);
-    console.log(corridors);
-    console.log(mask);
-    // метрики уровня
-    console.log(`${levelMetric.fillPercent() * 100} % заполнения`);
-    console.log('связность: ' + levelMetric.connectivity());
 
     // по маске уровня заполняем уровни outsideLayer, groundLayer
     // fill, putTileAt, weightedRandomize
@@ -146,5 +107,5 @@ export default function buildLevel(width, height, scene) {
     wallsLayer.setDepth(10);
     wallsLayer.setCollisionBetween(0, 320); // столкновение с тайлами у которых индексы 0..320
 
-    return {"Ground" : groundLayer, "Outside" : outsideLayer, "Walls" : wallsLayer, "rooms":rooms, "corridors":corridors, "fillPercent": levelMetric.fillPercent() * 100}
+    return {"Ground" : groundLayer, "Outside" : outsideLayer, "Walls" : wallsLayer}
 }
