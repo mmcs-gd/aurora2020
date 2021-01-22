@@ -17,21 +17,44 @@ function randomInt(min, max)
 }
 
 export default class Merger{
-    constructor(owner, player, powerLevell) {
-        const powerLevel = powerLevell || randomInt(0, 2);
+    constructor(owner, player, powerLevel) {
+        powerLevel = powerLevel || randomInt(0, 1);
+        if (powerLevel < 0)
+        {
+            powerLevel = 0;
+        }
         if (powerLevel > 4)
         {
-            powerLevel = 4
+            powerLevel = 4;
         }
+        //console.log(owner.body)
+        /*
+        reservation of bad scales
+        owner.body.scale = 5555;
+        owner.scaleX = 5555;
+        owner._scaleX = 5555;
+        owner.scale.setTo(5555, 5555);
+        owner.scale = 5555;
+        owner.body.setScale(5555,5555)
+        owner.texture.setSize(5555)
+        owner.frame.width = 5555
+        owner.frame.realWidth = 5555
+        owner.frame.setSize(5555,5555,5555,5555)*/
+        const powerCoeff = 0.06
+        //good scales
+        //owner.displayWidth = 5555;
+        owner.setScale(1 + powerCoeff * powerLevel, 1 + powerCoeff * powerLevel)
         //console.log(powerLevel)
-        owner.maxSpeed = ((powerLevel * 0.12) + 0.3) * player.maxSpeed;
+        //works only with hitbox
+        owner.setSize(owner.width * 0.6, owner.height * 0.8);
+        owner.maxSpeed = ((powerLevel * powerCoeff) + 0.3) * player.maxSpeed;
         owner.tint = 0xbfff00
         this.table = new StateTable({
             me: owner,
             npcs: [],
             player: player,
             selectedEnemy: null,
-            distance: 200,
+            distance: 200 * (1 + powerCoeff * powerLevel),
             timer: 0,
             powerLevel: powerLevel,
             realTint: tints[powerLevel],
