@@ -63,7 +63,16 @@ export default class Slime extends Phaser.Physics.Arcade.Sprite{
         this.updateAnimation();
     }
     updateAnimation() {
+        const animsController = this.anims;
+        if (this.wantToJump)
+        {
+            animsController.play(this.animations[1], true);
+        } else
+        {
+            animsController.play(this.animations[0], true);
+        }
     }
+    
     hasArrived()
     {
         return this.pointOfInterest === undefined || this.pointOfInterest.distance(this.body.position) < eps;
@@ -78,13 +87,14 @@ export default class Slime extends Phaser.Physics.Arcade.Sprite{
             this.nextLocation = this.body.position;
         }
     }
-    damage()
+    damage(scene)
     {
         if (this.hp > 0) {
             this.hp = this.hp - 41
-        } else {
-            this.nextLocation = null
-            this.body.destroy()
+        }
+        if (this.hp <= 0) {
+            this.nextLocation = null;
+            this.destroy();
         }
     }
 }

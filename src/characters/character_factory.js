@@ -9,11 +9,15 @@ import AnimationLoader from "../utils/animation-loader";
 import Mine from "./mine";
 import SmartSlime from './minerScene/smartSlime';
 import NPC from "../characters/npc";
+import SlimeWithStates from './slime_with_states';
+import SlimeStates from '../ai/behaviour/slime_states';
+
+import { Bullets, PlayerWithGun } from './player_with_gun';
+import UserControlled from '../ai/behaviour/user_controlled';
+import NpcWithStates from './npc_with_states';
+import NpcStates from '../ai/behaviour/npc_states';
 
 export default class CharacterFactory {
-
-
-
     constructor(scene) {
         this.scene = scene;
 
@@ -65,20 +69,69 @@ export default class CharacterFactory {
 
 
     buildNPCCharacter(spriteSheetName, x, y, params) {
-        let character = new NPC(this.scene, x, y,
-            spriteSheetName, 2,
-            params.Steering);
-
+        let character;
+        if (params.useStates) {
+            character = new NpcWithStates(this.scene, x, y, spriteSheetName, 'gun', NpcStates.ChasingSlime);
+            params.addConditions(character);
+            params.createStateTable(character);
+            params.initSteerings(character);
+        } else {
+            character = new NPC(this.scene, x, y, spriteSheetName, 2, params.Steering);
+        }
         character.animationSets = this.animationLibrary.get(spriteSheetName);
         return character;
     }
 
+    addBulletsBehaviour(character) {
+        this.scene.bullets = new Bullets(this.scene);
+        if (this.scene.groundLayer) {
+            this.scene.physics.add.collider(this.scene.bullets, this.scene.groundLayer, (bullet) => {
+                bullet.setVisible(false);
+                bullet.setActive(false);
+            });
+        }
+        if (this.scene.otherLayer) {
+            this.scene.physics.add.collider(this.scene.bullets, this.scene.otherLayer, (bullet) => {
+                bullet.setVisible(false);
+                bullet.setActive(false);
+            });
+        }
+        const context = this;
+        this.scene.input.on('pointerdown', (pointer) => {
+            const {x, y} = character.bulletStartingPoint
+
+            character.lastTimeFired = (new Date()).getTime();
+
+            const vx = pointer.x + context.scene.cameras.main.scrollX - x;
+            const vy = pointer.y + context.scene.cameras.main.scrollY - y;
+
+            const BULLET_SPEED = 400
+            const mult = BULLET_SPEED / Math.sqrt(vx*vx + vy*vy)            
+            this.scene.bullets.fireBullet(x, y, vx * mult, vy * mult, character);
+        });
+    }
+
     buildPlayerCharacter(spriteSheetName, x, y, params = {}) {
-        let character = new Player(this.scene, x, y, spriteSheetName, 2, params);
-        character.maxSpeed = 100;
-        character.setCollideWorldBounds(true);
-        character.cursors = this.scene.input.keyboard.createCursorKeys();
-        character.animationSets = this.animationLibrary.get('aurora');
+        const maxSpeed = 100;
+        let character;
+        if (params.withGun) {
+            character = new PlayerWithGun(this.scene, x, y, spriteSheetName, 'gun');
+            const wasdCursorKeys = this.scene.input.keyboard.addKeys({
+                up:Phaser.Input.Keyboard.KeyCodes.W,
+                down:Phaser.Input.Keyboard.KeyCodes.S,
+                left:Phaser.Input.Keyboard.KeyCodes.A,
+                right:Phaser.Input.Keyboard.KeyCodes.D
+            });
+            character.addBehaviour(new UserControlled(150, wasdCursorKeys));
+            this.addBulletsBehaviour(character);
+        } else {
+            character = new Player(this.scene, x, y, spriteSheetName, 2, params);
+            character.setCollideWorldBounds(true);
+            character.cursors = this.scene.input.keyboard.createCursorKeys();
+        }
+        character.maxSpeed = maxSpeed;
+        
+        character.animationSets = this.animationLibrary.get(spriteSheetName);
         //todo: not here
         character.footstepsMusic = this.scene.sound.add('footsteps', {
             mute: false,
@@ -109,6 +162,11 @@ export default class CharacterFactory {
         let slime;
         if (params.useSteering) {
             slime = new SmartSlime(this.scene, x, y, this.slimeSpriteSheet, 9*slimeType);
+        } else if (params.useStates) {
+            slime = new SlimeWithStates(this.scene, x, y, this.slimeSpriteSheet, 9*slimeType, SlimeStates.Searching);
+            params.addSlimesConditions(slime);
+            params.createStateTable(slime);
+            params.initSteerings(slime);
         } else {
             slime = new Slime(this.scene, x, y, this.slimeSpriteSheet, 9 * slimeType);
         }
