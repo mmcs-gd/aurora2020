@@ -33,10 +33,10 @@ export default class PortalManager{
             let tileX = Math.floor((x + (this.player.body.gameObject.width / 2)) / this.widthTile);
             let tileY = Math.floor((y + (this.player.body.gameObject.height / 2)) / this.heightTile);
             
-            if (this.player.faceDirection == 0) tileX -= 2;
-            if (this.player.faceDirection == 1) tileX += 3;
-            if (this.player.faceDirection == 2) tileY -= 2;
-            if (this.player.faceDirection == 3) tileY += 3;
+            if (this.player.faceDirection == 0) tileX -= 1;
+            if (this.player.faceDirection == 1) tileX += 2;
+            if (this.player.faceDirection == 2) tileY -= 1;
+            if (this.player.faceDirection == 3) tileY += 2;
             
             x = tileX * this.widthTile;
             y = tileY * this.heightTile;

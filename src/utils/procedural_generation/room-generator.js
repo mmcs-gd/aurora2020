@@ -34,9 +34,7 @@ export default class RoomGenerator {
         this.startPointY = 0;
     }
     generateRooms() {
-        
         const generatedMatrixAndRooms = getMatrixRooms(this.width, this.height);
-        
         const matrix = generatedMatrixAndRooms['Matrix'];
         const rooms = generatedMatrixAndRooms['Rooms'];
         for (let y = 0; y < this.height; y++) 

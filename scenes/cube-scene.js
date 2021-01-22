@@ -11,10 +11,12 @@ import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 import EffectsFactory from "../src/utils/effects-factory";
 
 import Music from '../assets/audio/musicBox.mp3'
+import ExaminationManager from '../src/utils/examination-manager/examination-manager'
 import GeneratorArtifacts from '../src/utils/generator-artifacts/generator-artifacts'
 import TeleportManager from '../src/utils/portal/teleport-manager'
 import PortalManager from '../src/utils/portal/portal-manager'
 import tilemapPng from '../assets/tileset/Dungeon_Tileset.png'
+import Observer from '../src/observer'
 
 
 let CubeScene = new Phaser.Class({
@@ -45,8 +47,7 @@ let CubeScene = new Phaser.Class({
     },
 
     create: function () {
-        //let music = this.scene.sound.get('musicBox');
-        this.sound.setVolume(0.05);
+        this.sound.setVolume(0.3);
         this.sound.play('musicBox');
         this.sizeMapTileX = 60;
         this.sizeMapTileY = 60;
@@ -55,12 +56,9 @@ let CubeScene = new Phaser.Class({
         this.characterFactory = new CharacterFactory(this);
         this.level++;
         this.hasPlayerReachedStairs = false;
-        
-        this.portals = [];
 
         const roomGenerator = new RoomGenerator(32, this, this.sizeMapTileX, this.sizeMapTileY);
         const layersOfLevel = roomGenerator.generateRooms();
-        
 
         this.groundLayer  = layersOfLevel["Ground"];
         this.stuffLayer   = layersOfLevel["Stuff"];
@@ -91,6 +89,9 @@ let CubeScene = new Phaser.Class({
                 .setAlpha(0.75)
                 .setDepth(20);
         });
+
+        this.portals = [];
+
         this.widthTile = 32;
         this.heightTile = 32;
         this.keySetPortal = this.input.keyboard.addKey('S');
@@ -104,34 +105,70 @@ let CubeScene = new Phaser.Class({
 
         this.generatorArtifacts = new GeneratorArtifacts(this.setRooms, 
             this.effectsFactory, this.widthTile, this.heightInPixels, this.countArtifacts);
-    
+        
+        this.examinationManager = new ExaminationManager(this.setRooms, this.characterFactory, this, this.player);
+        this.examinationManager.generateChunkInRoom();
+        this.roomsWithExam = this.examinationManager.getRoomsWithExam;
+        this.numbersRoomsWithExam = this.examinationManager.getNumbersRoomsWithExam;
+        this.slimes = this.examinationManager.getSlimes;
+        
+
+        for(let i = 0; i < this.slimes.length; i++) {
+            this.physics.add.collider(this.slimes[i], this.groundLayer);
+            this.physics.add.collider(this.slimes[i], this.stuffLayer);
+            this.physics.add.collider(this.slimes[i], this.outsideLayer);
+            this.gameObjects.push(this.slimes[i]);
+        }
+
         this.artifacts = this.generatorArtifacts.setArtifacts('magicSpell');
         this.countArtifacts = this.artifacts.length;
 
+        
+        
         this.textHealthPlayer = this.add.text(0, 0, "Health: " + this.player.health, 'courier');
         this.textInfoArtifacts = this.add.text(0, 20,"Artifacts: " + this.player.countArtifacts + 'x' + this.countArtifacts,'courier');
-        
+
+        this.observer = new Observer(this.roomsWithExam, this.player);
     },
 
     update: function () {
         if (this.gameObjects) {
             this.gameObjects.forEach( function(element) { element.update(); });
-                this.portals = this.portalManager.updatePortal();
-                this.teleportManager.updateTeleport(this.portals);
-                const camera = this.cameras.main;
-                const x = camera.scrollX;
-                const y = camera.scrollY;
-                if (this.generatorArtifacts.updateArtifacts(this.player, this.artifacts))
-                {
-                    this.textInfoArtifacts.destroy();
-                    this.textInfoArtifacts = this.add.text(x, y,  
-                        "Artifacts: " + this.player.countArtifacts + 'x' + this.countArtifacts,'courier');
-                }    
-                this.textHealthPlayer.setX(x);
-                this.textHealthPlayer.setY(y + 10);
-                this.textInfoArtifacts.setX(x);
-                this.textInfoArtifacts.setY(y + this.textHealthPlayer.height + 10);
-
+            this.portals = this.portalManager.updatePortal();
+            this.teleportManager.updateTeleport(this.portals);
+            
+            const camera = this.cameras.main;
+            const x = camera.scrollX;
+            const y = camera.scrollY;
+            if (this.generatorArtifacts.updateArtifacts(this.player, this.artifacts))
+            {
+                this.textInfoArtifacts.destroy();
+                this.textInfoArtifacts = this.add.text(x, y, 
+                    "Artifacts: " + this.player.countArtifacts + 'x' + this.countArtifacts,'courier');
+            }    
+            if (this.observer.playerInRoomWithExam(this, this.gameObjects))
+            {
+                this.textHealthPlayer.destroy();
+                this.textHealthPlayer = this.add.text(0, 0, "Health: " + this.player.health, 'courier');
+            }
+            this.textHealthPlayer.setX(x);
+            this.textHealthPlayer.setY(y + 10);
+            this.textInfoArtifacts.setX(x);
+            this.textInfoArtifacts.setY(y + this.textHealthPlayer.height + 10);
+            }
+            if (this.player.health == 0) {
+                this.sound.setMute(true)
+                this.textInfoArtifacts.destroy();
+                this.textHealthPlayer.destroy();
+                this.textLose = this.add.text(0, 160, "YOU LOSE", 'courier');
+                this.scene.pause();
+            }
+            if (this.player.countArtifacts == this.countArtifacts) {
+                this.sound.setMute(true)
+                this.textInfoArtifacts.destroy();
+                this.textHealthPlayer.destroy();
+                this.textWin = this.add.text(0, 160, "WIN", 'courier');
+                this.scene.pause();
             }
         },
     tilesToPixels(tileX, tileY) {

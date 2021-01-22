@@ -9,7 +9,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite{
         this.abilities  = params.abilities || []
         this.faceDirection = 3;
         this.countArtifacts = 0;
-        this.health = 5;
+        this.health = 1;
     }
 
     update() {

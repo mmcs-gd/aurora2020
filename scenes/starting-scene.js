@@ -80,6 +80,7 @@ let StartingScene = new Phaser.Class({
         this.physics.add.collider(this.player, worldLayer);
 
         this.slimes =  this.physics.add.group();
+        
         let params = {};
         for(let i = 0; i < 10; i++) {
             const x = Phaser.Math.RND.between(50, this.physics.world.bounds.width - 50 );

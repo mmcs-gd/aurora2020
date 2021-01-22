@@ -87,6 +87,7 @@ class Room {
         this.width = width;
         this.height = height;
         this.isExamination = false;
+        this.slimes = [];
         this.room = new Array();
         for (let y = 0; y < height; y++) {
             this.room[y] = new Array();
@@ -105,7 +106,7 @@ class Room {
         }
         
     }
-
+    getSlimesFromRoom() { return this.slimes; }
     get matrixRoom() { return this.room; }
 
     _generateHollowMatrix() {
