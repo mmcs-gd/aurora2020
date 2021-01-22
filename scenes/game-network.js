@@ -107,6 +107,7 @@ let SceneNetwork = new Phaser.Class({
         console.log(this.mask);
         console.log(this.rooms);
         console.log(this.corridors);
+        this.levelMetric = new LevelMetric(this.mask.length, this.mask[0].length, this.rooms, this.corridors, this.mask);
 
         this.frameN = 0; // номер кадра с начала игры
         this.gameObjects = [];
@@ -127,8 +128,8 @@ let SceneNetwork = new Phaser.Class({
                 height: 50*32
             },
             roomsCount: this.rooms.length,
-            fillPercent: undefined,
-            npc: [ ...this.npc.values() ],
+            fillPercent: this.levelMetric.fillPercent() * 100,
+            npc: this.npc,
         };
 
         // передаём инфу в сцену с картой
@@ -140,7 +141,7 @@ let SceneNetwork = new Phaser.Class({
             rooms: this.rooms,
             corridors: this.corridors,
             portal: this.portal, // buildLevel добавил portal
-            npc: [ ...this.npc.values() ],
+            npc: this.npc,
             player: this.player,
         };
 
@@ -169,6 +170,11 @@ let SceneNetwork = new Phaser.Class({
                 this.scene.run("SceneText");
             }
             this.showMap = !this.showMap;
+        });
+
+        this.input.keyboard.on("keydown_ESC", event => {
+            this.scene.pause("SceneText");
+            this.scene.stop("SceneText");
         });
 
         // запускаем сцену в которой выводим текст
@@ -205,7 +211,8 @@ let SceneNetwork = new Phaser.Class({
 
             // если только появился, то создаём punk
             if (!this.npc.has(key)) {
-                const npc = this.characterFactory.buildCharacter('punk', this.player.x+64, this.player.y+64);
+                const startRoom = this.rooms[0];
+                const npc = this.characterFactory.buildCharacter('punk', startRoom.x*32+32, startRoom.y*32+32);
                 //this.physics.add.collider(npc, wallsLayer);
                 this.physics.add.collider(npc, this.outsideLayer);
                 this.gameObjects.push(npc);
@@ -251,6 +258,7 @@ let SceneNetwork = new Phaser.Class({
             alive: false,
         });
         this.ws.send(dataJSON);
+        //this.ws.close();
         this.buffer.delete(this.id);
         this.npc.delete(this.id);
     }

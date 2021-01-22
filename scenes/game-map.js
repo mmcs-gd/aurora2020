@@ -62,6 +62,11 @@ let SceneMap = new Phaser.Class({
         this.npc = npc;
 
         this.drawMap();
+
+        this.input.keyboard.on("keydown_ESC", event => {
+            this.scene.pause("SceneMap");
+            this.scene.stop("SceneMap");
+        });
     },
 
     update: function () {
@@ -79,8 +84,13 @@ let SceneMap = new Phaser.Class({
 
             // draw NPC
             this.graphics.fillStyle(0x0000FF, 1.0);
-            this.npc.forEach(obj => this.graphics.fillCircle(map.x + obj.x * coef.w, map.y + obj.y * coef.h, 3));
             this.time = time;
+
+            if (this.npc instanceof Map){
+                [...this.npc.values()].forEach(obj => this.graphics.fillCircle(map.x + obj.x * coef.w, map.y + obj.y * coef.h, 3));
+            } else {
+                this.npc.forEach(obj => this.graphics.fillCircle(map.x + obj.x * coef.w, map.y + obj.y * coef.h, 3));
+            }
         }
     },
 

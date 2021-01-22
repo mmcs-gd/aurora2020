@@ -150,11 +150,15 @@ let SceneDungeon = new Phaser.Class({
             this.showMap = !this.showMap;
         });
 
-        // https://www.html5gamedevs.com/topic/10139-phaser-keyboard-codes-cheatsheet/
-        this.input.keyboard.on("keydown_ONE", event => {
-            // skill 1
-            console.log("skill 1");
+        this.input.keyboard.on("keydown_ESC", event => {
+            this.scene.pause("SceneText");
+            this.scene.stop("SceneText");
         });
+
+        // https://www.html5gamedevs.com/topic/10139-phaser-keyboard-codes-cheatsheet/
+        /*this.input.keyboard.on("keydown_ONE", event => {
+            console.log("skill 1");
+        });*/
 
         // запускаем сцену в которой выводим текст
         this.scene.run("SceneText");
