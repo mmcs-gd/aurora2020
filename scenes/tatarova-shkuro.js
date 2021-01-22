@@ -131,7 +131,7 @@ let TatarovaShkuro = new Phaser.Class({
             ...style
         }
         const gameOver = this.add.text(0,height, text, textStyle);
-        const exitText = this.add.text(0, height + gameOver.height, '\nДля выхода нажмите Esc\n',
+        const exitText = this.add.text(0, height + gameOver.height, '\nДля выхода нажмите Enter\n',
         {
             ...textStyle,
             fontSize: '28px',

@@ -55,11 +55,15 @@ let MenuScene = new Phaser.Class({
         });
 
         this.input.keyboard.on("keydown_ESC", event => {
-            if (this._runningScene !== null) {
+				if (this._runningScene !== null) {
                 this.scene.pause(this._runningScene);
                 this.scene.stop(this._runningScene);
                 this._runningScene = null;
             }
+        });
+
+				this.input.keyboard.on("keydown_ENTER", event => {
+						window.location.reload();
         });
     },
 
