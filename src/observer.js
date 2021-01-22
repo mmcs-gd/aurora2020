@@ -19,8 +19,8 @@ export default class Observer {
             let room = this.roomsWithExam[i];
             if (playerX - 1 > room.x 
                 && playerY - 1 > room.y 
-                && playerX + 1 < room.x + room.width 
-                && playerY + 1 < room.y + room.height) { 
+                && playerX + 2 < room.x + room.width 
+                && playerY + 2 < room.y + room.height) { 
                     for (let j = 0; j < room.slimes.length; j++) {
                         room.slimes[j].setVisible(true);
                         room.slimes[j].active = true;
