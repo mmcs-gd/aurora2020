@@ -210,12 +210,20 @@ let SceneNetwork = new Phaser.Class({
                 this.physics.add.collider(npc, this.outsideLayer);
                 this.gameObjects.push(npc);
                 this.npc.set(key, npc);
-            } else {
-                //console.log(key);
-                //const buffer = this.buffer.get(id);
-                const npc = this.npc.get(key);
-                npc.x = this.player.x + 64;
-                npc.y = this.player.y + 64;
+            }
+
+            if (this.id !== key && 0 < val.length) {
+                val.sort( (a, b) => a.frame - b.frame);
+                const { id, frame, x, y, vx, vy, alive } = val[0];
+
+                const npc = this.npc.get(id);
+                npc.x = x;
+                npc.y = y;
+
+                // удалить с карты
+                if (!alive) {
+
+                }
             }
 
             this.buffer.set(key, []);
