@@ -9,13 +9,27 @@ const TILES = {
 
     WALL_LEFT: 18,
     WALL_RIGHT: 16,
-    WALL_TOP: 39,
-    WALL_BOTTOM: 52,
+    WALL_TOP: 20,
+    WALL_BOTTOM: 36,
 
-    CORNER_TOP_LEFT: 0,
-    CORNER_TOP_RIGHT: 0,
-    CORNER_BOTTOM_LEFT: 35,
-    CORNER_BOTTOM_RIGHT: 37,
+    CORRIDOR_TOP: 39,
+    CORRIDOR_BOTTOM: 52,
+
+    WALL_TOP_LEFT: 19,
+    WALL_TOP_RIGHT: 21,
+    WALL_BOTTOM_LEFT: 35,
+    WALL_BOTTOM_RIGHT: 37,
+
+    UPPER_TOP: 4,
+    UPPER_BOTTOM1: 36,
+    UPPER_BOTTOM2: 52,
+
+    UPPER_TOP_LEFT: 3,
+    UPPER_TOP_RIGHT: 5,
+    UPPER_BOTTOM_LEFT1: 35,
+    UPPER_BOTTOM_RIGHT1: 37,
+    UPPER_BOTTOM_LEFT2: 51,
+    UPPER_BOTTOM_RIGHT2: 53,
 }
 
 
@@ -31,10 +45,11 @@ export default function buildLevel(width, height, scene, { rooms, corridors, mas
 
     const tileSet = scene.map.addTilesetImage("tiles", null, tileSize, tileSize);
     
-    // создаём уровни сцены
+    // создаём уровни сцены. какой порядок?
     const outsideLayer = scene.map.createBlankDynamicLayer("Outside", tileSet);
     const groundLayer = scene.map.createBlankDynamicLayer("Ground", tileSet);
     const wallsLayer = scene.map.createBlankDynamicLayer("Walls", tileSet);
+    //const upperLayer = scene.map.createBlankDynamicLayer("Upper", tileSet);
 
     // по маске уровня заполняем уровни outsideLayer, groundLayer
     // fill, putTileAt, weightedRandomize
@@ -42,25 +57,41 @@ export default function buildLevel(width, height, scene, { rooms, corridors, mas
 		for (let y = 0; y < height; y++) {
 			if (mask[x][y] === 0) {
 				outsideLayer.putTileAt(TILES.BLANK, x, y);
-            } else if (mask[x][y] === 2) {
+            } else if (mask[x][y] === 1) {
+                groundLayer.weightedRandomize(x, y, 1, 1, TILES.FLOOR);
+            }/*else if (mask[x][y] === 2) {
                 wallsLayer.putTileAt(TILES.WALL_LEFT, x, y);
                 groundLayer.weightedRandomize(x, y, 1, 1, TILES.FLOOR);
             } else if (mask[x][y] === 3) {
                 wallsLayer.putTileAt(TILES.WALL_RIGHT, x, y);
                 groundLayer.weightedRandomize(x, y, 1, 1, TILES.FLOOR);
             } else if (mask[x][y] === 4) {
-				wallsLayer.putTileAt(TILES.WALL_TOP, x, y);
+                wallsLayer.putTileAt(TILES.WALL_TOP, x, y);
+                groundLayer.weightedRandomize(x, y, 1, 1, TILES.FLOOR);
             } else if (mask[x][y] === 5) {
-				wallsLayer.putTileAt(TILES.WALL_BOTTOM, x, y);
+                wallsLayer.putTileAt(TILES.CORRIDOR_BOTTOM, x, y);
+                //upperLayer.putTileAt(TILES.UPPER_BOTTOM1, x, y-1);
+                //upperLayer.putTileAt(TILES.UPPER_BOTTOM2, x, y);
+                groundLayer.weightedRandomize(x, y, 1, 1, TILES.FLOOR);
             } else if (mask[x][y] === 6) {
-				wallsLayer.putTileAt(TILES.CORNER_TOP_LEFT, x, y);
+                wallsLayer.putTileAt(TILES.WALL_TOP_LEFT, x, y);
+                groundLayer.weightedRandomize(x, y, 1, 1, TILES.FLOOR);
             } else if (mask[x][y] === 7) {
-				wallsLayer.putTileAt(TILES.CORNER_TOP_RIGHT, x, y);
-            } else if (mask[x][y] === 5) {
-				wallsLayer.putTileAt(TILES.CORNER_BOTTOM_LEFT, x, y);
-            } else if (mask[x][y] === 5) {
-				wallsLayer.putTileAt(TILES.CORNER_BOTTOM_RIGHT, x, y);
-            } else {
+                wallsLayer.putTileAt(TILES.WALL_TOP_RIGHT, x, y);
+                groundLayer.weightedRandomize(x, y, 1, 1, TILES.FLOOR);
+            } else if (mask[x][y] === 8) {
+                wallsLayer.putTileAt(TILES.WALL_BOTTOM_LEFT, x, y);
+                groundLayer.weightedRandomize(x, y, 1, 1, TILES.FLOOR);
+            } else if (mask[x][y] === 9) {
+                wallsLayer.putTileAt(TILES.WALL_BOTTOM_RIGHT, x, y);
+                groundLayer.weightedRandomize(x, y, 1, 1, TILES.FLOOR);
+            } else if (mask[x][y] === 10) {
+                wallsLayer.putTileAt(TILES.CORRIDOR_TOP, x, y);
+                groundLayer.weightedRandomize(x, y, 1, 1, TILES.FLOOR);
+            } else if (mask[x][y] === 11) {
+                wallsLayer.putTileAt(TILES.CORRIDOR_BOTTOM, x, y);
+                groundLayer.weightedRandomize(x, y, 1, 1, TILES.FLOOR);
+            } */else {
                 groundLayer.weightedRandomize(x, y, 1, 1, TILES.FLOOR);
             }
 		}
@@ -69,7 +100,8 @@ export default function buildLevel(width, height, scene, { rooms, corridors, mas
     // добавляем персонажа Аврору
     const startRoom = rooms[0];
     scene.player = scene.characterFactory.buildCharacter('aurora', startRoom.x*32+32, startRoom.y*32+32, {player: true});
-    scene.physics.add.collider(scene.player, wallsLayer);
+    //scene.physics.add.collider(scene.player, wallsLayer);
+    scene.physics.add.collider(scene.player, outsideLayer);
     scene.gameObjects.push(scene.player);
 
     // точка появления игроков
@@ -87,7 +119,8 @@ export default function buildLevel(width, height, scene, { rooms, corridors, mas
         //const npc = scene.characterFactory.buildCharacter('green', roomNPC.x*32+32, roomNPC.y*32+32, { Steering: new Exploring(this) });
         const npc = scene.characterFactory.buildCharacter('punk', roomNPC.x*32+32, roomNPC.y*32+32);
         npc.setAI(new Aggressive(npc, [scene.player]), 'idle');
-        scene.physics.add.collider(npc, wallsLayer);
+        //scene.physics.add.collider(npc, wallsLayer);
+        scene.physics.add.collider(npc, outsideLayer);
         scene.physics.add.collider(npc, scene.player, scene.onNpcPlayerCollide.bind(scene));
         scene.gameObjects.push(npc);
         scene.npc.push(npc);
@@ -104,8 +137,10 @@ export default function buildLevel(width, height, scene, { rooms, corridors, mas
     // настройки столкновений с уровнями
     // https://photonstorm.github.io/phaser3-docs/Phaser.Tilemaps.Tilemap.html#setCollision__anchor
     scene.physics.world.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels, true, true, true, true);
-    wallsLayer.setDepth(10);
-    wallsLayer.setCollisionBetween(0, 320); // столкновение с тайлами у которых индексы 0..320
+    //wallsLayer.setDepth(10);
+    //wallsLayer.setCollisionBetween(0, 320); // столкновение с тайлами у которых индексы 0..320
+    outsideLayer.setDepth(10);
+    outsideLayer.setCollision(TILES.BLANK);
 
     return {"Ground" : groundLayer, "Outside" : outsideLayer, "Walls" : wallsLayer}
 }

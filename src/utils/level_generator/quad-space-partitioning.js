@@ -77,25 +77,41 @@ export default class QuadSpacePartitioning {
                 if (0 < y && matrix[i][y-1] === 0) matrix[i][y-1] = 4;
             }
             for (let i = x; i < x+w; i++) { // нижняя стена
-                if (y+h < this.height-1 && matrix[i][y+h] === 0) matrix[i][y+h] = 5;
+                if (y+h < this.height && matrix[i][y+h] === 0) matrix[i][y+h] = 5;
             }
             for (let i = y; i < y+h; i++) { // левая стена
                 if (0 < x && matrix[x-1][i] === 0) matrix[x-1][i] = 2;
             }
             for (let i = y; i < y+h; i++) { // правая стена
-                if (x+w < this.width-1 && matrix[x+w][i] === 0) matrix[x+w][i] = 3;
+                if (x+w < this.width && matrix[x+w][i] === 0) matrix[x+w][i] = 3;
             }
 
             if (0 < x && 0 < y && matrix[x-1][y-1] === 0) matrix[x-1][y-1] = 6; // верхний левый угол
-            if (x+w < this.width-1 && 0 < y && matrix[x+w][y-1] === 0) matrix[x+w][y-1] = 7; // верхний правый угол
-            if (0 < x && y+h < this.height-1 && matrix[x-1][y+h] === 0) matrix[x-1][y+h] = 8; // нижний левый угол
-            if (x+w < this.width-1 && y+h < this.height-1 && matrix[x+w][y+h] === 0) matrix[x+w][y+h] = 9; // нижний правый угол
+            if (x+w < this.width && 0 < y && matrix[x+w][y-1] === 0) matrix[x+w][y-1] = 7; // верхний правый угол
+            if (0 < x && y+h < this.height && matrix[x-1][y+h] === 0) matrix[x-1][y+h] = 8; // нижний левый угол
+            if (x+w < this.width && y+h < this.height && matrix[x+w][y+h] === 0) matrix[x+w][y+h] = 9; // нижний правый угол
         }
-        rooms.forEach(r => makeWall(r));
-        corridors.forEach( ({ rect_dx, rect_dy }) => {
-            if (rect_dx) makeWall(rect_dx);
-            if (rect_dy) makeWall(rect_dy);
-        });
+        //rooms.forEach(r => makeWall(r));
+
+        // 10-wall_top, 11-wall_bottom
+        const makeWall2 = ({ x,y,w,h }) => {
+            /*for (let i = x; i < x+w; i++) { // верхняя стена
+                if (0 < y && matrix[i][y-1] === 0) matrix[i][y-1] = 10;
+            }*/
+            for (let i = x; i < x+w; i++) { // нижняя стена
+                if (y+h < this.height && matrix[i][y+h] === 0) matrix[i][y+h] = 11;
+            }
+            for (let i = y; i < y+h; i++) { // левая стена
+                if (0 < x && matrix[x-1][i] === 0) matrix[x-1][i] = 2;
+            }
+            for (let i = y; i < y+h; i++) { // правая стена
+                if (x+w < this.width && matrix[x+w][i] === 0) matrix[x+w][i] = 3;
+            }
+        }
+        /*corridors.forEach( ({ rect_dx, rect_dy }) => {
+            if (rect_dx) makeWall2(rect_dx);
+            if (rect_dy) makeWall2(rect_dy);
+        });*/
 
         return { rooms: rooms, corridors:corridors, mask:matrix };
     }
