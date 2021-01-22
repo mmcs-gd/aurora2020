@@ -7,7 +7,7 @@ import Footsteps from "../assets/audio/footstep_ice_crunchy_run_01.wav";
 //import bulletPng from '../assets/sprites/bullet.png'
 
 
-import buildLevel from '../src/utils/level_generator/level-build';
+import buildLevel from '../src/utils/level_generator/level-build-network';
 import LevelMetric from "../src/utils/level_generator/level-metric";
 //import Bullets from '../src/characters/bullet';
 
@@ -49,7 +49,8 @@ let SceneNetwork = new Phaser.Class({
             console.log(`Код: ${event.code} причина: ${event.reason}`);
         };
         //
-        this.buffer = [];
+        this.npc = new Map();
+        this.buffer = new Map(); // у каждого юзера свой буфер сообщений
         this.ws.onmessage = (event) => {
             //console.log("Получены данные");
 
@@ -69,7 +70,11 @@ let SceneNetwork = new Phaser.Class({
 
                 if (id !== this.id){
                     //console.log(data.data);
-                    this.buffer.push(data.data);
+                    if (!this.buffer.get(id)) {
+                        this.buffer.set(id, []);
+                    }
+
+                    this.buffer.get(id).push(data.data);
                 }
             }
         };
@@ -103,6 +108,7 @@ let SceneNetwork = new Phaser.Class({
         console.log(this.rooms);
         console.log(this.corridors);
 
+        this.frameN = 0; // номер кадра с начала игры
         this.gameObjects = [];
         this.characterFactory = new CharacterFactory(this);
         this.effectsFactory.loadAnimations();
@@ -122,7 +128,7 @@ let SceneNetwork = new Phaser.Class({
             },
             roomsCount: this.rooms.length,
             fillPercent: undefined,
-            npc: this.npc, // buildLevel добавил npc
+            npc: [ ...this.npc.values() ],
         };
 
         // передаём инфу в сцену с картой
@@ -134,7 +140,7 @@ let SceneNetwork = new Phaser.Class({
             rooms: this.rooms,
             corridors: this.corridors,
             portal: this.portal, // buildLevel добавил portal
-            npc: this.npc,
+            npc: [ ...this.npc.values() ],
             player: this.player,
         };
 
@@ -182,7 +188,7 @@ let SceneNetwork = new Phaser.Class({
             //console.log('Отправляем данные');
             const dataJSON = JSON.stringify({
                 id: this.id,
-                frame: 1000,
+                frame: this.frameN++,
                 x: this.player.x,
                 y: this.player.y,
                 vx: 0,
@@ -192,40 +198,35 @@ let SceneNetwork = new Phaser.Class({
             this.ws.send(dataJSON);
         }
 
-        // изменить состояние других игроков
-        this.npc[0].x = this.player.x + 64;
-        this.npc[0].y = this.player.y + 64;
+        // пройтись по буферам и изменить состояние других игроков
         // могут потеряться записи во время update?
-        this.buffer = [];
+        for (let el of this.buffer) { // то же самое, что и recipeMap.entries()
+            const [key, val] = el;
+
+            // если только появился, то создаём punk
+            if (!this.npc.has(key)) {
+                const npc = this.characterFactory.buildCharacter('punk', this.player.x+64, this.player.y+64);
+                //this.physics.add.collider(npc, wallsLayer);
+                this.physics.add.collider(npc, this.outsideLayer);
+                this.gameObjects.push(npc);
+                this.npc.set(key, npc);
+            } else {
+                //console.log(key);
+                //const buffer = this.buffer.get(id);
+                const npc = this.npc.get(key);
+                npc.x = this.player.x + 64;
+                npc.y = this.player.y + 64;
+            }
+
+            this.buffer.set(key, []);
+        }
     },
 
     tilesToPixels (tileX, tileY) {
         return [tileX*this.tileSize, tileY*this.tileSize];
     },
 
-    onNpcPlayerCollide() {
-        alert('Погиб!');
-        this.scene.pause("SceneNetwork");
-        this.scene.pause("SceneText");
-        this.scene.pause("SceneMap");
-
-        if (this.ws.readyState === WebSocket.OPEN){
-            console.log('помер');
-
-            const dataJSON = JSON.stringify({
-                id: this.id,
-                frame: 1000,
-                x: this.player.x,
-                y: this.player.y,
-                vx: 0,
-                vy: 0,
-                alive: false,
-            });
-            this.ws.send(dataJSON);
-        }
-    },
-
-    runSceneBoss() {
+    runSceneDungeon() {
         // переход на сцену SceneDungeon
         //console.log('runSceneDungeon');
         this.scene.pause("SceneNetwork");
@@ -234,7 +235,7 @@ let SceneNetwork = new Phaser.Class({
 
         const dataJSON = JSON.stringify({
             id: this.id,
-            frame: 1000,
+            frame: this.frameN,
             x: this.player.x,
             y: this.player.y,
             vx: 0,
@@ -242,6 +243,8 @@ let SceneNetwork = new Phaser.Class({
             alive: false,
         });
         this.ws.send(dataJSON);
+        this.buffer.delete(this.id);
+        this.npc.delete(this.id);
     }
 });
 
