@@ -3,23 +3,19 @@ import SlimeStates from '../../ai/behaviour/slime_states';
 import NpcStates from '../../ai/behaviour/npc_states';
 
 import { StateTable, StateTableRow } from '../../ai/behaviour/state';
-import Pursuit from '../../ai/steerings/pursuit';
-import Ranaway from '../../ai/steerings/ranaway';
 import Wander from '../../ai/steerings/wander';
 import Attack from '../../ai/steerings/attack';
-import Flee from '../../ai/steerings/flee';
 import Chase from '../../ai/steerings/chase';
 import RanawayFromObjects from '../../ai/steerings/ranaway_from_objects';
 import ChaseClosest from '../../ai/steerings/chaseClosest';
 import { Gold, Potion, Scroll } from '../../characters/interactive_objects';
-import { Shadowing } from '../../ai/steerings/shadowing';
 
 export default class FillLevel {
     constructor(tilemapper, groundLayer, collideLayer, upperLayer) {
         this.tilemapper = tilemapper;
         this.groundLayer = groundLayer;
         this.collideLayer = collideLayer;
-				this.upperLayer = upperLayer;
+        this.upperLayer = upperLayer;
         this.scene = tilemapper.scene;
         this.map = tilemapper.map;
     }
@@ -49,8 +45,8 @@ export default class FillLevel {
     }
 
     checkFreeSpaceForMobs(x, y, mobs) {
-        if (this.tileAt(x,y) !== config.FLOOR || this.collideLayer.getTileAt(x, y) !== null 
-				|| this.groundLayer.getTileAt(x,y) !== null) {
+        if (this.tileAt(x, y) !== config.FLOOR || this.collideLayer.getTileAt(x, y) !== null
+            || this.groundLayer.getTileAt(x, y) !== null) {
             return false;
         }
         if (this.calcDistance({ x, y }, this.scene.player.body) < 5) {
@@ -66,12 +62,12 @@ export default class FillLevel {
     }
 
     checkFreeSpaceForObjects(x, y, objects, tries) {
-   			if(this.tileAt(x, y) !== config.FLOOR 
-				|| this.collideLayer.getTileAt(x, y) !== null 
-				|| this.upperLayer.getTileAt(x,y) !== null){
-					return false;
-				}
-					
+        if (this.tileAt(x, y) !== config.FLOOR
+            || this.collideLayer.getTileAt(x, y) !== null
+            || this.upperLayer.getTileAt(x, y) !== null) {
+            return false;
+        }
+
         const characters = [this.scene.player, this.scene.npc];
         for (const c of characters) {
             if (this.calcDistance({ x, y }, c.body) < 20) {
@@ -91,8 +87,8 @@ export default class FillLevel {
         let playerX = 10, playerY = 10;
 
         while (!this.checkFreeSpace(playerX, playerY)) {
-            playerX = Phaser.Math.RND.between(0, this.map.length-1);
-            playerY = Phaser.Math.RND.between(0, this.map[0].length-1);
+            playerX = Phaser.Math.RND.between(0, this.map.length - 1);
+            playerY = Phaser.Math.RND.between(0, this.map[0].length - 1);
         }
 
         this.scene.player = this.scene.characterFactory.buildCharacter('aurora', playerX * this.tilemapper.tilesize, playerY * this.tilemapper.tilesize, { player: true, withGun: true });
@@ -115,7 +111,7 @@ export default class FillLevel {
         this.slimesInfo.setDepth(11);
         this.hpInfo = this.scene.add.text(0, this.scoreInfo.height + this.slimesInfo.height, 'HP: 100', style);
         this.hpInfo.setDepth(11);
-        
+
         this.scene.events.on('addScore', () => {
             const playerScore = this.scene.player.score;
             const npcScore = this.scene.npc.score;
@@ -165,12 +161,12 @@ export default class FillLevel {
 
         const slimesAmount = 50;
         for (let i = 0; i < slimesAmount; i++) {
-            let x = Phaser.Math.RND.between(0, this.map.length-1);
-            let y = Phaser.Math.RND.between(0, this.map[0].length-1);
+            let x = Phaser.Math.RND.between(0, this.map.length - 1);
+            let y = Phaser.Math.RND.between(0, this.map[0].length - 1);
 
             while (!this.checkFreeSpaceForMobs(x, y, slimes.children.entries)) {
-                x = Phaser.Math.RND.between(0, this.map.length-1);
-                y = Phaser.Math.RND.between(0, this.map[0].length-1);
+                x = Phaser.Math.RND.between(0, this.map.length - 1);
+                y = Phaser.Math.RND.between(0, this.map[0].length - 1);
             }
 
             x *= this.tilemapper.tilesize;
@@ -212,12 +208,12 @@ export default class FillLevel {
         return function (slime) {
             slime.isEnemyFiring = function () {
                 const enemies = [that.scene.player, that.scene.npc];
-     
+
                 for (const enemy of enemies) {
-                    const d = Math.sqrt((slime.x - enemy.x)*(slime.x - enemy.x) + (slime.y - enemy.y)*(slime.y - enemy.y));
+                    const d = Math.sqrt((slime.x - enemy.x) * (slime.x - enemy.x) + (slime.y - enemy.y) * (slime.y - enemy.y));
                     if (d < 70 && enemy.isFiring) {
                         slime.steerings[SlimeStates.Running].objects = [
-                            {...enemy, dangerZone: 40 }
+                            { ...enemy, dangerZone: 40 }
                         ];
                         return true;
                     }
@@ -266,7 +262,7 @@ export default class FillLevel {
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, () => slime.isDead, SlimeStates.Dead));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Attacking, () => slime.isDead, SlimeStates.Dead));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Running, () => slime.isDead, SlimeStates.Dead));
-            
+
 
             slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, slime.isEnemyFiring, SlimeStates.Running));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Attacking, slime.isEnemyFiring, SlimeStates.Running));
@@ -277,8 +273,8 @@ export default class FillLevel {
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, slime.isEnemyClose, SlimeStates.Attacking));
 
             slime.stateTable.addState(new StateTableRow(SlimeStates.Running, slime.canWander, SlimeStates.Searching));
-            slime.stateTable.addState(new StateTableRow(SlimeStates.Running, slime.isEnemyClose, SlimeStates.Pursuing));
-            
+            slime.stateTable.addState(new StateTableRow(SlimeStates.Running, slime.isEnemyAround, SlimeStates.Pursuing));
+
             slime.stateTable.addState(new StateTableRow(SlimeStates.Pursuing, slime.canWander, SlimeStates.Searching));
             slime.stateTable.addState(new StateTableRow(SlimeStates.Searching, () => slime.canChangeDirect, SlimeStates.Searching));
 
@@ -335,26 +331,15 @@ export default class FillLevel {
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.slimeIsCloser, NpcStates.ChasingSlime));
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.goldIsCloser, NpcStates.ChasingObject));
 
-            //npc.stateTable.addState(new StateTableRow(NpcStates.Following, npc.slimeIsCloser, NpcStates.ChasingSlime));
-            //npc.stateTable.addState(new StateTableRow(NpcStates.Following, npc.goldIsCloser, NpcStates.ChasingObject));
-            
             npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, () => !npc.canAttackSlime() && npc.goldIsCloser(), NpcStates.ChasingObject));
-						//npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, () => !npc.canAttackSlime(), NpcStates.ChasingObject));
-
-            //npc.stateTable.addState(new StateTableRow(NpcStates.Following, npc.needToHeal, NpcStates.ChasingObject));
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.needToHeal, NpcStates.ChasingObject));
             npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, npc.needToHeal, NpcStates.ChasingObject));
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, () => !npc.needToHeal() && npc.goldIsCloser(), NpcStates.ChasingObject));
-						npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, () => !npc.needToHeal() && npc.slimeIsCloser(), NpcStates.ChasingSlime));
+            npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, () => !npc.needToHeal() && npc.slimeIsCloser(), NpcStates.ChasingSlime));
 
-            //npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, npc.shouldFollowPlayer, NpcStates.Following));
-            //npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, npc.shouldFollowPlayer, NpcStates.Following));
-            //npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, npc.shouldFollowPlayer, NpcStates.Following));
-            
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingSlime, () => npc.isDead, NpcStates.Dead));
             npc.stateTable.addState(new StateTableRow(NpcStates.Attacking, () => npc.isDead, NpcStates.Dead));
             npc.stateTable.addState(new StateTableRow(NpcStates.ChasingObject, () => npc.isDead, NpcStates.Dead));
-
         }
     }
 
@@ -365,7 +350,6 @@ export default class FillLevel {
                 [NpcStates.ChasingSlime]: new ChaseClosest(that.scene.finder, npc, that.scene.slimes.children.entries, 80),
                 [NpcStates.Attacking]: new Attack(npc, []),
                 [NpcStates.ChasingObject]: new ChaseClosest(that.scene.finder, npc, []),
-                [NpcStates.Following]: new Shadowing(npc, [that.scene.player])
             };
             npc.steerings = steerings;
         }
@@ -391,8 +375,7 @@ export default class FillLevel {
 
                 const d1 = ChaseClosest.calculateDistance(npc, slime);
                 const d2 = ChaseClosest.calculateDistance(npc, object);
-                //if (d1 <= d2 && d1 < 300) {
-								if (d1 <= d2) {
+                if (d1 <= d2) {
                     npc.target = slime;
                     return true;
                 }
@@ -418,8 +401,7 @@ export default class FillLevel {
 
                 const d1 = ChaseClosest.calculateDistance(npc, object);
                 const d2 = ChaseClosest.calculateDistance(npc, slime);
-                //if (d1 <= d2 && d1 < 300) {
-								if (d1 <= d2) {
+                if (d1 <= d2) {
                     npc.steerings[NpcStates.ChasingObject].objects = objects;
                     npc.target = object;
                     return true;
@@ -443,14 +425,6 @@ export default class FillLevel {
                 }
                 return needToHeal;
             }
-
-            npc.shouldFollowPlayer = function () {
-                const shouldFollow = !npc.slimeIsCloser() && !npc.goldIsCloser() && !npc.canAttackSlime() && !npc.needToHeal();
-                if (shouldFollow) {
-                    npc.target = that.scene.player;
-                }
-                return shouldFollow;
-            }
         }
     }
 
@@ -460,123 +434,123 @@ export default class FillLevel {
         const scrolls = this.scene.scrolls;
         return [...gold.children.entries, ...potions.children.entries, ...scrolls.children.entries];
     }
-		
-		countFloors(x,y){
-			let neigbors = [this.tileAt(x-1,y), this.tileAt(x,y-1), this.tileAt(x+1,y), this.tileAt(x,y+1)].filter(o => o === config.FLOOR);
-			return neigbors.length;
-		}
-		
-		isConfigHor(x,y){
-			/* configurations
-			0000
-			0110
-			*11*
-			&
-			*11*
-			0110
-			0000			
-			*/
-			return this.tileAt(x,y) === config.FLOOR && (
-				this.tileAt(x-2,y-1) !== config.FLOOR && this.tileAt(x-1,y-1) !== config.FLOOR
-				&& this.tileAt(x,y-1) !== config.FLOOR && this.tileAt(x+1,y-1) !== config.FLOOR
-				&& this.tileAt(x-2,y) !== config.FLOOR && this.tileAt(x-1,y) === config.FLOOR
-				&& this.tileAt(x+1,y) !== config.FLOOR
-				&& this.tileAt(x-1,y+1) === config.FLOOR && this.tileAt(x,y+1) === config.FLOOR
-				
-				||
-				
-				this.tileAt(x-1,y-1) === config.FLOOR && this.tileAt(x,y-1) === config.FLOOR
-				&& this.tileAt(x-2,y) !== config.FLOOR && this.tileAt(x-1,y) === config.FLOOR
-				&& this.tileAt(x+1,y) !== config.FLOOR
-				&& this.tileAt(x-2,y+1) !== config.FLOOR && this.tileAt(x-1,y+1) !== config.FLOOR
-				&& this.tileAt(x,y+1) !== config.FLOOR && this.tileAt(x+1,y+1) !== config.FLOOR
-				);
-		}
-		
-		isConfigVert(x,y){
-			/* configurations
-			00*
-			011
-			011
-			00*
-			&
-			*00
-			110
-			110
-			*00
-			*/
-			return this.tileAt(x,y) === config.FLOOR && (
-			  this.tileAt(x-1,y-2) !== config.FLOOR && this.tileAt(x,y-2) !== config.FLOOR
-				&& this.tileAt(x-1,y-1) !== config.FLOOR && this.tileAt(x,y-1) === config.FLOOR
-				&& this.tileAt(x+1,y-1) === config.FLOOR
-				&& this.tileAt(x-1,y) !== config.FLOOR
-				&& this.tileAt(x+1,y) === config.FLOOR
-				&& this.tileAt(x-1,y+1) !== config.FLOOR && this.tileAt(x,y+1) !== config.FLOOR
-				
-				||
-				
-				this.tileAt(x,y-2) !== config.FLOOR && this.tileAt(x+1,y-2) !== config.FLOOR
-				&& this.tileAt(x-1,y-1) === config.FLOOR && this.tileAt(x,y-1) === config.FLOOR
-				&& this.tileAt(x+1,y-1) !== config.FLOOR
-				&& this.tileAt(x-1,y) === config.FLOOR
-				&& this.tileAt(x+1,y) !== config.FLOOR
-				&& this.tileAt(x,y+1) !== config.FLOOR && this.tileAt(x+1,y+1) !== config.FLOOR
-				);
-		}
-		
+
+    countFloors(x, y) {
+        let neigbors = [this.tileAt(x - 1, y), this.tileAt(x, y - 1), this.tileAt(x + 1, y), this.tileAt(x, y + 1)].filter(o => o === config.FLOOR);
+        return neigbors.length;
+    }
+
+    isConfigHor(x, y) {
+        /* configurations
+        0000
+        0110
+        *11*
+        &
+        *11*
+        0110
+        0000			
+        */
+        return this.tileAt(x, y) === config.FLOOR && (
+            this.tileAt(x - 2, y - 1) !== config.FLOOR && this.tileAt(x - 1, y - 1) !== config.FLOOR
+            && this.tileAt(x, y - 1) !== config.FLOOR && this.tileAt(x + 1, y - 1) !== config.FLOOR
+            && this.tileAt(x - 2, y) !== config.FLOOR && this.tileAt(x - 1, y) === config.FLOOR
+            && this.tileAt(x + 1, y) !== config.FLOOR
+            && this.tileAt(x - 1, y + 1) === config.FLOOR && this.tileAt(x, y + 1) === config.FLOOR
+
+            ||
+
+            this.tileAt(x - 1, y - 1) === config.FLOOR && this.tileAt(x, y - 1) === config.FLOOR
+            && this.tileAt(x - 2, y) !== config.FLOOR && this.tileAt(x - 1, y) === config.FLOOR
+            && this.tileAt(x + 1, y) !== config.FLOOR
+            && this.tileAt(x - 2, y + 1) !== config.FLOOR && this.tileAt(x - 1, y + 1) !== config.FLOOR
+            && this.tileAt(x, y + 1) !== config.FLOOR && this.tileAt(x + 1, y + 1) !== config.FLOOR
+        );
+    }
+
+    isConfigVert(x, y) {
+        /* configurations
+        00*
+        011
+        011
+        00*
+        &
+        *00
+        110
+        110
+        *00
+        */
+        return this.tileAt(x, y) === config.FLOOR && (
+            this.tileAt(x - 1, y - 2) !== config.FLOOR && this.tileAt(x, y - 2) !== config.FLOOR
+            && this.tileAt(x - 1, y - 1) !== config.FLOOR && this.tileAt(x, y - 1) === config.FLOOR
+            && this.tileAt(x + 1, y - 1) === config.FLOOR
+            && this.tileAt(x - 1, y) !== config.FLOOR
+            && this.tileAt(x + 1, y) === config.FLOOR
+            && this.tileAt(x - 1, y + 1) !== config.FLOOR && this.tileAt(x, y + 1) !== config.FLOOR
+
+            ||
+
+            this.tileAt(x, y - 2) !== config.FLOOR && this.tileAt(x + 1, y - 2) !== config.FLOOR
+            && this.tileAt(x - 1, y - 1) === config.FLOOR && this.tileAt(x, y - 1) === config.FLOOR
+            && this.tileAt(x + 1, y - 1) !== config.FLOOR
+            && this.tileAt(x - 1, y) === config.FLOOR
+            && this.tileAt(x + 1, y) !== config.FLOOR
+            && this.tileAt(x, y + 1) !== config.FLOOR && this.tileAt(x + 1, y + 1) !== config.FLOOR
+        );
+    }
+
     addObjects() {
         const gold = this.scene.gold;
         const potions = this.scene.potions;
         const scrolls = this.scene.scrolls;
-				let x = 0; let y = 0;
-				for(let i = 0; i < this.map.length; ++i){
-					for(let j = 0; j < this.map[0].length; ++j){
-						x = i * this.tilemapper.tilesize;
-						y = j * this.tilemapper.tilesize;
-						if(this.map[i][j] === config.FLOOR && 
-						(this.countFloors(i,j) === 1)){ 
-							const g = new Gold(this.scene, x, y);
-							gold.add(g);
-						} else if(this.isConfigHor(i,j)){
-							gold.add(new Gold(this.scene, x, y));
-							gold.add(new Gold(this.scene, x - this.tilemapper.tilesize, y));
-						} else if(this.isConfigVert(i,j)){
-							gold.add(new Gold(this.scene, x, y));
-							gold.add(new Gold(this.scene, x, y - this.tilemapper.tilesize));
-						}
-						else if(this.map[i][j] === config.FLOOR && this.collideLayer.getTileAt(i,j-1) !== null
-						&& this.collideLayer.getTileAt(i-1,j-1) !== null && this.upperLayer.getTileAt(i,j-2) !== null
-						&& this.upperLayer.getTileAt(i-1, j-2) !== null){
-							scrolls.add(new Scroll(this.scene, x, y));
-							scrolls.add(new Scroll(this.scene, x - this.tilemapper.tilesize, y));
-						}
-					}
-				}
-				this.scene.physics.add.collider(this.scene.player, gold, (player, g) => {
+        let x = 0; let y = 0;
+        for (let i = 0; i < this.map.length; ++i) {
+            for (let j = 0; j < this.map[0].length; ++j) {
+                x = i * this.tilemapper.tilesize;
+                y = j * this.tilemapper.tilesize;
+                if (this.map[i][j] === config.FLOOR &&
+                    (this.countFloors(i, j) === 1)) {
+                    const g = new Gold(this.scene, x, y);
+                    gold.add(g);
+                } else if (this.isConfigHor(i, j)) {
+                    gold.add(new Gold(this.scene, x, y));
+                    gold.add(new Gold(this.scene, x - this.tilemapper.tilesize, y));
+                } else if (this.isConfigVert(i, j)) {
+                    gold.add(new Gold(this.scene, x, y));
+                    gold.add(new Gold(this.scene, x, y - this.tilemapper.tilesize));
+                }
+                else if (this.map[i][j] === config.FLOOR && this.collideLayer.getTileAt(i, j - 1) !== null
+                    && this.collideLayer.getTileAt(i - 1, j - 1) !== null && this.upperLayer.getTileAt(i, j - 2) !== null
+                    && this.upperLayer.getTileAt(i - 1, j - 2) !== null) {
+                    scrolls.add(new Scroll(this.scene, x, y));
+                    scrolls.add(new Scroll(this.scene, x - this.tilemapper.tilesize, y));
+                }
+            }
+        }
+        this.scene.physics.add.collider(this.scene.player, gold, (player, g) => {
             g.interact(player);
         });
         this.scene.physics.add.collider(this.scene.npc, gold, (npc, g) => {
             g.interact(npc);
         });
-				this.scene.physics.add.collider(this.scene.player, scrolls, (player, scroll) => {
+        this.scene.physics.add.collider(this.scene.player, scrolls, (player, scroll) => {
             scroll.interact(player);
         });
         this.scene.physics.add.collider(this.scene.npc, scrolls, (npc, scroll) => {
             scroll.interact(npc);
         });
-				
+
         //--- POTIONS ---
         const potionAmount = 10;
         for (let i = 0; i < potionAmount; i++) {
             let tries = 0;
-            x = Phaser.Math.RND.between(0, this.map.length-1);
-            y = Phaser.Math.RND.between(0, this.map[0].length-1);
+            x = Phaser.Math.RND.between(0, this.map.length - 1);
+            y = Phaser.Math.RND.between(0, this.map[0].length - 1);
 
             while (tries < 20 && !this.checkFreeSpaceForObjects(x, y, this.getAllObjects(), tries)) {
-                if(this.tileAt(x,y) === config.FLOOR)
-									tries += 1;
-								x = Phaser.Math.RND.between(0, this.map.length-1);
-                y = Phaser.Math.RND.between(0, this.map[0].length-1);
+                if (this.tileAt(x, y) === config.FLOOR)
+                    tries += 1;
+                x = Phaser.Math.RND.between(0, this.map.length - 1);
+                y = Phaser.Math.RND.between(0, this.map[0].length - 1);
             }
 
             x *= this.tilemapper.tilesize;

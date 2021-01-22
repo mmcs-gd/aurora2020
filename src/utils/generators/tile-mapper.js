@@ -1,27 +1,6 @@
 import FillLevel from './fill-level';
 import { config, digitToType } from './map-config';
 
-// Dangeon
-// const TILE_MAPPING = {
-//     BLANK: 17,
-//     WALL: {
-//         TOP_LEFT: 3,
-//         TOP_RIGHT: 5,
-//         BOTTOM_RIGHT: 53,
-//         BOTTOM_LEFT: 51,
-
-//         TOP: 4,
-//         LEFT: 18, //35, //18,
-//         RIGHT: 16, // 37, //16,
-//         BOTTOM: 52, // 1, //52,
-//         INNER_TOP_LEFT: 0,
-//         INNER_TOP_RIGHT: 2,
-//         INNER_BOTTOM_LEFT: 32,
-//         INNER_BOTTOM_RIGHT: 34,
-//     },
-//     FLOOR: 95
-// };
-
 // Crystal
 const TILE_MAPPING = {
 	BLANK: 13,
