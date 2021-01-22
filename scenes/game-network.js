@@ -48,7 +48,7 @@ let SceneNetwork = new Phaser.Class({
             }
             console.log(`Код: ${event.code} причина: ${event.reason}`);
         };
-        //
+        // ключи - id
         this.npc = new Map();
         this.buffer = new Map(); // у каждого юзера свой буфер сообщений
         this.ws.onmessage = (event) => {
@@ -78,8 +78,19 @@ let SceneNetwork = new Phaser.Class({
             } else if (data.name === 'disconnect') {
                 const disconnectID = data.data;
 
-                // удалить объект из игры
+                // удалить объект из игры или сделать над ним надпись
                 console.log(`удалили игрока с id ${disconnectID}`);
+
+                const npc = this.npc.get(disconnectID);
+                const index = this.gameObjects.indexOf(npc);
+                console.log(`index: ${index}`);
+                if (index > -1) {
+                    this.gameObjects.splice(index, 1);
+                }
+                this.npc.delete(disconnectID);
+                this.buffer.delete(disconnectID);
+
+                this.add.text(npc.x-10, npc.y-25, `off`, {fill: '#F00', fontSize: 10});
             }
         };
         //
