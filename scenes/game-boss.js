@@ -41,6 +41,7 @@ let SceneBoss = new Phaser.Class({
 
     create: function () {
         this.gameObjects = [];
+        this.slimes = [];
         const map = this.make.tilemap({key: "map"});
 
         // Parameters are the name you gave the tileset in Tiled and then the key of the tileset image in
@@ -53,7 +54,7 @@ let SceneBoss = new Phaser.Class({
         const worldLayer = map.createStaticLayer("Walls", tileset, 0, 0);
         const aboveLayer = map.createStaticLayer("Upper", tileset, 0, 0);
         this.tileSize = 32;
-
+        this.finder = new EasyStar.js();
         let grid = [];
         for(let y = 0; y < worldLayer.tilemap.height; y++){
             let col = [];
@@ -63,6 +64,9 @@ let SceneBoss = new Phaser.Class({
             }
             grid.push(col);
         }
+
+        this.finder.setGrid(grid);
+        this.finder.setAcceptableTiles([0]);
 
         worldLayer.setCollisionBetween(1, 500);
         aboveLayer.setDepth(10);
@@ -93,11 +97,6 @@ let SceneBoss = new Phaser.Class({
                 .setAlpha(0.75)
                 .setDepth(20);
         });
-
-        this.input.keyboard.on("keydown_ONE", event => {
-            // skill 1
-            console.log("skill 1");
-        });
     },
 
     update: function () {
@@ -116,6 +115,27 @@ let SceneBoss = new Phaser.Class({
         alert('Погиб!');
         this.scene.pause("SceneBoss");
         this.scene.pause("SceneText");
+    },
+
+    createSlimes() {
+        console.log('появление желешек');
+        this.slimes =  this.physics.add.group();
+        let params = {};
+        for(let i = 0; i < 5; i++) {
+            const x = Phaser.Math.RND.between(50, this.physics.world.bounds.width - 50 );
+            const y = Phaser.Math.RND.between(50, this.physics.world.bounds.height -50 );
+            params.slimeType = Phaser.Math.RND.between(0, 4);
+            const slime = this.characterFactory.buildSlime(x, y, params);
+            this.slimes.add(slime);
+            this.physics.add.collider(slime, this.worldLayer);
+            this.gameObjects.push(slime);
+        }
+        this.physics.add.collider(this.player, this.slimes);
+    },
+
+    killSlimes() {
+        console.log('убивает желешеки');
+        this.slimes.forEach(s => s.damage());
     }
 });
 
