@@ -54,7 +54,6 @@ let playerID = 1;
 // работа по сети
 // подписаться на событие "подключение к серверу"
 server.on('connection', ws => {
-  console.log('Соединение установлено');
 
   // добавить в список игроков
   const id = playerID++;
@@ -64,6 +63,7 @@ server.on('connection', ws => {
     health: 100,
   };
 
+  console.log(`Соединение установлено. id ${id}`);
   // отправить карту подземелья
   const idJSON = JSON.stringify({ name: 'id', data: id });
   ws.send(idJSON);
@@ -73,7 +73,7 @@ server.on('connection', ws => {
 
   // вешает на вебсокет нового подключения callback вызываемый при получении от него сообщения
   ws.on('message', message => {
-    console.log(`received: ${message}}`);
+    //console.log(`received: ${message}}`);
 
     const data = JSON.parse(message);
     const dataSend = JSON.stringify({ name: 'user', data: data });
@@ -83,8 +83,16 @@ server.on('connection', ws => {
     });
   });
 
-});
 
-server.on('close', ws => {
-  // удалить игрока из списка игроков
+  ws.on('close', ws => {
+    console.log(`Соединение разорвано. id: ${id}`);
+
+    // отправить игрокам остальным сообщение об этом
+    server.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) client.send(JSON.stringify({
+            name: 'disconnect',
+            data: id,
+        }));
+      });
+  });
 });

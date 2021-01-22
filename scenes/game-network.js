@@ -39,7 +39,7 @@ let SceneNetwork = new Phaser.Class({
         this.ws.onopen = () => {
             console.log('Соединение установлено');
         }
-        // закрытие соединения
+        // соединение закрыто
         this.ws.onclose = (event) => {
             if (event.wasClean) {
                 console.log('Соединение закрыто чисто');
@@ -66,16 +66,20 @@ let SceneNetwork = new Phaser.Class({
             } else if (data.name === 'user') {
                 // получили позицию другого игрока
                 // frame - какой кадр с начала игры воспроизводится
-                const { id, frame, x, y, vx, vy, alive } = data.data;
+                const { id, frame, x, y, vx, vy } = data.data;
 
                 if (id !== this.id){
                     //console.log(data.data);
                     if (!this.buffer.get(id)) {
                         this.buffer.set(id, []);
                     }
-
                     this.buffer.get(id).push(data.data);
                 }
+            } else if (data.name === 'disconnect') {
+                const disconnectID = data.data;
+
+                // удалить объект из игры
+                console.log(`удалили игрока с id ${disconnectID}`);
             }
         };
         //
@@ -103,7 +107,7 @@ let SceneNetwork = new Phaser.Class({
 
         while (!this.id || !this.mask || !this.rooms || !this.corridors) {}
 
-        console.log(`id: ${this.id}`);
+        console.log(`мой id: ${this.id}`);
         console.log(this.mask);
         console.log(this.rooms);
         console.log(this.corridors);
@@ -176,25 +180,12 @@ let SceneNetwork = new Phaser.Class({
             this.scene.pause("SceneText");
             this.scene.stop("SceneText");
 
-            // отключаемся от сервера
-            /*const dataJSON = JSON.stringify({
-                id: this.id,
-                frame: this.frameN,
-                x: this.player.x,
-                y: this.player.y,
-                vx: 0,
-                vy: 0,
-                alive: false,
-            });
-            this.ws.send(dataJSON);
-            //this.ws.close();
-            this.buffer.delete(this.id);
-            this.npc.delete(this.id);*/
+            // разорвать соединение с сервером
+            this.ws.close();
         });
 
         // запускаем сцену в которой выводим текст
         this.scene.run("SceneText");
-        //console.log(this.player);
     },
 
     update: function () {
@@ -214,7 +205,6 @@ let SceneNetwork = new Phaser.Class({
                 y: this.player.y,
                 vx: this.player.body.velocity.x,
                 vy: this.player.body.velocity.y,
-                alive: true,
             });
             this.ws.send(dataJSON);
         }
@@ -246,11 +236,6 @@ let SceneNetwork = new Phaser.Class({
                 npc.body.setVelocityX(vx);
                 npc.body.setVelocityY(vy);
                 npc.updateAnimation();
-
-                // удалить игрока с карты
-                if (!alive) {
-                    console.log(`удалили игрока с id ${key}`);
-                }
             }
 
             this.buffer.set(key, []);
@@ -268,19 +253,8 @@ let SceneNetwork = new Phaser.Class({
         this.scene.stop("SceneNetwork");
         this.scene.run("SceneDungeon");
 
-        const dataJSON = JSON.stringify({
-            id: this.id,
-            frame: this.frameN,
-            x: this.player.x,
-            y: this.player.y,
-            vx: 0,
-            vy: 0,
-            alive: false,
-        });
-        this.ws.send(dataJSON);
-        //this.ws.close();
-        this.buffer.delete(this.id);
-        this.npc.delete(this.id);
+        // разорвать соединение с сервером
+        this.ws.close();
     }
 });
 

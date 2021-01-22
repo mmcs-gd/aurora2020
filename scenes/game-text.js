@@ -19,7 +19,7 @@ let SceneText = new Phaser.Class({
         this.add.text(0, 18, `rooms count: ${roomsCount}`, {fill: '#FFF', fontSize: 16});
         this.add.text(0, 36, `заполнение: ${Math.round(fillPercent)} %`, {fill: '#FFF', fontSize: 16});
 
-        this.npcText = this.add.text(0, 54, `кол-во ${npc instanceof Map ? 'игроков' : 'NPC'}: ${npc instanceof Map ? npc.size : npc.length}`, {fill: '#FFF', fontSize: 16});
+        this.npcText = this.add.text(0, 54, `кол-во ${npc instanceof Map ? 'игроков' : 'NPC'}: ${npc instanceof Map ? npc.size+1 : npc.length}`, {fill: '#FFF', fontSize: 16});
         this.fpsText = this.add.text(0, 72, `FPS: `, {fill: '#FFF', fontSize: 16});
 
         this.npc = npc;
@@ -28,7 +28,7 @@ let SceneText = new Phaser.Class({
     },
 
     update: function () {
-        this.npcText.text = `кол-во ${this.npc instanceof Map ? 'игроков' : 'NPC'}: ${this.npc instanceof Map ? this.npc.size : this.npc.length}`;
+        this.npcText.text = `кол-во ${this.npc instanceof Map ? 'игроков' : 'NPC'}: ${this.npc instanceof Map ? this.npc.size+1 : this.npc.length}`;
 
         // FPS
         const second = (new Date()).getSeconds();
