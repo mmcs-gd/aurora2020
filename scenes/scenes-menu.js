@@ -19,23 +19,34 @@ import SteeringUnionGroupScene from './steering-union-group-scene';
 import EffectsScene from './effects-scene'
 import SlimeRushScene from "./slime-rush";
 
+import SceneNetwork from "./game-network";
+import SceneDungeon from "./game-dungeon";
+import SceneBoss from "./game-boss";
+import SceneMap from "./game-map";
+import SceneText from "./game-text";
+
 const scenes = [
-    ['StartingScene', StartingScene],
-    ['SteeringFleeScene', SteeringFleeScene],
-    ['SteeringExploringScene', SteeringExploringScene],
-    ['RealLevelScene', RealLevelScene],
-    ['SteeringRudnevScene', SteeringRudnevScene],
-    [ 'EffectsScene', EffectsScene],
-    ['SlimeRushScene', SlimeRushScene],
-  //  ['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
-  //  ['SteeringPursuitScene', SteeringPursuitScene],
-  //  ['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
-  //  ['SteeringWanderingScene', SteeringWanderingScene],
-  //  ['SteeringArrivalScene', SteeringArrivalScene],
-    ['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
-    ['MinerScene', MinerScene],
-    ['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
-    ['SteeringUnionGroupScene', SteeringUnionGroupScene]
+    //['StartingScene', StartingScene],
+    //['SteeringFleeScene', SteeringFleeScene],
+    //['SteeringExploringScene', SteeringExploringScene],
+    //['RealLevelScene', RealLevelScene],
+    //['SteeringRudnevScene', SteeringRudnevScene],
+    //['EffectsScene', EffectsScene],
+    //['SlimeRushScene', SlimeRushScene],
+    //['SteeringPursuitWithDistanceScene', SteeringPursuitWithDistanceScene],
+    //['SteeringPursuitScene', SteeringPursuitScene],
+    //['SteeringEvadeAndPursuitScene', SteeringEvadeAndPursuitScene],
+    //['SteeringWanderingScene', SteeringWanderingScene],
+    //['SteeringArrivalScene', SteeringArrivalScene],
+    //['ExplorationAndShadowingScene', ExplorationAndShadowingScene],
+    //['MinerScene', MinerScene],
+    //['ProcedurallyGeneratedScene', ProcedurallyGeneratedScene],
+    //['SteeringUnionGroupScene', SteeringUnionGroupScene],
+    ['SceneNetwork', SceneNetwork],
+    ['SceneDungeon', SceneDungeon],
+    ['SceneBoss', SceneBoss],
+    ['SceneMap', SceneMap],
+    ['SceneText', SceneText],
 ];
 
 let MenuScene = new Phaser.Class({
@@ -64,9 +75,13 @@ let MenuScene = new Phaser.Class({
         const tileset = map.addTilesetImage('Dungeon_Tileset', 'tiles');
         map.createStaticLayer('Main', tileset, 0, 0);
 
+        // инфа по кнопкам управления
+        this.add.text(32 * 7 - 4, 0, '↑→↓← движение', {fill: '#FFF', fontSize : 18})
+        this.add.text(32 * 7 - 4, 24, 'M - карта', {fill: '#FFF', fontSize : 18})
+        //this.add.text(32 * 7 - 4, 48, 'ЛКМ - стрельба', {fill: '#FFF', fontSize : 18})
 
-        this.add.text(32 * 7 - 4, 32 * 2 + 4, 'SCENES', {fill: '#FFF', fontSize : 28})
-            .setShadow(2,2,'#000', true);
+        //this.add.text(32 * 7 - 4, 32 * 2 + 4, 'SCENES', {fill: '#FFF', fontSize : 28})
+        //    .setShadow(2,2,'#000', true);
 
         // creating list of buttons
         let k = 0;
@@ -190,5 +205,4 @@ class Hint extends Phaser.Scene {
     }
 }
 
-export default MenuScene 
-
+export default MenuScene
